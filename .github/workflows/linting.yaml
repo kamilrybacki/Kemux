@@ -6,7 +6,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  PYTHON_SOURCE_DIR: "./src"
+  PYTHON_SOURCE_DIR: "./src ./tests"
   PYTHON_VERSION: "3.10"
 
 jobs:
