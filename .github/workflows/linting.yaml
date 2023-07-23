@@ -1,0 +1,47 @@
+name: Code linting using diff-cache and linters
+run-name: Code linting
+on: [push]
+concurrency:
+  group: ${{ github.ref }}-linting
+  cancel-in-progress: true
+
+env:
+  PYTHON_SOURCE_DIR: "./src"
+  PYTHON_VERSION: "3.10"
+
+jobs:
+  lint-markdown:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Lint Markdown files
+        uses: docker://avtodev/markdown-lint:v1
+  lint-python:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Install Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      - name: Install Python dependencies
+        run: |
+          pip \
+            install \
+              -r requirements.txt \
+              mypy
+      - name: Lint files with Ruff
+        uses: chartboost/ruff-action@v1
+        with:
+          src: ${{ env.PYTHON_SOURCE_DIR }}
+          args: "check --config .github/configs/ruff.toml"
+      - name: Check types with mypy
+        run: |
+          mypy \
+            --namespace-packages \
+            --explicit-package-bases \
+            --config-file .github/configs/mypy.ini \
+            --python-version ${{ env.PYTHON_VERSION }} \
+            $(find ${{ env.PYTHON_SOURCE_DIR }} -name '*.py')
