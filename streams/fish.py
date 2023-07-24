@@ -1,8 +1,8 @@
 import kafkasplitter.data.stream
 
 
-class StreamSchema(kafkasplitter.data.schema.OutputSchema):
-    name: str
+class Schema(kafkasplitter.data.schema.OutputSchema):
+    ...
 
 
 class Stream(kafkasplitter.data.stream.StreamModel):
