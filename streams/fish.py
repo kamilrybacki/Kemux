@@ -1,9 +1,10 @@
-import kafkasplitter.data.stream
+import kafkasplitter.data.streams.output
+import kafkasplitter.data.schemas.output
 
 
-class Schema(kafkasplitter.data.schema.OutputSchema):
+class Schema(kafkasplitter.data.schemas.output.OutputSchema):
     ...
 
 
-class Stream(kafkasplitter.data.stream.StreamModel):
-    topic = 'animals'
+class Branch(kafkasplitter.data.streams.output.OutputStream):
+    topics = ['aquatic', 'real']

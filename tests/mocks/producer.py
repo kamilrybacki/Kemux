@@ -29,7 +29,7 @@ try:
         bootstrap_servers='localhost:9092',
     )
     if 'splitter_input' in test_consumer.topics():
-        admin_client.delete_topics(['splitter_input'])
+        admin_client.delete_topics(['metrics'])
     counter = 0
     while True:
         counter += 1
