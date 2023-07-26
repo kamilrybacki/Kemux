@@ -1,30 +1,17 @@
 import abc
 import dataclasses
-import logging
 
 import faust
-import pydantic
 
+import kemux.data.streams.base
 import kemux.data.schemas.input
 import kemux.data.schemas.output
 
 
 @dataclasses.dataclass
-class OutputStream(abc.ABC):
-    logger = dataclasses.field(
-        init=False,
-        default=logging.getLogger(f'OUT::{__name__}')
-    )
-    topic: str = dataclasses.field(init=False)
-    _topic_handler: faust.TopicT = dataclasses.field(init=False)
-
-    @property
-    @abc.abstractmethod
-    def schema(self) -> kemux.data.schemas.output.OutputSchema:
-        ...
-
+class OutputStream(kemux.data.streams.base.StreamBase, abc.ABC):
     @classmethod
-    def process(cls, message: kemux.data.schemas.input.BaseSchema) -> None:
+    def process(cls, message: dict) -> None:
         schema: kemux.data.schemas.output.OutputSchema = cls.schema
         if schema.classify(message):
             transformed_message = schema.transform(message)

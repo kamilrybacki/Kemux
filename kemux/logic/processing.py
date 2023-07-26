@@ -81,8 +81,10 @@ class Processor:
             stream_class.topic = module_name
             if issubclass(stream_class, kemux.data.streams.output.OutputStream):
                 output_models[module_name] = stream_class
-            else:
+            elif issubclass(stream_class, kemux.data.streams.input.InputStream):
                 input_models[module_name] = stream_class
+            else:
+                self.__logger.error(f'Invalid stream module: {module_name}. Class is neither an Input or Output stream')
         return input_models, output_models
 
     def start(self) -> None:

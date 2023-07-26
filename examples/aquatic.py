@@ -1,7 +1,7 @@
 import kemux.data.streams.output
 import kemux.data.schemas.output
 
-import animals
+import examples.animals as animals
 
 
 class Schema(kemux.data.schemas.output.OutputSchema):

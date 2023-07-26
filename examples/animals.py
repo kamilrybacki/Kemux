@@ -4,7 +4,7 @@ import kemux.data.streams.input
 import kemux.data.schemas.input
 
 
-class AnimalsSchema(kemux.data.schemas.input.BaseSchema):
+class Schema(kemux.data.schemas.input.InputSchema):
     timestamp: datetime.datetime
     _name_: str
     _value_: float
@@ -23,8 +23,6 @@ class AnimalsSchema(kemux.data.schemas.input.BaseSchema):
 
 
 class Stream(kemux.data.streams.input.InputStream):
-    schema = AnimalsSchema
-
-    def ingest(self, message: kemux.data.schemas.input.BaseSchema) -> kemux.data.schemas.input.BaseSchema:
+    def ingest(self, message: kemux.data.schemas.input.InputSchema) -> kemux.data.schemas.input.BaseSchema:
         message.labels['stream'] = self.topic
         return message

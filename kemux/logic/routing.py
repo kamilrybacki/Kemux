@@ -31,5 +31,5 @@ class Router():
         message._validate()
         ingested_message = input_stream.ingest(message)
         for output_stream in self.outputs.values():
-            output_stream: kemux.data.streams.output.OutputStream
-            output_stream.process(ingested_message)
+            raw_ingested_message = ingested_message.asdict()
+            output_stream.process(raw_ingested_message)

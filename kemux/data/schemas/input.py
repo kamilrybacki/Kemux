@@ -1,9 +1,23 @@
 import typing
 
+import faust
 import kemux.data.schemas.base
 
 
 class InputSchema(kemux.data.schemas.base.SchemaBase):
+    __record_class__: type[faust.Record]
+
+    @classmethod
+    def _construct_record_class(cls) -> None:
+        cls.__record_class__ = type(
+            cls.__name__,
+            (faust.Record,),
+            {
+                field: cls.__annotations__[field]
+                for field in cls.__fields__
+            }
+        )
+
     def _validate(self) -> None:
         class_fields = set(self.__dir__())  # pylint: disable=unnecessary-dunder-call
         for field in self.__decorated_fields__:
