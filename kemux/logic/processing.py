@@ -8,10 +8,10 @@ import os
 import faust
 import faust.types
 
-import kafkasplitter.logic.routing
-import kafkasplitter.data.schemas.input
-import kafkasplitter.data.streams.input
-import kafkasplitter.data.streams.output
+import kemux.logic.routing
+import kemux.data.schemas.input
+import kemux.data.streams.input
+import kemux.data.streams.output
 
 DEFAULT_MODELS_PATH = 'streams'
 
@@ -25,7 +25,7 @@ class Processor:
     _source_topics: dict[str, faust.TopicT] = dataclasses.field(init=False)
     __instance: Processor | None = dataclasses.field(init=False, default=None)
     __logger: logging.Logger = dataclasses.field(init=False, default=logging.getLogger(__name__))
-    __router: kafkasplitter.logic.routing.Router = dataclasses.field(init=False)
+    __router: kemux.logic.routing.Router = dataclasses.field(init=False)
     __agents: dict[str, faust.types.AgentT] = dataclasses.field(init=False)
 
     @classmethod
@@ -50,7 +50,7 @@ class Processor:
                 datadir=instance.persistent_data_directory,
             )
             input_models, output_models = instance.classify_models(streams_dir)
-            instance.__router = kafkasplitter.logic.routing.Router(
+            instance.__router = kemux.logic.routing.Router(
                 app=app,
                 inputs=input_models,
                 outputs=output_models,
@@ -60,14 +60,14 @@ class Processor:
         return cls.__instance
     
     def classify_models(self) -> tuple[
-        dict[str, kafkasplitter.data.streams.input.InputStream],
-        dict[str, kafkasplitter.data.streams.output.OutputStream]
+        dict[str, kemux.data.streams.input.InputStream],
+        dict[str, kemux.data.streams.output.OutputStream]
     ]:
         if not os.path.isdir(self.streams_dir):
             raise ValueError(f'Invalid streams directory: {self.streams_dir}')
         present_modules = filter(os.listdir(self.streams_dir), lambda module: module.endswith('.py'))
-        output_models: dict[str, kafkasplitter.data.streams.output.OutputStream] = {}
-        input_models: dict[str, kafkasplitter.data.streams.input.InputStream] = {}
+        output_models: dict[str, kemux.data.streams.output.OutputStream] = {}
+        input_models: dict[str, kemux.data.streams.input.InputStream] = {}
         for module in present_modules:
             module_name = module.removesuffix('.py')
             module_path = os.path.join(self.streams_dir, module)
@@ -76,29 +76,26 @@ class Processor:
             except (OSError, ImportError) as cant_import_stream_module:
                 self.__logger.error(f'Failed to import stream module: {module_name}', exc_info=cant_import_stream_module)
                 continue
-            valid_stream_module = True
-            for expected_attribute in ['Stream', 'Schema']:
-                if not hasattr(module, expected_attribute):
-                    self.__logger.error(f'Invalid stream module: {module_name}. No {expected_attribute} class found')
-            if not valid_stream_module:
-                continue
-            stream_class = getattr(module, 'Stream')
-            if issubclass(stream_class, kafkasplitter.data.streams.output.OutputStream):
+            if not (stream_class := (module, 'Stream', None)):
+                self.__logger.error(f'Invalid stream module: {module_name}. No Stream class found')
+            stream_class.topic = module_name
+            if issubclass(stream_class, kemux.data.streams.output.OutputStream):
                 output_models[module_name] = stream_class
             else:
                 input_models[module_name] = stream_class
         return input_models, output_models
 
     def start(self) -> None:
-        async def _process_input_stream_message(messages: faust.StreamT[kafkasplitter.data.schemas.input.InputSchema]) -> None:
-            self.__logger.info('Processing messages')
-            async for message in messages:
-                self.__router.process_message(message)
-
         self.__logger.info('Starting receiver')
         for stream in self.__router.inputs.values():
-            stream: kafkasplitter.data.streams.input.InputStream
-            self.__logger.info(f'Starting handler for topics: {stream.targets}')
+            stream: kemux.data.streams.input.InputStream
+            self.__logger.info(f'Starting handler for topic: {stream.topic}')
             input_topics_handler: faust.TopicT = stream._get_handler(self._app)  # pylint: disable=protected-access
-            self.__agents[stream.id] = self._app.agent(input_topics_handler)(_process_input_stream_message)
+
+            async def _process_input_stream_message(messages: faust.StreamT[kemux.data.schemas.input.BaseSchema]) -> None:
+                self.__logger.info('Processing messages')
+                async for message in messages:
+                    self.__router.route(stream, message)
+
+            self.__agents[stream.topic] = self._app.agent(input_topics_handler)(_process_input_stream_message)
         self._app.main()

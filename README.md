@@ -1,3 +1,1 @@
-# BasicPythonProject
-
-My template for Python projects
+# Kemux - Kafka Demultiplexer
