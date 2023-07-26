@@ -9,7 +9,8 @@ import faust
 import faust.types
 
 import kemux.logic.routing
-import kemux.data.schemas.input
+import kemux.data.schemas.base
+import kemux.data.streams.base
 import kemux.data.streams.input
 import kemux.data.streams.output
 
@@ -65,7 +66,10 @@ class Processor:
     ]:
         if not os.path.isdir(self.streams_dir):
             raise ValueError(f'Invalid streams directory: {self.streams_dir}')
-        present_modules = filter(os.listdir(self.streams_dir), lambda module: module.endswith('.py'))
+        present_modules: list[str] = filter(
+            lambda module: module.endswith('.py'),
+            os.listdir(self.streams_dir),
+        )
         output_models: dict[str, kemux.data.streams.output.OutputStream] = {}
         input_models: dict[str, kemux.data.streams.input.InputStream] = {}
         for module in present_modules:
@@ -76,12 +80,27 @@ class Processor:
             except (OSError, ImportError) as cant_import_stream_module:
                 self.__logger.error(f'Failed to import stream module: {module_name}', exc_info=cant_import_stream_module)
                 continue
+
+            stream_class: kemux.data.streams.base.StreamBase
+            schema_class: kemux.data.schemas.base.SchemaBase
+
             if not (stream_class := (module, 'Stream', None)):
                 self.__logger.error(f'Invalid stream module: {module_name}. No Stream class found')
+            if not (schema_class := (module, 'Schema', None)):
+                self.__logger.error(f'Invalid stream module: {module_name}. No Schema class found')
             stream_class.topic = module_name
+
             if issubclass(stream_class, kemux.data.streams.output.OutputStream):
+                if not issubclass(schema_class, kemux.data.schemas.output.OutputSchema):
+                    self.__logger.error(f'Invalid stream module: {module_name}. Schema class is not an OutputSchema')
+                    continue
+                stream_class.schema = schema_class
                 output_models[module_name] = stream_class
             elif issubclass(stream_class, kemux.data.streams.input.InputStream):
+                if not issubclass(schema_class, kemux.data.schemas.input.InputSchema):
+                    self.__logger.error(f'Invalid stream module: {module_name}. Schema class is not an InputSchema')
+                    continue
+                stream_class.schema = schema_class
                 input_models[module_name] = stream_class
             else:
                 self.__logger.error(f'Invalid stream module: {module_name}. Class is neither an Input or Output stream')

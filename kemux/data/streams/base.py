@@ -9,7 +9,7 @@ import kemux.data.schemas.base
 @dataclasses.dataclass
 class StreamBase:
     topic: str = dataclasses.field(init=False)
-    schema: kemux.data.schemas.base.BaseSchema = dataclasses.field(init=False)
+    schema: kemux.data.schemas.base.SchemaBase = dataclasses.field(init=False)
     logger = dataclasses.field(
         init=False,
         default=logging.getLogger(__name__)

@@ -23,6 +23,6 @@ class Schema(kemux.data.schemas.input.InputSchema):
 
 
 class Stream(kemux.data.streams.input.InputStream):
-    def ingest(self, message: kemux.data.schemas.input.InputSchema) -> kemux.data.schemas.input.BaseSchema:
+    def ingest(self, message: Schema) -> Schema:
         message.labels['stream'] = self.topic
         return message
