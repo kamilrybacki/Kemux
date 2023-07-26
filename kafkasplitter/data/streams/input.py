@@ -14,7 +14,7 @@ class InputStream(abc.ABC):
         init=False,
         default=logging.getLogger(f'IN::{__name__}')
     )
-    _topic_handlers: faust.types.AgentT = dataclasses.field(init=False)
+    _topics_handler: faust.types.AgentT | None = dataclasses.field(init=False, default=None)
 
     @property
     @abc.abstractmethod
@@ -26,8 +26,22 @@ class InputStream(abc.ABC):
     def schema(self) -> kafkasplitter.data.schemas.input.InputSchema:
         ...
 
+    @property
     @classmethod
-    def validate(cls, message: kafkasplitter.data.schemas.input.InputSchema) -> bool:
-        if '_validate' not in message.__dir__():
-            raise NotImplementedError(f'Validation runner not found in message! Check the inheritance of {message.__class__} (should be InputSchema)')
-        message._validate()  # pylint: disable=protected-access
+    def id(cls) -> str:
+        return '|'.join(cls.topics) if isinstance(cls.topics, list) else cls.topics
+    
+    @property
+    @classmethod
+    def targets(cls) -> str:
+        return cls.id().replace('|', ', ')
+
+    @classmethod
+    def _get_handler(cls, app: faust.App) -> faust.TopicT:
+        if cls._topics_handler is None:
+            schema_with_validators = kafkasplitter.data.schemas.input.prepare_input_stream_schema_class(cls.schema)
+            cls._topics_handler = app.topic(
+                cls.topics,
+                value_type=schema_with_validators
+            )
+        return cls._topics_handler

@@ -2,14 +2,17 @@ import os
 
 import kafkasplitter.logic.processing
 
-
 def start() -> None:
-    data_dir = os.getenv('SPLITTER_DATA_DIR')
-    streams_dir = os.getenv('SPLITTER_STREAMS_DIR')
-    if not data_dir:
+    if not (streams_dir := os.getenv('SPLITTER_STREAMS_DIR')):
+        raise ValueError('SPLITTER_STREAMS_DIR environment variable not set')
+    if not (data_dir := os.getenv('SPLITTER_DATA_DIR')):
         raise ValueError('SPLITTER_DATA_DIR environment variable not set')
+    if not (kafka_address := os.getenv('SPLITTER_KAFKA_ADDRESS')):
+        raise ValueError('SPLITTER_KAFKA_ADDRESS environment variable not set')
     receiver = kafkasplitter.logic.processing.Processor.init(
-        os.getenv('SPLITTER_KAFKA_ADDRESS', 'kafka://0.0.0.0:9092'),
+        kafka_address,
+        streams_dir,
+        data_dir
     )
     receiver.start()
 

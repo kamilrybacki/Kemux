@@ -1,37 +1,41 @@
 from __future__ import annotations
 
 import dataclasses
+import importlib.machinery
 import logging
 import os
 
 import faust
 import faust.types
 
+import kafkasplitter.logic.routing
 import kafkasplitter.data.schemas.input
 import kafkasplitter.data.streams.input
-import kafkasplitter.logic.routing.split
-import kafkasplitter.logic.routing.ingest
+import kafkasplitter.data.streams.output
 
 DEFAULT_MODELS_PATH = 'streams'
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(kw_only=True)
 class Processor:
     kafka_address: str
-    persistent_data_directory: str
     streams_dir: str
+    persistent_data_directory: str
     _app: faust.App = dataclasses.field(init=False)
     _source_topics: dict[str, faust.TopicT] = dataclasses.field(init=False)
     __instance: Processor | None = dataclasses.field(init=False, default=None)
     __logger: logging.Logger = dataclasses.field(init=False, default=logging.getLogger(__name__))
-    __ingester: kafkasplitter.logic.routing.ingest.Ingester = dataclasses.field(init=False)
-    __splitter: kafkasplitter.logic.routing.split.Splitter = dataclasses.field(init=False)
+    __router: kafkasplitter.logic.routing.Router = dataclasses.field(init=False)
     __agents: dict[str, faust.types.AgentT] = dataclasses.field(init=False)
 
     @classmethod
-    def init(cls, kafka_address: str) -> Processor:
+    def init(cls, kafka_address: str, data_dir: str, streams_dir: str) -> Processor:
         if cls.__instance is None:
-            instance = cls(kafka_address)
+            instance: Processor = cls(
+                kafka_address=kafka_address,
+                streams_dir=streams_dir,
+                persistent_data_directory=data_dir,
+            )
             instance.__logger.info('Initialized receiver')
             logging.basicConfig(
                 level=logging.INFO,
@@ -45,34 +49,56 @@ class Processor:
                 value_serializer='json',
                 datadir=instance.persistent_data_directory,
             )
-            input_models, output_models = instance.classify_models()
+            input_models, output_models = instance.classify_models(streams_dir)
+            instance.__router = kafkasplitter.logic.routing.Router(
+                app=app,
+                inputs=input_models,
+                outputs=output_models,
+            )
             instance._app = app
             cls.__instance = instance
         return cls.__instance
     
-    @classmethod
-    def classify_models(cls) -> tuple[
-        list[kafkasplitter.data.streams.input.InputStream],
-        list[kafkasplitter.data.streams.output.OutputStream]
+    def classify_models(self) -> tuple[
+        dict[str, kafkasplitter.data.streams.input.InputStream],
+        dict[str, kafkasplitter.data.streams.output.OutputStream]
     ]:
-        if not os.path.isdir(cls.streams_dir):
-            raise ValueError(f'Invalid streams directory: {cls.streams_dir}')
+        if not os.path.isdir(self.streams_dir):
+            raise ValueError(f'Invalid streams directory: {self.streams_dir}')
+        present_modules = filter(os.listdir(self.streams_dir), lambda module: module.endswith('.py'))
+        output_models: dict[str, kafkasplitter.data.streams.output.OutputStream] = {}
+        input_models: dict[str, kafkasplitter.data.streams.input.InputStream] = {}
+        for module in present_modules:
+            module_name = module.removesuffix('.py')
+            module_path = os.path.join(self.streams_dir, module)
+            try:
+                module = importlib.machinery.SourceFileLoader(module_name, module_path).load_module()
+            except (OSError, ImportError) as cant_import_stream_module:
+                self.__logger.error(f'Failed to import stream module: {module_name}', exc_info=cant_import_stream_module)
+                continue
+            valid_stream_module = True
+            for expected_attribute in ['Stream', 'Schema']:
+                if not hasattr(module, expected_attribute):
+                    self.__logger.error(f'Invalid stream module: {module_name}. No {expected_attribute} class found')
+            if not valid_stream_module:
+                continue
+            stream_class = getattr(module, 'Stream')
+            if issubclass(stream_class, kafkasplitter.data.streams.output.OutputStream):
+                output_models[module_name] = stream_class
+            else:
+                input_models[module_name] = stream_class
+        return input_models, output_models
 
     def start(self) -> None:
-        self.__logger.info('Starting receiver')
-        for stream in self.__ingester.get_streams():
-            stream: kafkasplitter.data.streams.input.InputStream
-            topics = stream.topics if isinstance(stream.topics, list) else [stream.topics]
-            topics_key = '|'.join(topics)
-            self.__logger.info(f'Starting handler for topics: {topics_key.replace("|", ", ")}')
-            self.__agents[topics_key] = self._agent_factory(topics) 
-        self._app.main()
-    
-    def _agent_factory(self, topics_to_subscribe: list[str]) -> faust.types.AgentT:
-        input_topics_handler: faust.TopicT = self.__ingester.get_topics_handler(topics_to_subscribe)
-        async def _process_input_stream_message(messages: faust.StreamT[kafkasplitter.data.schema.InputSchema]) -> None:
+        async def _process_input_stream_message(messages: faust.StreamT[kafkasplitter.data.schemas.input.InputSchema]) -> None:
             self.__logger.info('Processing messages')
             async for message in messages:
-                self.__ingester.validate_message(message)
-                self.__splitter.process_message(message)
-        return self._app.agent(input_topics_handler)(_process_input_stream_message)
+                self.__router.process_message(message)
+
+        self.__logger.info('Starting receiver')
+        for stream in self.__router.inputs.values():
+            stream: kafkasplitter.data.streams.input.InputStream
+            self.__logger.info(f'Starting handler for topics: {stream.targets}')
+            input_topics_handler: faust.TopicT = stream._get_handler(self._app)  # pylint: disable=protected-access
+            self.__agents[stream.id] = self._app.agent(input_topics_handler)(_process_input_stream_message)
+        self._app.main()
