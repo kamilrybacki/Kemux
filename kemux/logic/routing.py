@@ -14,7 +14,7 @@ import kemux.data.streams.output
 @dataclasses.dataclass
 class Router():
     app: faust.App
-    inputs: dict[str, kemux.data.streams.input.InputStream] = dataclasses.field(init=False, default_factory=dict)
+    inputs: dict[str, kemux.data.streams.input.InputStream]
     outputs: dict[str, kemux.data.streams.output.OutputStream]
     __logger: logging.Logger = dataclasses.field(init=False)
 

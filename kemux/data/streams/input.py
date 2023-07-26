@@ -20,6 +20,6 @@ class InputStream(kemux.data.streams.base.StreamBase, abc.ABC):
             schema: kemux.data.schemas.input.InputSchema = cls.schema
             cls._topic_handler = app.topic(
                 cls.topic,
-                value_type=schema.__record_class__,
+                value_type=schema._record_class,
             )
         return cls._topic_handler

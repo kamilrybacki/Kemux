@@ -1,9 +1,11 @@
+import dataclasses
 import datetime
 
 import kemux.data.streams.input
 import kemux.data.schemas.input
 
 
+@dataclasses.dataclass
 class Schema(kemux.data.schemas.input.InputSchema):
     timestamp: datetime.datetime
     _name_: str

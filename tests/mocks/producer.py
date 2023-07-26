@@ -8,14 +8,14 @@ import time
 
 test_producer = kafka.KafkaProducer(bootstrap_servers='localhost:9092')
 test_consumer = kafka.KafkaConsumer(
-    'splitter_input',
+    'animals',
     bootstrap_servers='localhost:9092',
     auto_offset_reset='earliest',
     enable_auto_commit=True,
     group_id='test_consumer',
 )
 
-possible_names = [
+POSSIBLE_KEYS = [
     'dog',
     'cat',
     'bird',
@@ -23,30 +23,32 @@ possible_names = [
     'snake',
 ]
 
+TEST_TOPIC = 'animals'
+
 
 try:
     admin_client = kafka.admin.KafkaAdminClient(
         bootstrap_servers='localhost:9092',
     )
-    if 'splitter_input' in test_consumer.topics():
-        admin_client.delete_topics(['metrics'])
+    if TEST_TOPIC in test_consumer.topics():
+        admin_client.delete_topics([TEST_TOPIC])
     counter = 0
     while True:
         counter += 1
         json_message = {
             'timestamp': datetime.datetime.now().isoformat(),
             'value': counter,
-            'name': random.choice(possible_names),
+            'name': random.choice(POSSIBLE_KEYS),
             'labels': {
                 'test': 'test',
             },
         }
-        print('Sending message: ' + str(json_message))
+        print(f'Sending message: {json_message}')
         encoded_message: bytes = json.dumps(
             json_message,
             default=bson.json_util.default,
         ).encode('utf-8')
-        test_producer.send('splitter_input', encoded_message)
+        test_producer.send(TEST_TOPIC, encoded_message)
         time.sleep(5)
 except KeyboardInterrupt:
     test_producer.close()

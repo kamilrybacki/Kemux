@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import abc
+import dataclasses
 import typing
 
 import faust
@@ -9,8 +10,9 @@ import kemux.data.schemas.base
 import kemux.data.schemas.input
 
 
+@dataclasses.dataclass
 class OutputSchema(kemux.data.schemas.base.SchemaBase, abc.ABC):
-    __output_constructor__: type[faust.Record]
+    _output_constructor: type[faust.Record] = dataclasses.field(init=False)
 
     @property
     @abc.abstractmethod
@@ -40,11 +42,11 @@ class OutputSchema(kemux.data.schemas.base.SchemaBase, abc.ABC):
             target_fields_annotations = {
                 target_field: (target_field_annotation, ...)
                 for target_field, target_field_annotation in cls.__annotations__.items()
-                if target_field in cls.__fields__
+                if target_field in cls._fields__
             }
-            cls.__output_constructor__ = type(
+            cls._output_constructor = type(
                 cls.__name__,
                 (faust.Record),
                 **target_fields_annotations,
             )
-        return cls.__output_constructor__(**message)
+        return cls._output_constructor(**message)

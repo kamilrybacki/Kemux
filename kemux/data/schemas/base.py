@@ -1,35 +1,36 @@
+import dataclasses
 import logging
-import typing
 import re
 
 DECORATED_FIELDS_REGEX = re.compile(r'^_[a-z]+_$', re.IGNORECASE)
 
 
+@dataclasses.dataclass
 class SchemaBase:
-    __logger: logging.Logger
-    __fields_regex: typing.Pattern[str] = DECORATED_FIELDS_REGEX
-    __decorated_fields__: list[str]
-    __fields__: list[str]
+    _logger: logging.Logger = dataclasses.field(init=False)
+    _decorated_fields: list[str] = dataclasses.field(init=False, default_factory=list)
+    _fields: list[str] = dataclasses.field(init=False, default_factory=list)
 
     @classmethod
     def _find_decorated_fields(cls) -> None:
-        if not cls.__decorated_fields__:
-            cls.__decorated_fields__ = [*filter(
-                cls.__fields_regex.match,
-                cls.__dir__()
-            )]
-        if not cls.__decorated_fields__:
+        print(cls.__dict__)
+        cls._decorated_fields = [*filter(
+            DECORATED_FIELDS_REGEX.match,
+            cls.__annotations__.keys(),
+        )]
+        if not cls._decorated_fields:
             raise ValueError(f'No fields to validate found in {cls.__name__}')
-        cls.__fields__ = [
+        cls._fields = [
             field.strip('_')
-            for field in cls.__decorated_fields__
+            for field in cls._decorated_fields
         ]
-        cls.__logger.info('Found schema fields: %s', ', '.join(cls.__fields__))
+        cls._logger = logging.getLogger(cls.__name__)
+        cls._logger.info('Found schema fields: %s', ', '.join(cls._fields))
         cls._link_fields()
 
     @classmethod
     def _link_fields(cls) -> None:
-        for field in cls.__decorated_fields__:
+        for field in cls._decorated_fields:
             cls.__annotations__[field.strip('_')] = cls.__annotations__[field]
             setattr(
                 cls,

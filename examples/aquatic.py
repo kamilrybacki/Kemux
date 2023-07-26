@@ -1,7 +1,10 @@
+import dataclasses
+
 import kemux.data.streams.output
 import kemux.data.schemas.output
 
 
+@dataclasses.dataclass
 class Schema(kemux.data.schemas.output.OutputSchema):
     _name_: str
     _value_: int

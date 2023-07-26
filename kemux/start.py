@@ -11,8 +11,8 @@ def start() -> None:
         raise ValueError('SPLITTER_KAFKA_ADDRESS environment variable not set')
     receiver = kemux.logic.processing.Processor.init(
         kafka_address,
+        data_dir,
         streams_dir,
-        data_dir
     )
     receiver.start()
 

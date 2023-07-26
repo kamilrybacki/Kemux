@@ -1,26 +1,28 @@
+import dataclasses
 import typing
 
 import faust
 import kemux.data.schemas.base
 
 
+@dataclasses.dataclass
 class InputSchema(kemux.data.schemas.base.SchemaBase):
-    __record_class__: type[faust.Record]
+    _record_class: type[faust.Record] = dataclasses.field(init=False)
 
     @classmethod
     def _construct_record_class(cls) -> None:
-        cls.__record_class__ = type(
+        cls._record_class = type(
             cls.__name__,
             (faust.Record,),
             {
                 field: cls.__annotations__[field]
-                for field in cls.__fields__
+                for field in cls._fields
             }
         )
 
     def _validate(self) -> None:
         class_fields = set(self.__dir__())  # pylint: disable=unnecessary-dunder-call
-        for field in self.__decorated_fields__:
+        for field in self._decorated_fields__:
             validator_name = f'{field}validator'
             validated = False
             for class_field in class_fields:
@@ -29,7 +31,7 @@ class InputSchema(kemux.data.schemas.base.SchemaBase):
                 validator = getattr(self, validator_name)
                 if not isinstance(validator, typing.Callable):
                     raise ValueError(f'Validator: {validator_name} is not callable')
-                self.__logger.info('Validating field: %s', field)
+                self._logger.info('Validating field: %s', field)
                 actual_field_value = getattr(
                     self, 
                     field.strip('_')
