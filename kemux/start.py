@@ -2,6 +2,7 @@ import os
 
 import kemux.logic.processing
 
+
 def start() -> None:
     if not (streams_dir := os.getenv('SPLITTER_STREAMS_DIR')):
         raise ValueError('SPLITTER_STREAMS_DIR environment variable not set')

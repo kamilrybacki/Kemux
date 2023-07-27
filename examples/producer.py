@@ -1,10 +1,11 @@
 import datetime
-import bson.json_util
 import json
-import kafka
-import kafka.admin
 import random
 import time
+
+import bson.json_util
+import kafka
+import kafka.admin
 
 test_producer = kafka.KafkaProducer(bootstrap_servers='localhost:9092')
 test_consumer = kafka.KafkaConsumer(
@@ -19,8 +20,11 @@ POSSIBLE_KEYS = [
     'dog',
     'cat',
     'bird',
+    'spider',
     'fish',
     'snake',
+    'bat',
+    'lizard',
 ]
 
 TEST_TOPIC = 'animals'
@@ -49,6 +53,6 @@ try:
             default=bson.json_util.default,
         ).encode('utf-8')
         test_producer.send(TEST_TOPIC, encoded_message)
-        time.sleep(5)
+        time.sleep(0.25)
 except KeyboardInterrupt:
     test_producer.close()

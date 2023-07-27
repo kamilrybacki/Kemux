@@ -1,30 +1,99 @@
 import dataclasses
 import datetime
 
-import kemux.data.streams.input
-import kemux.data.schemas.input
+import kemux.data.io.input
+import kemux.data.io.output
+import kemux.data.schema.input
+import kemux.data.schema.output
 
 
-@dataclasses.dataclass
-class Schema(kemux.data.schemas.input.InputSchema):
-    timestamp: datetime.datetime
-    _name_: str
-    _value_: float
-    _labels_: dict[str, str]
+class Input:
+    @dataclasses.dataclass
+    class Schema(kemux.data.schema.input.InputSchema):
+        _timestamp_ : datetime.datetime
+        _name_ : str
+        _value_ : int
+        _labels_ : dict[str, str]
 
-    def _name_validator(self, value: str) -> None:
-        if not value:
-            raise ValueError('Name cannot be empty')
+        @staticmethod
+        def _timestamp_validator(timestamp: datetime.datetime) -> None:
+            pass
+
+        @staticmethod
+        def _name_validator(name: str) -> None:
+            if not isinstance(name, str):
+                raise ValueError(f'Invalid name: {name}')
+
+        @staticmethod
+        def _value_validator(value: int) -> None:
+            if not isinstance(value, int):
+                raise ValueError(f'Invalid value: {value}')
+
+        @staticmethod
+        def _labels_validator(labels: dict[str, str]) -> None:
+            if not isinstance(labels, dict):
+                raise ValueError(f'Invalid labels: {labels}')
+
+    @dataclasses.dataclass
+    class IO(kemux.data.io.input.StreamInput):
+        topic = 'animals'
+
+        @staticmethod
+        def ingest(message: dict) -> dict:
+            return message
+
+
+class Outputs:
+    class Aquatic:
+        @dataclasses.dataclass
+        class Schema(kemux.data.schema.output.OutputSchema):
+            _name_: str
+            _value_: float
+
+            @staticmethod
+            def transform(message: dict) -> dict:
+                return message
+
+        @dataclasses.dataclass
+        class IO(kemux.data.io.output.StreamOutput):
+            topic = 'aquatic'
+
+            @staticmethod
+            def filter(message: dict) -> bool:
+                return message.get('name') in ['fish', 'shark']
+
+    class Spooky:
+        @dataclasses.dataclass
+        class Schema(kemux.data.schema.output.OutputSchema):
+            _name_: str
+            _value_: float
+
+            @staticmethod
+            def transform(message: dict) -> dict:
+                return message
+        
+        @dataclasses.dataclass
+        class IO(kemux.data.io.output.StreamOutput):
+            topic = 'spooky'
+
+            @staticmethod
+            def filter(message: dict) -> bool:
+                return message.get('name') in ['bat', 'spider']
     
-    def _value_validator(self, value: float) -> None:
-        if value < 0:
-            raise ValueError('Value cannot be negative')
-    
-    def _labels_validator(self, value: dict[str, str]) -> None:
-        pass
+    class Flying:
+        @dataclasses.dataclass
+        class Schema(kemux.data.schema.output.OutputSchema):
+            _name_: str
+            _value_: float
 
+            @staticmethod
+            def transform(message: dict) -> dict:
+                return message
+        
+        @dataclasses.dataclass
+        class IO(kemux.data.io.output.StreamOutput):
+            topic = 'flying'
 
-class Stream(kemux.data.streams.input.InputStream):
-    def ingest(self, message: Schema) -> Schema:
-        message.labels['stream'] = self.topic
-        return message
+            @staticmethod
+            def filter(message: dict) -> bool:
+                return message.get('name') in ['bat', 'bird']

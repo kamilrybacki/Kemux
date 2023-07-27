@@ -2,19 +2,19 @@ from __future__ import annotations
 
 import dataclasses
 import importlib.machinery
+import inspect
 import logging
 import os
+import types
 
 import faust
 import faust.types
 
-import kemux.logic.routing
-import kemux.data.schemas.input
-import kemux.data.schemas.output
-import kemux.data.schemas.base
-import kemux.data.streams.base
-import kemux.data.streams.input
-import kemux.data.streams.output
+import kemux.data.io.input
+import kemux.data.io.output
+import kemux.data.schema.input
+import kemux.data.schema.output
+import kemux.data.stream
 
 DEFAULT_MODELS_PATH = 'streams'
 
@@ -25,10 +25,9 @@ class Processor:
     streams_dir: str
     persistent_data_directory: str
     _app: faust.App = dataclasses.field(init=False)
-    _source_topics: dict[str, faust.TopicT] = dataclasses.field(init=False)
     __instance: Processor | None = dataclasses.field(init=False, default=None)
     __logger: logging.Logger = dataclasses.field(init=False, default=logging.getLogger(__name__))
-    __router: kemux.logic.routing.Router = dataclasses.field(init=False)
+    __streams: dict[str, kemux.data.stream.StreamBase] = dataclasses.field(init=False, default_factory=dict)
     __agents: dict[str, faust.types.AgentT] = dataclasses.field(init=False, default_factory=dict)
 
     @classmethod
@@ -52,76 +51,97 @@ class Processor:
                 value_serializer='json',
                 datadir=instance.persistent_data_directory,
             )
-            input_models, output_models = instance.classify_models()
-            instance.__router = kemux.logic.routing.Router(
-                app=app,
-                inputs=input_models,
-                outputs=output_models,
-            )
+            instance.__streams = instance.load_streams()
             instance._app = app
             cls.__instance = instance
         return cls.__instance
-    
-    def classify_models(self) -> tuple[
-        dict[str, kemux.data.streams.input.InputStream],
-        dict[str, kemux.data.streams.output.OutputStream]
-    ]:
+
+    def load_streams(self) -> dict[str, kemux.data.stream.StreamBase]:
         if not os.path.isdir(self.streams_dir):
             raise ValueError(f'Invalid streams directory: {self.streams_dir}')
-        present_modules: list[str] = filter(
+        present_modules_filenames: list[str] = filter(
             lambda module: module.endswith('.py'),
             os.listdir(self.streams_dir),
         )
-        output_models: dict[str, kemux.data.streams.output.OutputStream] = {}
-        input_models: dict[str, kemux.data.streams.input.InputStream] = {}
-        for module in present_modules:
-            module_name = module.removesuffix('.py')
-            module_path = os.path.join(self.streams_dir, module)
-            try:
-                module = importlib.machinery.SourceFileLoader(module_name, module_path).load_module()
-            except (OSError, ImportError) as cant_import_stream_module:
-                self.__logger.error(f'Failed to import stream module: {module_name}', exc_info=cant_import_stream_module)
-                continue
+        return {
+            module_filename.removesuffix('.py'): self._load_stream_module(module_filename)
+            for module_filename in present_modules_filenames
+        }
 
-            stream_class: kemux.data.streams.base.StreamBase
-            schema_class: kemux.data.schemas.base.SchemaBase
+    def _load_stream_module(self, module_filename: str) -> kemux.data.stream.StreamBase | None:
+        module_name = module_filename.removesuffix('.py')
+        module_full_path = os.path.join(self.streams_dir, module_filename)
+        try:
+            imported_module: types.ModuleType = importlib.machinery.SourceFileLoader(module_name, module_full_path).load_module()
+        except (OSError, ImportError) as cant_import_stream_module:
+            self.__logger.error(f'Failed to import stream module: {module_name}', exc_info=cant_import_stream_module)
+            return None
+        if not (input := getattr(imported_module, 'Input', None)):
+            raise ValueError(f'No input found for stream module: {module_name}')
+        if not (outputs := getattr(imported_module, 'Outputs', None)):
+            raise ValueError(f'No outputs found for stream module: {module_name}')
+        return kemux.data.stream.StreamBase(
+            input=self._load_input(input),
+            outputs=self._load_outputs(outputs)
+        )
 
-            if not (stream_class := getattr(module, 'Stream', None)):
-                self.__logger.error(f'Invalid stream module: {module_name}. No Stream class found')
-            if not (schema_class := getattr(module, 'Schema', None)):
-                self.__logger.error(f'Invalid stream module: {module_name}. No Schema class found')
-            stream_class.topic = module_name
-            schema_class._find_decorated_fields()
+    def _load_input(self, input_class: type) -> kemux.data.io.input.StreamInput:
+        input_schema: kemux.data.schema.input.InputSchema
+        input_io: kemux.data.io.input.StreamInput
 
-            if issubclass(stream_class, kemux.data.streams.output.OutputStream):
-                if not issubclass(schema_class, kemux.data.schemas.output.OutputSchema):
-                    self.__logger.error(f'Invalid stream module: {module_name}. Schema class is not an OutputSchema')
-                    continue
-                stream_class.schema = schema_class
-                output_models[module_name] = stream_class
-            elif issubclass(stream_class, kemux.data.streams.input.InputStream):
-                if not issubclass(schema_class, kemux.data.schemas.input.InputSchema):
-                    self.__logger.error(f'Invalid stream module: {module_name}. Schema class is not an InputSchema')
-                    continue
-                schema_class._construct_record_class()
-                stream_class.schema = schema_class
-                input_models[module_name] = stream_class
-            else:
-                self.__logger.error(f'Invalid stream module: {module_name}. Class is neither an Input or Output stream')
-        return input_models, output_models
+        input_schema, input_io = self._extract_schema_and_io(input_class)
+        input_schema._find_decorated_fields()
+        input_schema._construct_input_record_class()
+        input_io.schema = input_schema
+        return input_io
+
+    def _load_outputs(self, outputs: type) -> list[kemux.data.io.output.StreamOutput]:
+            return [
+                self._load_output(output)
+                for output in outputs.__dict__.values()
+                if inspect.isclass(output)
+            ]
+
+    def _load_output(self, output_class: type) -> kemux.data.io.output.StreamOutput:
+        output_schema: kemux.data.schema.output.OutputSchema
+        output_io: kemux.data.io.output.StreamOutput
+
+        output_schema, output_io = self._extract_schema_and_io(output_class)
+        output_schema._find_decorated_fields()
+        output_schema._construct_output_record_class()
+        output_io.schema = output_schema
+        return output_io
+    
+    def _extract_schema_and_io(self, source: type) -> tuple[kemux.data.schema.input.InputSchema, kemux.data.io.input.StreamInput]:
+        schema, io = getattr(
+            source, 'Schema', None
+        ), getattr(
+            source, 'IO', None
+        )
+        if not schema:
+            raise ValueError(f'Invalid input {source.__name__} - no schema found')
+        if not io:
+            raise ValueError(f'Invalid input {source.__name__} - no io found')
+        return schema, io
 
     def start(self) -> None:
         self.__logger.info('Starting receiver')
-        for stream in self.__router.inputs.values():
-            stream: kemux.data.streams.input.InputStream
-            self.__logger.info(f'Starting handler for topic: {stream.topic}')
-            input_topics_handler: faust.TopicT = stream._get_handler(self._app)  # pylint: disable=protected-access
+        for stream_name, stream in self.__streams.items():
+            stream: kemux.data.stream.StreamBase
+            stream_input: kemux.data.io.input.StreamInput = stream.input
 
-            async def _process_input_stream_message(messages: faust.StreamT[kemux.data.schemas.input.InputSchema]) -> None:
+            self.__logger.info(f'Activating input stream: {stream_name}')
+            input_topics_handler: faust.TopicT = stream_input._get_handler(self._app)  # pylint: disable=protected-access
+            self.__logger.info(f'Activating output streams: {stream_name}')
+            for output in stream.outputs:
+                output: kemux.data.io.output.StreamOutput
+                output._initialize_handler(self._app)
+
+            async def _process_input_stream_message(messages: faust.StreamT[kemux.data.schema.input.InputSchema]) -> None:
                 self.__logger.info('Processing messages')
                 async for message in messages:
-                    self.__logger.info(message.__dict__)
-                    self.__router.route(stream, message)
+                    await stream.process(message)
 
-            self.__agents[stream.topic] = self._app.agent(input_topics_handler)(_process_input_stream_message)
+            self.__logger.info('Activating agent for input stream')
+            self.__agents[stream_name] = self._app.agent(input_topics_handler)(_process_input_stream_message)
         self._app.main()
