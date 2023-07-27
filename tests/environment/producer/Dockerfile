@@ -3,12 +3,12 @@ FROM python:3.11.4-bullseye
 ARG TARGET_KAFKA_ADDRESS
 ENV TARGET_KAFKA_ADDRESS=${TARGET_KAFKA_ADDRESS}
 
-COPY ./producer.py /opt/producer.py
-COPY ./entrypoint.sh /entrypoint.sh
+COPY ./tests/environment/producer/start.py /opt/start.py
 
 RUN \
   pip \
     install \
+      pymongo \
       kafka-python
 
-ENTRYPOINT [ "/entrypoint.sh" ]
+CMD [ "python", "/opt/start.py", "worker", "-l", "info" ]

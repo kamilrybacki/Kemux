@@ -27,7 +27,9 @@ def start_producer() -> None:
     producer_logger = logging.getLogger('PRODUCER')
     if not (kafka_host := os.environ.get('TARGET_KAFKA_ADDRESS')):
         raise ValueError('TARGET_KAFKA_ADDRESS not set')
-    test_producer = kafka.KafkaProducer(bootstrap_servers=kafka_host)
+    test_producer = kafka.KafkaProducer(
+        bootstrap_servers=kafka_host,
+    )
     test_consumer = kafka.KafkaConsumer(
         TEST_TOPIC,
         bootstrap_servers=kafka_host,
@@ -62,3 +64,7 @@ def start_producer() -> None:
             time.sleep(0.25)
     except KeyboardInterrupt:
         test_producer.close()
+
+
+if __name__ == '__main__':
+    start_producer()
