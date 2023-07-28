@@ -90,7 +90,7 @@ class Processor:
         input_schema: kemux.data.schema.input.InputSchema
         input_io: kemux.data.io.input.StreamInput
 
-        input_schema, input_io = self._extract_schema_and_io(input_class)
+        input_schema, input_io = self._extract_schema_and_io(input_class)  # type: ignore
         input_schema._find_decorated_fields()
         input_schema._construct_input_record_class()
         input_io.schema = input_schema
@@ -107,7 +107,7 @@ class Processor:
         output_schema: kemux.data.schema.output.OutputSchema
         output_io: kemux.data.io.output.StreamOutput
 
-        output_schema, output_io = self._extract_schema_and_io(output_class)
+        output_schema, output_io = self._extract_schema_and_io(output_class)  # type: ignore
         output_schema._find_decorated_fields()
         output_schema._construct_output_record_class()
         output_io.schema = output_schema
