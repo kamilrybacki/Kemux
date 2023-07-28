@@ -1,0 +1,16 @@
+name: Integration tests using Dockerized services
+run-name: Integration tests
+on: [push]
+concurrency:
+  group: ${{ github.ref }}-it
+  cancel-in-progress: true
+
+jobs:
+  integration-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Prepare env file for Docker Compose
+        run: |
+          echo "KEMUX_BRANCH=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >> ./tests/environment/.env
+          cat ./tests/environment/.env

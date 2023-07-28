@@ -46,8 +46,7 @@ services:
     networks:
       - kemux
     build:
-      context: ../../
-      dockerfile: ./tests/environment/producer/Dockerfile
+      dockerfile: ./docker/Producer.Dockerfile
       args:
         TARGET_KAFKA_ADDRESS: "kemux-kafka:9092"
       no_cache: true
@@ -55,12 +54,11 @@ services:
       - kemux-kafka
       - kemux-zoo
     
-  kemux-consumer:
+  kemux-splitter:
     networks:
       - kemux
     build:
-      context: ../../
-      dockerfile: ./tests/environment/consumer/Dockerfile
+      dockerfile: ./docker/Splitter.Dockerfile
       args:
         KEMUX_KAFKA_ADDRESS: "kafka://kemux-kafka:9092"
       no_cache: true
