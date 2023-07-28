@@ -126,8 +126,8 @@ class Processor:
     def start(self) -> None:
         self.__logger.info('Starting receiver')
         stream: kemux.data.stream.StreamBase
-        stream_input: kemux.data.io.input.StreamInput = stream.input
         for stream_name, stream in self.__streams.items():
+            stream_input: kemux.data.io.input.StreamInput = stream.input
             self.__logger.info(f'Activating input stream: {stream_name}')
             input_topics_handler: faust.TopicT = stream_input._get_handler(self._app)  # pylint: disable=protected-access
             self.__logger.info(f'Activating output streams: {stream_name}')
