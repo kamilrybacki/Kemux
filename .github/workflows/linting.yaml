@@ -30,8 +30,9 @@ jobs:
         run: |
           pip \
             install \
-              -r requirements.txt \
-              mypy
+              -r requirements-ci.txt \
+              mypy \
+              .
       - name: Lint files with Ruff
         uses: chartboost/ruff-action@v1
         with:
