@@ -30,4 +30,4 @@ class OutputSchema(kemux.data.schema.base.SchemaBase):
                 cls.__name__,
                 (faust.Record, ),
                 {'__annotations__': target_fields_annotations},
-            )
+            )  # type: ignore

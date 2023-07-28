@@ -14,4 +14,4 @@ class StreamOutput(kemux.data.io.base.IOBase):
     @classmethod
     async def send(cls, message: dict) -> None:
         if cls.filter(message):
-            await cls._topic_handler.send(value=message)
+            await cls._topic_handler.send(value=message)  # type: ignore

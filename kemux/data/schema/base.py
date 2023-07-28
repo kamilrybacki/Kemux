@@ -10,15 +10,15 @@ DECORATED_FIELDS_REGEX = re.compile(r'^_[a-z]+_$', re.IGNORECASE)
 class StreamRecordT(faust.Record):
     _decorated_fields: dict[str, type]
     _fields: dict[str, type]
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict:  # type: ignore
         ...
 
 
 @dataclasses.dataclass
 class SchemaBase:
     _logger: logging.Logger = dataclasses.field(init=False)
-    _decorated_fields: list[str] = dataclasses.field(init=False, default_factory=list)
-    _fields: dict[str, type] = dataclasses.field(init=False, default_factory=list)
+    _decorated_fields: dict[str] = dataclasses.field(init=False, default_factory=dict)
+    _fields: dict[str, type] = dataclasses.field(init=False, default_factory=dict)
     _record_class: StreamRecordT = dataclasses.field(init=False)
 
     @classmethod

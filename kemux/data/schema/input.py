@@ -1,6 +1,6 @@
 import dataclasses
 import dateutil.parser
-import typing
+import types
 
 import faust
 import faust.models.fields
@@ -22,8 +22,8 @@ class InputSchema(kemux.data.schema.base.SchemaBase):
             serializer='json', 
             date_parser=dateutil.parser.parse
         ):
-            _decorated_fields: dict[str, type] = faust.models.fields.FieldDescriptor(required=False, exclude=True, default=cls._decorated_fields)
-            _fields: dict[str, type] = faust.models.fields.FieldDescriptor(required=False, exclude=True, default=cls._fields, type=dict)
+            _decorated_fields: dict[str, type] = faust.models.fields.FieldDescriptor(required=False, exclude=True, default=cls._decorated_fields)  # type: ignore
+            _fields: dict[str, type] = faust.models.fields.FieldDescriptor(required=False, exclude=True, default=cls._fields, type=dict)  # type: ignore
 
             def _validate(self) -> None:
                 for field in self._decorated_fields.keys():
@@ -32,7 +32,7 @@ class InputSchema(kemux.data.schema.base.SchemaBase):
                         self.__class__,
                         validator_name
                     )
-                    if not isinstance(validator, typing.Callable):
+                    if not isinstance(validator, types.FunctionType):
                         raise ValueError(f'Validator: {validator_name} is not callable')
                     actual_field_value = getattr(
                         self, 
@@ -55,11 +55,11 @@ class InputSchema(kemux.data.schema.base.SchemaBase):
             if field.endswith('_validator')
         ]
         for validator in implemented_validators:
-            if not isinstance(validator, typing.Callable):
+            if not isinstance(validator, types.FunctionType):
                 raise ValueError(f'Validator: {validator} is not callable')
             setattr(InputRecord, validator.__name__, validator)
 
-        cls._record_class = InputRecord
+        cls._record_class = InputRecord  # type: ignore
 
     @classmethod
     def asdict(cls) -> dict[str, type]:

@@ -15,7 +15,7 @@ class IOBase:
         init=False,
         default=logging.getLogger(__name__)
     )
-    _topic_handler: faust.types.AgentT | None = dataclasses.field(init=False, default=None)
+    _topic_handler: faust.types.TopicT | None = dataclasses.field(init=False, default=None)
 
     @classmethod
     def _get_handler(cls, app: faust.App) -> faust.TopicT:
@@ -30,4 +30,4 @@ class IOBase:
             cls.topic,
             value_type=schema._record_class,
         )
-        cls._topic_handler.maybe_declare()
+        cls._topic_handler.maybe_declare()  # type: ignore

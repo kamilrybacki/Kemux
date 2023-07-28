@@ -59,7 +59,7 @@ class Processor:
     def load_streams(self) -> dict[str, kemux.data.stream.StreamBase]:
         if not os.path.isdir(self.streams_dir):
             raise ValueError(f'Invalid streams directory: {self.streams_dir}')
-        present_modules_filenames: list[str] = filter(
+        present_modules_filenames: filter[str] = filter(
             lambda module: module.endswith('.py'),
             os.listdir(self.streams_dir),
         )
@@ -68,14 +68,13 @@ class Processor:
             for module_filename in present_modules_filenames
         }
 
-    def _load_stream_module(self, module_filename: str) -> kemux.data.stream.StreamBase | None:
+    def _load_stream_module(self, module_filename: str) -> kemux.data.stream.StreamBase:
         module_name = module_filename.removesuffix('.py')
         module_full_path = os.path.join(self.streams_dir, module_filename)
         try:
             imported_module: types.ModuleType = importlib.machinery.SourceFileLoader(module_name, module_full_path).load_module()
         except (OSError, ImportError) as cant_import_stream_module:
-            self.__logger.error(f'Failed to import stream module: {module_name}', exc_info=cant_import_stream_module)
-            return None
+            raise ValueError(f'Invalid stream module: {module_name}') from cant_import_stream_module
         if not (input := getattr(imported_module, 'Input', None)):
             raise ValueError(f'No input found for stream module: {module_name}')
         if not (outputs := getattr(imported_module, 'Outputs', None)):
@@ -126,21 +125,21 @@ class Processor:
 
     def start(self) -> None:
         self.__logger.info('Starting receiver')
+        stream: kemux.data.stream.StreamBase
+        stream_input: kemux.data.io.input.StreamInput = stream.input
         for stream_name, stream in self.__streams.items():
-            stream: kemux.data.stream.StreamBase
-            stream_input: kemux.data.io.input.StreamInput = stream.input
-
             self.__logger.info(f'Activating input stream: {stream_name}')
             input_topics_handler: faust.TopicT = stream_input._get_handler(self._app)  # pylint: disable=protected-access
             self.__logger.info(f'Activating output streams: {stream_name}')
+
+            output: kemux.data.io.output.StreamOutput
             for output in stream.outputs:
-                output: kemux.data.io.output.StreamOutput
                 output._initialize_handler(self._app)
 
             async def _process_input_stream_message(messages: faust.StreamT[kemux.data.schema.input.InputSchema]) -> None:
                 self.__logger.info('Processing messages')
                 async for message in messages:
-                    await stream.process(message)
+                    await stream.process(message)  # type: ignore
 
             self.__logger.info('Activating agent for input stream')
             self.__agents[stream_name] = self._app.agent(input_topics_handler)(_process_input_stream_message)
