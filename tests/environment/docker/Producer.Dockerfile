@@ -22,7 +22,7 @@ RUN \
 RUN \
   ls \
     -la \
-      /Kemux \
+      /Kemux/tests \
   && \
   mkdir \
     -p \
