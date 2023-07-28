@@ -20,13 +20,17 @@ RUN \
       ${KAFKA_BRANCH}
 
 RUN \
+  ls \
+    -la \
+      /Kemux \
+  && \
   mkdir \
     -p \
       /opt/kemux-producer \
   && \
   cp \
-    /Kemux/tests/lib/producer/* \
-    /opt/kemux-producer \
+    /Kemux/tests/lib/producer/start.py \
+    /opt/kemux-producer/start.py \
   && \
   rm \
     -rf \
