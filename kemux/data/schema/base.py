@@ -17,7 +17,7 @@ class StreamRecordT(faust.Record):
 @dataclasses.dataclass
 class SchemaBase:
     _logger: logging.Logger = dataclasses.field(init=False)
-    _decorated_fields: dict[str] = dataclasses.field(init=False, default_factory=dict)
+    _decorated_fields: dict[str, type] = dataclasses.field(init=False, default_factory=dict)
     _fields: dict[str, type] = dataclasses.field(init=False, default_factory=dict)
     _record_class: StreamRecordT = dataclasses.field(init=False)
 

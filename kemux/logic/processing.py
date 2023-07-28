@@ -10,8 +10,10 @@ import types
 import faust
 import faust.types
 
+import kemux.data.io.base
 import kemux.data.io.input
 import kemux.data.io.output
+import kemux.data.schema.base
 import kemux.data.schema.input
 import kemux.data.schema.output
 import kemux.data.stream
@@ -111,7 +113,10 @@ class Processor:
         output_io.schema = output_schema
         return output_io
     
-    def _extract_schema_and_io(self, source: type) -> tuple[kemux.data.schema.input.InputSchema, kemux.data.io.input.StreamInput]:
+    def _extract_schema_and_io(self, source: type) -> tuple[
+        kemux.data.schema.base.SchemaBase,
+        kemux.data.io.base.IOBase
+    ]:
         schema, io = getattr(
             source, 'Schema', None
         ), getattr(

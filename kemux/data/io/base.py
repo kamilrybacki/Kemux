@@ -21,7 +21,7 @@ class IOBase:
     def _get_handler(cls, app: faust.App) -> faust.TopicT:
         if cls._topic_handler is None:
             cls._initialize_handler(app)
-        return cls._topic_handler
+        return cls._topic_handler  # type: ignore
     
     @classmethod
     def _initialize_handler(cls, app: faust.App) -> None:
