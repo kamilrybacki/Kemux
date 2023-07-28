@@ -1,51 +1,42 @@
 FROM python:3.11.4-bullseye
 
 ARG KEMUX_KAFKA_ADDRESS
+ARG KEMUX_BRANCH
 
 USER root
 
 RUN \
-  useradd \
-    --create-home \
-    --shell /bin/bash \
-    consumer \
-  && \
-  usermod \
-    --append \
-    --groups \
-      consumer \
-    consumer
-
-RUN \
   mkdir \
     -p \
-      /home/consumer/streams \
-      /home/consumer/kemux
-
-COPY ./.local/tests/environment/consumer/streams/* /home/consumer/streams
-COPY ./.local/tests/environment/consumer/start.py /home/consumer/start.py
-COPY ./* /home/consumer/kemux
-
-RUN \
-  chown \
-    -R \
-      consumer:consumer \
-        /home/consumer
-
-RUN \
-  unset \
-    -v \
-      PYTHONPATH
-
-USER consumer
+      /kemux \
+  && \
+  git \
+    clone \
+      --branch \
+        ${KEMUX_BRANCH} \
+      https://github.com/KamilRybacki/Kemux.git \
+      /kemux
 
 RUN \
   pip \
     install \
-      /home/consumer/kemux
+      /home/splitter/kemux
 
-ENV KEMUX_STREAMS_DIR=/home/consumer/streams
+RUN \
+  mkdir \
+    -p \
+      /opt/kemux-splitter \
+  && \
+  cp \
+    /kemux/tests/lib/splitter/* \
+    /opt/kemux-splitter \
+  && \
+  rm \
+    -rf \
+      /kemux
+
+ENV KEMUX_STREAMS_DIR=/opt/kemux-splitter/streams
 ENV KEMUX_DATA_DIR=/tmp
 ENV KEMUX_KAFKA_ADDRESS=${KEMUX_KAFKA_ADDRESS}
 
-CMD [ "python", "/home/consumer/start.py", "worker", "-l", "info" ]
+CMD [ "python", "/home/splitter/start.py", "worker", "-l", "info" ]

@@ -48,7 +48,8 @@ services:
     build:
       dockerfile: ./docker/Producer.Dockerfile
       args:
-        TARGET_KAFKA_ADDRESS: "kemux-kafka:9092"
+        KEMUX_BRANCH: ${KEMUX_BRANCH}
+        KEMUX_KAFKA_ADDRESS: "kemux-kafka:9092"
       no_cache: true
     depends_on:
       - kemux-kafka
@@ -60,6 +61,7 @@ services:
     build:
       dockerfile: ./docker/Splitter.Dockerfile
       args:
+        KEMUX_BRANCH: ${KEMUX_BRANCH}
         KEMUX_KAFKA_ADDRESS: "kafka://kemux-kafka:9092"
       no_cache: true
     depends_on:

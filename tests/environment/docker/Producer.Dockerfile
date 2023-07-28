@@ -1,9 +1,36 @@
 FROM python:3.11.4-bullseye
 
-ARG TARGET_KAFKA_ADDRESS
-ENV TARGET_KAFKA_ADDRESS=${TARGET_KAFKA_ADDRESS}
+ARG KEMUX_KAFKA_ADDRESS
+ENV KEMUX_KAFKA_ADDRESS=${KEMUX_KAFKA_ADDRESS}
 
-COPY ./.local/tests/environment/producer/start.py /opt/start.py
+ARG KAFKA_BRANCH
+
+USER root
+
+RUN \
+  git \
+    clone \
+      https://github.com/KamilRybacki/Kemux.git \
+  && \
+  cd \
+    /Kemux \
+  && \
+  git \
+    checkout \
+      ${KAFKA_BRANCH}
+
+RUN \
+  mkdir \
+    -p \
+      /opt/kemux-producer \
+  && \
+  cp \
+    /Kemux/tests/lib/producer/* \
+    /opt/kemux-producer \
+  && \
+  rm \
+    -rf \
+      /Kemux
 
 RUN \
   pip \
@@ -11,4 +38,4 @@ RUN \
       pymongo \
       kafka-python
 
-CMD [ "python", "/opt/start.py"]
+CMD [ "python", "/opt/kemux/tests/lib/producer/start.py"]
