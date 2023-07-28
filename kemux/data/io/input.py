@@ -1,7 +1,5 @@
 import dataclasses
 
-import faust
-
 import kemux.data.io.base
 import kemux.data.schema.input
 
