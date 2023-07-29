@@ -29,8 +29,8 @@ def start_producer() -> None:
         level=logging.INFO,
     )
     producer_logger = logging.getLogger('PRODUCER')
-    if not (kafka_host := os.environ.get('TARGET_KAFKA_ADDRESS')):
-        raise ValueError('TARGET_KAFKA_ADDRESS not set')
+    if not (kafka_host := os.environ.get('KEMUX_KAFKA_ADDRESS')):
+        raise ValueError('KEMUX_KAFKA_ADDRESS not set')
     test_producer = kafka.KafkaProducer(
         bootstrap_servers=kafka_host,
     )

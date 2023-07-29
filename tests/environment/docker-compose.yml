@@ -46,9 +46,9 @@ services:
     networks:
       - kemux
     build:
-      dockerfile: ./docker/Producer.Dockerfile
+      context: ../../
+      dockerfile: tests/environment/docker/Producer.Dockerfile
       args:
-        KEMUX_BRANCH: ${KEMUX_BRANCH}
         KEMUX_KAFKA_ADDRESS: "kemux-kafka:9092"
       no_cache: true
     depends_on:
@@ -59,9 +59,9 @@ services:
     networks:
       - kemux
     build:
-      dockerfile: ./docker/Splitter.Dockerfile
+      context: ../../
+      dockerfile: tests/environment/docker/Splitter.Dockerfile
       args:
-        KEMUX_BRANCH: ${KEMUX_BRANCH}
         KEMUX_KAFKA_ADDRESS: "kafka://kemux-kafka:9092"
       no_cache: true
     depends_on:

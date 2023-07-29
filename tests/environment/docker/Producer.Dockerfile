@@ -7,34 +7,9 @@ ARG KAFKA_BRANCH
 
 USER root
 
-RUN \
-  git \
-    clone \
-      https://github.com/KamilRybacki/Kemux.git \
-  && \
-  cd \
-    /Kemux \
-  && \
-  git \
-    checkout \
-      ${KAFKA_BRANCH}
-
-RUN \
-  ls \
-    -la \
-      /Kemux/tests \
-  && \
-  mkdir \
-    -p \
-      /opt/kemux-producer \
-  && \
-  cp \
-    /Kemux/tests/lib/producer/start.py \
-    /opt/kemux-producer/start.py \
-  && \
-  rm \
-    -rf \
-      /Kemux
+COPY \
+  tests/lib/producer/start.py \
+  /producer.py
 
 RUN \
   pip \
@@ -42,4 +17,4 @@ RUN \
       pymongo \
       kafka-python
 
-CMD [ "python", "/opt/kemux/tests/lib/producer/start.py"]
+CMD [ "python", "/producer.py"]

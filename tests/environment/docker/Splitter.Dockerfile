@@ -6,37 +6,56 @@ ARG KEMUX_BRANCH
 USER root
 
 RUN \
+  useradd \
+    -m \
+    -s \
+      /bin/bash \
+    kemux \
+  && \
   mkdir \
     -p \
-      /kemux \
-  && \
-  git \
-    clone \
-      --branch \
-        ${KEMUX_BRANCH} \
-      https://github.com/KamilRybacki/Kemux.git \
-      /kemux
+    /home/kemux/lib \
+    /home/kemux/streams
+
+COPY \
+  kemux/* \
+  pyproject.toml \
+  setup.cfg \
+  /home/kemux/lib/
+
+COPY \
+  tests/lib/splitter/start.py \
+  /home/kemux/splitter.py
+
+COPY \
+  tests/lib/splitter/streams/* \
+  /streams/
+
+RUN \
+  chown \
+    -R \
+      kemux:kemux \
+    /home/kemux
+
+USER kemux
+WORKDIR /home/kemux
 
 RUN \
   pip \
     install \
-      /home/splitter/kemux
-
-RUN \
-  mkdir \
-    -p \
-      /opt/kemux-splitter \
-  && \
-  cp \
-    /kemux/tests/lib/splitter/* \
-    /opt/kemux-splitter \
+      ./lib \
   && \
   rm \
     -rf \
-      /kemux
+    ./lib
 
-ENV KEMUX_STREAMS_DIR=/opt/kemux-splitter/streams
+RUN \
+  unset \
+    -v \
+      PYTHONPATH
+
+ENV KEMUX_STREAMS_DIR=/streams
 ENV KEMUX_DATA_DIR=/tmp
 ENV KEMUX_KAFKA_ADDRESS=${KEMUX_KAFKA_ADDRESS}
 
-CMD [ "python", "/home/splitter/start.py", "worker", "-l", "info" ]
+CMD [ "python", "/home/kemux/splitter.py", "worker", "-l", "info" ]
