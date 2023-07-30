@@ -53,7 +53,7 @@ services:
     depends_on:
       - kemux-kafka
       - kemux-zoo
-    
+
   kemux-splitter:
     networks:
       - kemux
