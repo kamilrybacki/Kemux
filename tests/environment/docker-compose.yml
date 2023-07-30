@@ -50,7 +50,6 @@ services:
       dockerfile: tests/environment/docker/Producer.Dockerfile
       args:
         KEMUX_KAFKA_ADDRESS: "kemux-kafka:9092"
-      no_cache: true
     depends_on:
       - kemux-kafka
       - kemux-zoo
@@ -63,7 +62,6 @@ services:
       dockerfile: tests/environment/docker/Splitter.Dockerfile
       args:
         KEMUX_KAFKA_ADDRESS: "kafka://kemux-kafka:9092"
-      no_cache: true
     depends_on:
       - kemux-producer
 
