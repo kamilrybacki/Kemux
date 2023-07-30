@@ -15,3 +15,6 @@ jobs:
         with:
           compose-file: |
             ./tests/environment/docker-compose.yml
+      - name: Check connection to Kafka container
+        run: |
+          docker ps
