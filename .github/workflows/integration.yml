@@ -10,7 +10,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Prepare env file for Docker Compose
-        run: |
-          echo "KEMUX_BRANCH=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >> ./tests/environment/.env
-          cat ./tests/environment/.env
+      - name: Deploy to Docker swarm
+        uses: isbang/compose-action@v1.5.0
+        with:
+          compose-file: |
+            ./tests/environment/docker-compose.yml
