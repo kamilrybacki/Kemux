@@ -22,21 +22,30 @@ RUN \
   mkdir \
     -p \
     ${SPLITTER_USER_HOME}/lib \
+    ${SPLITTER_USER_HOME}/lib/kemux \
     ${SPLITTER_USER_HOME}/streams \
     ${SPLITTER_USER_HOME}/data
 
 COPY \
-  kemux/* \
   pyproject.toml \
   setup.cfg \
   ${SPLITTER_USER_HOME}/lib/
+
+COPY \
+  kemux/ \ 
+  ${SPLITTER_USER_HOME}/lib/kemux/
+
+RUN \
+  ls \
+    -la \
+    ${SPLITTER_USER_HOME}/lib/kemux
 
 COPY \
   tests/lib/splitter/start.py \
   ${SPLITTER_USER_HOME}/splitter.py
 
 COPY \
-  tests/lib/splitter/streams/* \
+  tests/lib/splitter/streams/ \
   ${SPLITTER_USER_HOME}/streams/
 
 RUN \
@@ -49,26 +58,20 @@ USER ${SPLITTER_USER}
 WORKDIR ${SPLITTER_USER_HOME}
 
 RUN \
-  python3.11 \
+  python \
     -m pip \
       install \
         --upgrade \
         pip \
         setuptools \
         wheel \
-  && \
-  python3.11 \
-    -m pip \
-      install \
-      ${SPLITTER_USER_HOME}/lib \
-  && \
-  rm \
-    -rf \
-    ${SPLITTER_USER_HOME}/lib
+        ${SPLITTER_USER_HOME}/lib
 
 ENV KEMUX_STREAMS_DIR=${SPLITTER_USER_HOME}/streams
 ENV KEMUX_DATA_DIR=${SPLITTER_USER_HOME}/data
 ENV KEMUX_KAFKA_ADDRESS=${KEMUX_KAFKA_ADDRESS}
+
+ENV PYTHONPATH=${SPLITTER_USER_HOME}/.local
 
 CMD \
   python3.11 \

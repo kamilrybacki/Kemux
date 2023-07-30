@@ -1,201 +1,217 @@
-#1 [environment-kemux-producer internal] load build definition from Producer.Dockerfile
-#1 transferring dockerfile: 41B done
+#1 [environment-kemux-splitter internal] load build definition from Splitter.Dockerfile
+#1 transferring dockerfile: 1.45kB done
 #1 DONE 0.0s
 
-#2 [environment-kemux-splitter internal] load build definition from Splitter.Dockerfile
-#2 transferring dockerfile: 1.37kB done
+#2 [environment-kemux-producer internal] load build definition from Producer.Dockerfile
+#2 transferring dockerfile: 41B done
 #2 DONE 0.0s
 
-#3 [environment-kemux-producer internal] load .dockerignore
+#3 [environment-kemux-splitter internal] load .dockerignore
 #3 transferring context: 2B done
 #3 DONE 0.0s
 
-#4 [environment-kemux-splitter internal] load .dockerignore
+#4 [environment-kemux-producer internal] load .dockerignore
 #4 transferring context: 2B done
 #4 DONE 0.0s
 
 #5 [environment-kemux-producer internal] load metadata for docker.io/library/python:3.11.4-bullseye
-#5 DONE 0.5s
+#5 DONE 0.9s
 
-#6 [environment-kemux-producer internal] load build context
-#6 transferring context: 141B done
-#6 DONE 0.0s
+#6 [environment-kemux-splitter 1/3] FROM docker.io/library/python:3.11.4-bullseye@sha256:eb679a64d678b96ae0d8fabe65c3c0c567117b4d10cac1d53ade7392b5834b1b
+#6 CACHED
 
-#7 [environment-kemux-producer 2/3] COPY   tests/lib/producer/start.py   /producer.py
-#7 CACHED
+#7 [environment-kemux-producer internal] load build context
+#7 transferring context: 141B done
+#7 DONE 0.0s
 
-#8 [environment-kemux-producer 3/3] RUN   pip     install       pymongo       kafka-python
-#8 CACHED
+#8 [environment-kemux-splitter internal] load build context
+#8 transferring context: 1.07kB done
+#8 DONE 0.0s
 
-#9 [environment-kemux-producer 1/3] FROM docker.io/library/python:3.11.4-bullseye@sha256:eb679a64d678b96ae0d8fabe65c3c0c567117b4d10cac1d53ade7392b5834b1b
-#9 CACHED
+#9 [environment-kemux-producer 2/3] COPY   tests/lib/producer/start.py   /producer.py
+#9 DONE 0.0s
 
-#10 [environment-kemux-splitter internal] load build context
-#10 transferring context: 1.07kB done
-#10 DONE 0.0s
+#10 [environment-kemux-splitter  2/10] RUN   useradd     -m     -d /home/kemux     -s /bin/bash     kemux  &&   usermod     --append     --groups kemux    kemux  &&   mkdir     -p     /home/kemux/lib     /home/kemux/lib/kemux     /home/kemux/streams     /home/kemux/data
+#10 DONE 0.4s
 
-#11 [environment-kemux-producer] exporting to image
-#11 exporting layers done
-#11 writing image sha256:b61901a4a057556a3ed4fed5de288f3868acd1d47afd6f25b4f16979d43bf7cc done
-#11 naming to docker.io/library/environment-kemux-producer done
-#11 DONE 0.0s
+#11 [environment-kemux-splitter  3/10] COPY   pyproject.toml   setup.cfg   /home/kemux/lib/
+#11 DONE 0.1s
 
-#12 [environment-kemux-splitter 2/8] RUN   useradd     -m     -d /home/kemux     -s /bin/bash     kemux  &&   usermod     --append     --groups kemux    kemux  &&   mkdir     -p     /home/kemux/lib     /home/kemux/streams     /home/kemux/data
-#12 DONE 0.3s
+#12 [environment-kemux-producer 3/3] RUN   pip     install       pymongo       kafka-python
+#12 ...
 
-#13 [environment-kemux-splitter 3/8] COPY   kemux/*   pyproject.toml   setup.cfg   /home/kemux/lib/
-#13 DONE 0.1s
+#13 [environment-kemux-splitter  4/10] COPY   kemux/   /home/kemux/lib/kemux/
+#13 DONE 0.0s
 
-#14 [environment-kemux-splitter 4/8] COPY   tests/lib/splitter/start.py   /home/kemux/splitter.py
-#14 DONE 0.1s
+#14 [environment-kemux-splitter  5/10] RUN   ls     -la     /home/kemux/lib/kemux
+#14 0.404 total 20
+#14 0.404 drwxr-xr-x 1 root root 4096 Jul 30 17:52 .
+#14 0.404 drwxr-xr-x 1 root root 4096 Jul 30 17:52 ..
+#14 0.404 -rw-r--r-- 1 root root    0 Jul 28 19:37 __init__.py
+#14 0.404 drwxr-xr-x 4 root root 4096 Jul 30 17:40 data
+#14 0.404 drwxr-xr-x 2 root root 4096 Jul 30 17:40 logic
+#14 DONE 0.4s
 
-#15 [environment-kemux-splitter 5/8] COPY   tests/lib/splitter/streams/*   /home/kemux/streams/
+#15 [environment-kemux-splitter  6/10] COPY   tests/lib/splitter/start.py   /home/kemux/splitter.py
 #15 DONE 0.0s
 
-#16 [environment-kemux-splitter 6/8] RUN   chown     -R     kemux:kemux    /home/kemux
-#16 DONE 0.4s
+#16 [environment-kemux-splitter  7/10] COPY   tests/lib/splitter/streams/   /home/kemux/streams/
+#16 DONE 0.1s
 
-#17 [environment-kemux-splitter 7/8] WORKDIR /home/kemux
-#17 DONE 0.1s
+#17 [environment-kemux-splitter  8/10] RUN   chown     -R     kemux:kemux    /home/kemux
+#17 DONE 0.4s
 
-#18 [environment-kemux-splitter 8/8] RUN   python3.11     -m pip       install         --upgrade         pip         setuptools         wheel   &&   python3.11     -m pip       install       /home/kemux/lib   &&   rm     -rf     /home/kemux/lib
-#18 1.431 Defaulting to user installation because normal site-packages is not writeable
-#18 1.510 Requirement already satisfied: pip in /usr/local/lib/python3.11/site-packages (23.1.2)
-#18 1.705 Collecting pip
-#18 1.853   Downloading pip-23.2.1-py3-none-any.whl (2.1 MB)
-#18 2.483      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 2.1/2.1 MB 3.3 MB/s eta 0:00:00
-#18 2.491 Requirement already satisfied: setuptools in /usr/local/lib/python3.11/site-packages (65.5.1)
-#18 2.771 Collecting setuptools
-#18 2.811   Downloading setuptools-68.0.0-py3-none-any.whl (804 kB)
-#18 2.959      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 804.0/804.0 kB 5.4 MB/s eta 0:00:00
-#18 2.963 Requirement already satisfied: wheel in /usr/local/lib/python3.11/site-packages (0.41.0)
-#18 3.156 Installing collected packages: setuptools, pip
-#18 4.388   WARNING: The scripts pip, pip3 and pip3.11 are installed in '/home/kemux/.local/bin' which is not on PATH.
-#18 4.388   Consider adding this directory to PATH or, if you prefer to suppress this warning, use --no-warn-script-location.
-#18 4.396 Successfully installed pip-23.2.1 setuptools-68.0.0
-#18 4.584 
-#18 4.584 [notice] A new release of pip is available: 23.1.2 -> 23.2.1
-#18 4.584 [notice] To update, run: pip install --upgrade pip
-#18 5.316 Defaulting to user installation because normal site-packages is not writeable
-#18 5.379 Processing ./lib
-#18 5.380   Installing build dependencies: started
-#18 7.042   Installing build dependencies: finished with status 'done'
-#18 7.043   Getting requirements to build wheel: started
-#18 7.423   Getting requirements to build wheel: finished with status 'done'
-#18 7.426   Installing backend dependencies: started
-#18 8.672   Installing backend dependencies: finished with status 'done'
-#18 8.673   Preparing metadata (pyproject.toml): started
-#18 9.080   Preparing metadata (pyproject.toml): finished with status 'done'
-#18 9.384 Collecting faust-streaming==0.10.14 (from kemux==0.1.0)
-#18 9.384   Obtaining dependency information for faust-streaming==0.10.14 from https://files.pythonhosted.org/packages/56/4c/5f9515a0a948345cbe03a3c031fe982769a3e437a7e173ed8de69b1b407b/faust_streaming-0.10.14-cp311-cp311-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata
-#18 9.529   Downloading faust_streaming-0.10.14-cp311-cp311-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (21 kB)
-#18 9.938 Collecting aiohttp<4.0,>=3.8.0 (from faust-streaming==0.10.14->kemux==0.1.0)
-#18 9.938   Obtaining dependency information for aiohttp<4.0,>=3.8.0 from https://files.pythonhosted.org/packages/4c/b8/5c5efbb1d3cb1da3612b8e309e8e31b602ee9c5cca8e41961db385fc9d00/aiohttp-3.8.5-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata
-#18 9.977   Downloading aiohttp-3.8.5-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (7.7 kB)
-#18 10.04 Collecting aiohttp-cors<2.0,>=0.7 (from faust-streaming==0.10.14->kemux==0.1.0)
-#18 10.08   Downloading aiohttp_cors-0.7.0-py3-none-any.whl (27 kB)
-#18 10.18 Collecting aiokafka<0.9.0,>=0.8.0 (from faust-streaming==0.10.14->kemux==0.1.0)
-#18 10.18   Obtaining dependency information for aiokafka<0.9.0,>=0.8.0 from https://files.pythonhosted.org/packages/36/dd/31eda826eadb2c2931157b9bc825b28541a0b8159518a89f5b7b68604eb5/aiokafka-0.8.1-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata
-#18 10.21   Downloading aiokafka-0.8.1-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (19 kB)
-#18 10.28 Collecting click<8.2,>=6.7 (from faust-streaming==0.10.14->kemux==0.1.0)
-#18 10.28   Obtaining dependency information for click<8.2,>=6.7 from https://files.pythonhosted.org/packages/1a/70/e63223f8116931d365993d4a6b7ef653a4d920b41d03de7c59499962821f/click-8.1.6-py3-none-any.whl.metadata
-#18 10.32   Downloading click-8.1.6-py3-none-any.whl.metadata (3.0 kB)
-#18 10.38 Collecting mode-streaming>=0.3.0 (from faust-streaming==0.10.14->kemux==0.1.0)
-#18 10.41   Downloading mode_streaming-0.3.5-py2.py3-none-any.whl (100 kB)
-#18 10.46      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100.1/100.1 kB 2.0 MB/s eta 0:00:00
-#18 10.51 Collecting opentracing<=2.4.0,>=1.3.0 (from faust-streaming==0.10.14->kemux==0.1.0)
-#18 10.55   Downloading opentracing-2.4.0.tar.gz (46 kB)
-#18 10.56      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 46.2/46.2 kB 9.5 MB/s eta 0:00:00
-#18 10.57   Preparing metadata (setup.py): started
-#18 10.95   Preparing metadata (setup.py): finished with status 'done'
-#18 11.01 Collecting terminaltables<4.0,>=3.1 (from faust-streaming==0.10.14->kemux==0.1.0)
-#18 11.05   Downloading terminaltables-3.1.10-py2.py3-none-any.whl (15 kB)
-#18 11.26 Collecting yarl<2.0,>=1.0 (from faust-streaming==0.10.14->kemux==0.1.0)
-#18 11.32   Downloading yarl-1.9.2-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (282 kB)
-#18 11.38      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 282.8/282.8 kB 5.0 MB/s eta 0:00:00
-#18 11.46 Collecting croniter>=0.3.16 (from faust-streaming==0.10.14->kemux==0.1.0)
-#18 11.46   Obtaining dependency information for croniter>=0.3.16 from https://files.pythonhosted.org/packages/f2/91/e5ae454da8200c6eb6cf94ca05d799b51e2cb2cc458a7737aebc0c5a21bb/croniter-1.4.1-py2.py3-none-any.whl.metadata
-#18 11.50   Downloading croniter-1.4.1-py2.py3-none-any.whl.metadata (24 kB)
-#18 11.55 Collecting mypy-extensions (from faust-streaming==0.10.14->kemux==0.1.0)
-#18 11.59   Downloading mypy_extensions-1.0.0-py3-none-any.whl (4.7 kB)
-#18 11.63 Collecting venusian==3.0.0 (from faust-streaming==0.10.14->kemux==0.1.0)
-#18 11.67   Downloading venusian-3.0.0-py3-none-any.whl (13 kB)
-#18 11.72 Collecting intervaltree (from faust-streaming==0.10.14->kemux==0.1.0)
-#18 11.76   Downloading intervaltree-3.1.0.tar.gz (32 kB)
-#18 11.77   Preparing metadata (setup.py): started
-#18 12.21   Preparing metadata (setup.py): finished with status 'done'
-#18 12.28 Collecting six (from faust-streaming==0.10.14->kemux==0.1.0)
-#18 12.32   Downloading six-1.16.0-py2.py3-none-any.whl (11 kB)
-#18 12.40 Collecting attrs>=17.3.0 (from aiohttp<4.0,>=3.8.0->faust-streaming==0.10.14->kemux==0.1.0)
-#18 12.44   Downloading attrs-23.1.0-py3-none-any.whl (61 kB)
-#18 12.45      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 61.2/61.2 kB 5.8 MB/s eta 0:00:00
-#18 12.58 Collecting charset-normalizer<4.0,>=2.0 (from aiohttp<4.0,>=3.8.0->faust-streaming==0.10.14->kemux==0.1.0)
-#18 12.58   Obtaining dependency information for charset-normalizer<4.0,>=2.0 from https://files.pythonhosted.org/packages/bc/85/ef25d4ba14c7653c3020a1c6e1a7413e6791ef36a0ac177efa605fc2c737/charset_normalizer-3.2.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata
-#18 12.62   Downloading charset_normalizer-3.2.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (31 kB)
-#18 12.95 Collecting multidict<7.0,>=4.5 (from aiohttp<4.0,>=3.8.0->faust-streaming==0.10.14->kemux==0.1.0)
-#18 13.00   Downloading multidict-6.0.4-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (117 kB)
-#18 13.02      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 117.4/117.4 kB 5.8 MB/s eta 0:00:00
-#18 13.07 Collecting async-timeout<5.0,>=4.0.0a3 (from aiohttp<4.0,>=3.8.0->faust-streaming==0.10.14->kemux==0.1.0)
-#18 13.12   Downloading async_timeout-4.0.2-py3-none-any.whl (5.8 kB)
-#18 13.25 Collecting frozenlist>=1.1.1 (from aiohttp<4.0,>=3.8.0->faust-streaming==0.10.14->kemux==0.1.0)
-#18 13.25   Obtaining dependency information for frozenlist>=1.1.1 from https://files.pythonhosted.org/packages/e6/7e/74b176a5580e1a41da326d07cf47a0032923fb3eeec9afbd92bb5c6457df/frozenlist-1.4.0-cp311-cp311-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata
-#18 13.29   Downloading frozenlist-1.4.0-cp311-cp311-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (5.2 kB)
-#18 13.34 Collecting aiosignal>=1.1.2 (from aiohttp<4.0,>=3.8.0->faust-streaming==0.10.14->kemux==0.1.0)
-#18 13.38   Downloading aiosignal-1.3.1-py3-none-any.whl (7.6 kB)
-#18 13.46 Collecting kafka-python>=2.0.2 (from aiokafka<0.9.0,>=0.8.0->faust-streaming==0.10.14->kemux==0.1.0)
-#18 13.51   Downloading kafka_python-2.0.2-py2.py3-none-any.whl (246 kB)
-#18 13.56      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 246.5/246.5 kB 4.9 MB/s eta 0:00:00
-#18 13.62 Collecting packaging (from aiokafka<0.9.0,>=0.8.0->faust-streaming==0.10.14->kemux==0.1.0)
-#18 13.66   Downloading packaging-23.1-py3-none-any.whl (48 kB)
-#18 13.67      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 48.9/48.9 kB 6.4 MB/s eta 0:00:00
-#18 13.73 Collecting python-dateutil (from croniter>=0.3.16->faust-streaming==0.10.14->kemux==0.1.0)
-#18 13.76   Downloading python_dateutil-2.8.2-py2.py3-none-any.whl (247 kB)
-#18 13.81      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 247.7/247.7 kB 5.2 MB/s eta 0:00:00
-#18 13.90 Collecting colorlog>=2.9.0 (from mode-streaming>=0.3.0->faust-streaming==0.10.14->kemux==0.1.0)
-#18 13.94   Downloading colorlog-6.7.0-py2.py3-none-any.whl (11 kB)
-#18 14.01 Collecting idna>=2.0 (from yarl<2.0,>=1.0->faust-streaming==0.10.14->kemux==0.1.0)
-#18 14.05   Downloading idna-3.4-py3-none-any.whl (61 kB)
-#18 14.06      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 61.5/61.5 kB 5.5 MB/s eta 0:00:00
-#18 14.12 Collecting sortedcontainers<3.0,>=2.0 (from intervaltree->faust-streaming==0.10.14->kemux==0.1.0)
-#18 14.16   Downloading sortedcontainers-2.4.0-py2.py3-none-any.whl (29 kB)
-#18 14.27 Downloading faust_streaming-0.10.14-cp311-cp311-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl (1.1 MB)
-#18 14.45    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.1/1.1 MB 6.1 MB/s eta 0:00:00
-#18 14.49 Downloading aiohttp-3.8.5-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (1.1 MB)
-#18 14.63    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.1/1.1 MB 7.4 MB/s eta 0:00:00
-#18 14.67 Downloading aiokafka-0.8.1-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (1.2 MB)
-#18 14.81    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.2/1.2 MB 8.7 MB/s eta 0:00:00
-#18 14.85 Downloading click-8.1.6-py3-none-any.whl (97 kB)
-#18 14.86    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 97.9/97.9 kB 10.9 MB/s eta 0:00:00
-#18 14.90 Downloading croniter-1.4.1-py2.py3-none-any.whl (19 kB)
-#18 14.95 Downloading charset_normalizer-3.2.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (199 kB)
-#18 14.96    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 199.6/199.6 kB 12.3 MB/s eta 0:00:00
-#18 15.00 Downloading frozenlist-1.4.0-cp311-cp311-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl (250 kB)
-#18 15.03    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 250.5/250.5 kB 11.5 MB/s eta 0:00:00
-#18 15.04 Building wheels for collected packages: kemux, opentracing, intervaltree
-#18 15.04   Building wheel for kemux (pyproject.toml): started
-#18 15.49   Building wheel for kemux (pyproject.toml): finished with status 'done'
-#18 15.49   Created wheel for kemux: filename=kemux-0.1.0-py3-none-any.whl size=4490 sha256=9e73dc6e39e747dbf4eff1918a64f96506b0a81ad004a2fd0f459c319ac6911e
-#18 15.49   Stored in directory: /tmp/pip-ephem-wheel-cache-f07xvnl9/wheels/6b/ab/5a/fdd633e97241a2cc209cec76ad38653ee6ed634034a75287b5
-#18 15.49   Building wheel for opentracing (setup.py): started
-#18 15.96   Building wheel for opentracing (setup.py): finished with status 'done'
-#18 15.96   Created wheel for opentracing: filename=opentracing-2.4.0-py3-none-any.whl size=51404 sha256=4c6b500cd7edb027543123f241b3f48f80d2742f73f7039a351ce3a33c5ae81c
-#18 15.96   Stored in directory: /home/kemux/.cache/pip/wheels/d5/9a/0c/7189293233fd91d6e8f35bcd9a1ea76fb360f4344e5d8c4ec7
-#18 15.97   Building wheel for intervaltree (setup.py): started
-#18 16.47   Building wheel for intervaltree (setup.py): finished with status 'done'
-#18 16.47   Created wheel for intervaltree: filename=intervaltree-3.1.0-py2.py3-none-any.whl size=26099 sha256=3a90a192cca7602b0db7e3b413db83164648daf84e9569372d060e8c59876254
-#18 16.47   Stored in directory: /home/kemux/.cache/pip/wheels/31/d7/d9/eec6891f78cac19a693bd40ecb8365d2f4613318c145ec9816
-#18 16.47 Successfully built kemux opentracing intervaltree
-#18 16.62 Installing collected packages: sortedcontainers, opentracing, kafka-python, venusian, terminaltables, six, packaging, mypy-extensions, multidict, intervaltree, idna, frozenlist, colorlog, click, charset-normalizer, attrs, async-timeout, yarl, python-dateutil, aiosignal, aiokafka, croniter, aiohttp, mode-streaming, aiohttp-cors, faust-streaming, kemux
-#18 17.02   WARNING: The script normalizer is installed in '/home/kemux/.local/bin' which is not on PATH.
-#18 17.02   Consider adding this directory to PATH or, if you prefer to suppress this warning, use --no-warn-script-location.
-#18 17.60   WARNING: The script faust is installed in '/home/kemux/.local/bin' which is not on PATH.
-#18 17.60   Consider adding this directory to PATH or, if you prefer to suppress this warning, use --no-warn-script-location.
-#18 17.72 Successfully installed aiohttp-3.8.5 aiohttp-cors-0.7.0 aiokafka-0.8.1 aiosignal-1.3.1 async-timeout-4.0.2 attrs-23.1.0 charset-normalizer-3.2.0 click-8.1.6 colorlog-6.7.0 croniter-1.4.1 faust-streaming-0.10.14 frozenlist-1.4.0 idna-3.4 intervaltree-3.1.0 kafka-python-2.0.2 kemux-0.1.0 mode-streaming-0.3.5 multidict-6.0.4 mypy-extensions-1.0.0 opentracing-2.4.0 packaging-23.1 python-dateutil-2.8.2 six-1.16.0 sortedcontainers-2.4.0 terminaltables-3.1.10 venusian-3.0.0 yarl-1.9.2
-#18 DONE 18.0s
+#18 [environment-kemux-splitter  9/10] WORKDIR /home/kemux
+#18 DONE 0.0s
 
-#11 [environment-kemux-splitter] exporting to image
-#11 exporting layers
-#11 exporting layers 0.5s done
-#11 writing image sha256:770030b035e7b6255d61933b606586287d82a78246eb237b50f86af4dfca530b done
-#11 naming to docker.io/library/environment-kemux-splitter done
-#11 DONE 0.5s
+#19 [environment-kemux-splitter 10/10] RUN   python     -m pip       install         --upgrade         pip         setuptools         wheel         /home/kemux/lib
+#19 1.485 Defaulting to user installation because normal site-packages is not writeable
+#19 1.572 Processing ./lib
+#19 1.574   Installing build dependencies: started
+#19 ...
+
+#12 [environment-kemux-producer 3/3] RUN   pip     install       pymongo       kafka-python
+#12 2.379 Collecting pymongo
+#12 2.525   Downloading pymongo-4.4.1-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (607 kB)
+#12 2.679      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 607.6/607.6 kB 4.0 MB/s eta 0:00:00
+#12 2.732 Collecting kafka-python
+#12 2.774   Downloading kafka_python-2.0.2-py2.py3-none-any.whl (246 kB)
+#12 2.780      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 246.5/246.5 kB 56.3 MB/s eta 0:00:00
+#12 2.841 Collecting dnspython<3.0.0,>=1.16.0 (from pymongo)
+#12 2.881   Downloading dnspython-2.4.1-py3-none-any.whl (300 kB)
+#12 2.893      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 300.3/300.3 kB 31.2 MB/s eta 0:00:00
+#12 2.954 Installing collected packages: kafka-python, dnspython, pymongo
+#12 3.398 Successfully installed dnspython-2.4.1 kafka-python-2.0.2 pymongo-4.4.1
+#12 3.398 WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv
+#12 3.602 
+#12 3.602 [notice] A new release of pip is available: 23.1.2 -> 23.2.1
+#12 3.602 [notice] To update, run: pip install --upgrade pip
+#12 DONE 3.8s
+
+#20 [environment-kemux-producer] exporting to image
+#20 exporting layers 0.2s done
+#20 writing image sha256:e6f70cd37ecf54448a13ed901a5ff6746773a1dc08d1ea121fff1fcaf9fd14ca done
+#20 naming to docker.io/library/environment-kemux-producer done
+#20 DONE 0.2s
+
+#19 [environment-kemux-splitter 10/10] RUN   python     -m pip       install         --upgrade         pip         setuptools         wheel         /home/kemux/lib
+#19 4.286   Installing build dependencies: finished with status 'done'
+#19 4.288   Getting requirements to build wheel: started
+#19 4.735   Getting requirements to build wheel: finished with status 'done'
+#19 4.738   Installing backend dependencies: started
+#19 6.605   Installing backend dependencies: finished with status 'done'
+#19 6.607   Preparing metadata (pyproject.toml): started
+#19 7.063   Preparing metadata (pyproject.toml): finished with status 'done'
+#19 7.066 Requirement already satisfied: pip in /usr/local/lib/python3.11/site-packages (23.1.2)
+#19 7.261 Collecting pip
+#19 7.405   Downloading pip-23.2.1-py3-none-any.whl (2.1 MB)
+#19 7.632      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 2.1/2.1 MB 9.4 MB/s eta 0:00:00
+#19 7.641 Requirement already satisfied: setuptools in /usr/local/lib/python3.11/site-packages (65.5.1)
+#19 7.857 Collecting setuptools
+#19 7.859   Using cached setuptools-68.0.0-py3-none-any.whl (804 kB)
+#19 7.864 Requirement already satisfied: wheel in /usr/local/lib/python3.11/site-packages (0.41.0)
+#19 8.110 Collecting faust-streaming==0.10.14 (from kemux==0.1.0)
+#19 8.150   Downloading faust_streaming-0.10.14-cp311-cp311-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl (1.1 MB)
+#19 8.182      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.1/1.1 MB 35.4 MB/s eta 0:00:00
+#19 8.608 Collecting aiohttp<4.0,>=3.8.0 (from faust-streaming==0.10.14->kemux==0.1.0)
+#19 8.650   Downloading aiohttp-3.8.5-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (1.1 MB)
+#19 8.682      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.1/1.1 MB 35.0 MB/s eta 0:00:00
+#19 8.737 Collecting aiohttp-cors<2.0,>=0.7 (from faust-streaming==0.10.14->kemux==0.1.0)
+#19 8.776   Downloading aiohttp_cors-0.7.0-py3-none-any.whl (27 kB)
+#19 8.841 Collecting aiokafka<0.9.0,>=0.8.0 (from faust-streaming==0.10.14->kemux==0.1.0)
+#19 8.984   Downloading aiokafka-0.8.1-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (1.2 MB)
+#19 9.022      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.2/1.2 MB 32.6 MB/s eta 0:00:00
+#19 9.081 Collecting click<8.2,>=6.7 (from faust-streaming==0.10.14->kemux==0.1.0)
+#19 9.119   Downloading click-8.1.6-py3-none-any.whl (97 kB)
+#19 9.124      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 97.9/97.9 kB 42.6 MB/s eta 0:00:00
+#19 9.181 Collecting mode-streaming>=0.3.0 (from faust-streaming==0.10.14->kemux==0.1.0)
+#19 9.222   Downloading mode_streaming-0.3.5-py2.py3-none-any.whl (100 kB)
+#19 9.226      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100.1/100.1 kB 43.6 MB/s eta 0:00:00
+#19 9.279 Collecting opentracing<=2.4.0,>=1.3.0 (from faust-streaming==0.10.14->kemux==0.1.0)
+#19 9.319   Downloading opentracing-2.4.0.tar.gz (46 kB)
+#19 9.323      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 46.2/46.2 kB 13.3 MB/s eta 0:00:00
+#19 9.338   Preparing metadata (setup.py): started
+#19 10.03   Preparing metadata (setup.py): finished with status 'done'
+#19 10.09 Collecting terminaltables<4.0,>=3.1 (from faust-streaming==0.10.14->kemux==0.1.0)
+#19 10.13   Downloading terminaltables-3.1.10-py2.py3-none-any.whl (15 kB)
+#19 10.35 Collecting yarl<2.0,>=1.0 (from faust-streaming==0.10.14->kemux==0.1.0)
+#19 10.39   Downloading yarl-1.9.2-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (282 kB)
+#19 10.40      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 282.8/282.8 kB 28.6 MB/s eta 0:00:00
+#19 10.47 Collecting croniter>=0.3.16 (from faust-streaming==0.10.14->kemux==0.1.0)
+#19 10.52   Downloading croniter-1.4.1-py2.py3-none-any.whl (19 kB)
+#19 10.57 Collecting mypy-extensions (from faust-streaming==0.10.14->kemux==0.1.0)
+#19 10.61   Downloading mypy_extensions-1.0.0-py3-none-any.whl (4.7 kB)
+#19 10.67 Collecting venusian==3.0.0 (from faust-streaming==0.10.14->kemux==0.1.0)
+#19 10.75   Downloading venusian-3.0.0-py3-none-any.whl (13 kB)
+#19 10.80 Collecting intervaltree (from faust-streaming==0.10.14->kemux==0.1.0)
+#19 10.85   Downloading intervaltree-3.1.0.tar.gz (32 kB)
+#19 10.86   Preparing metadata (setup.py): started
+#19 11.60   Preparing metadata (setup.py): finished with status 'done'
+#19 11.66 Collecting six (from faust-streaming==0.10.14->kemux==0.1.0)
+#19 11.70   Downloading six-1.16.0-py2.py3-none-any.whl (11 kB)
+#19 12.28 Collecting attrs>=17.3.0 (from aiohttp<4.0,>=3.8.0->faust-streaming==0.10.14->kemux==0.1.0)
+#19 12.31   Downloading attrs-23.1.0-py3-none-any.whl (61 kB)
+#19 12.32      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 61.2/61.2 kB 19.3 MB/s eta 0:00:00
+#19 12.58 Collecting charset-normalizer<4.0,>=2.0 (from aiohttp<4.0,>=3.8.0->faust-streaming==0.10.14->kemux==0.1.0)
+#19 12.62   Downloading charset_normalizer-3.2.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (199 kB)
+#19 12.63      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 199.6/199.6 kB 41.5 MB/s eta 0:00:00
+#19 13.00 Collecting multidict<7.0,>=4.5 (from aiohttp<4.0,>=3.8.0->faust-streaming==0.10.14->kemux==0.1.0)
+#19 13.04   Downloading multidict-6.0.4-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (117 kB)
+#19 13.04      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 117.4/117.4 kB 39.6 MB/s eta 0:00:00
+#19 13.10 Collecting async-timeout<5.0,>=4.0.0a3 (from aiohttp<4.0,>=3.8.0->faust-streaming==0.10.14->kemux==0.1.0)
+#19 13.14   Downloading async_timeout-4.0.2-py3-none-any.whl (5.8 kB)
+#19 13.26 Collecting frozenlist>=1.1.1 (from aiohttp<4.0,>=3.8.0->faust-streaming==0.10.14->kemux==0.1.0)
+#19 13.30   Downloading frozenlist-1.4.0-cp311-cp311-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl (250 kB)
+#19 13.31      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 250.5/250.5 kB 24.8 MB/s eta 0:00:00
+#19 13.36 Collecting aiosignal>=1.1.2 (from aiohttp<4.0,>=3.8.0->faust-streaming==0.10.14->kemux==0.1.0)
+#19 13.40   Downloading aiosignal-1.3.1-py3-none-any.whl (7.6 kB)
+#19 13.48 Collecting kafka-python>=2.0.2 (from aiokafka<0.9.0,>=0.8.0->faust-streaming==0.10.14->kemux==0.1.0)
+#19 13.52   Downloading kafka_python-2.0.2-py2.py3-none-any.whl (246 kB)
+#19 13.53      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 246.5/246.5 kB 32.7 MB/s eta 0:00:00
+#19 13.59 Collecting packaging (from aiokafka<0.9.0,>=0.8.0->faust-streaming==0.10.14->kemux==0.1.0)
+#19 13.63   Downloading packaging-23.1-py3-none-any.whl (48 kB)
+#19 13.63      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 48.9/48.9 kB 23.0 MB/s eta 0:00:00
+#19 13.69 Collecting python-dateutil (from croniter>=0.3.16->faust-streaming==0.10.14->kemux==0.1.0)
+#19 13.73   Downloading python_dateutil-2.8.2-py2.py3-none-any.whl (247 kB)
+#19 13.74      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 247.7/247.7 kB 24.9 MB/s eta 0:00:00
+#19 13.81 Collecting colorlog>=2.9.0 (from mode-streaming>=0.3.0->faust-streaming==0.10.14->kemux==0.1.0)
+#19 13.85   Downloading colorlog-6.7.0-py2.py3-none-any.whl (11 kB)
+#19 13.96 Collecting idna>=2.0 (from yarl<2.0,>=1.0->faust-streaming==0.10.14->kemux==0.1.0)
+#19 14.00   Downloading idna-3.4-py3-none-any.whl (61 kB)
+#19 14.01      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 61.5/61.5 kB 26.9 MB/s eta 0:00:00
+#19 14.06 Collecting sortedcontainers<3.0,>=2.0 (from intervaltree->faust-streaming==0.10.14->kemux==0.1.0)
+#19 14.10   Downloading sortedcontainers-2.4.0-py2.py3-none-any.whl (29 kB)
+#19 14.17 Building wheels for collected packages: kemux, opentracing, intervaltree
+#19 14.17   Building wheel for kemux (pyproject.toml): started
+#19 14.65   Building wheel for kemux (pyproject.toml): finished with status 'done'
+#19 14.65   Created wheel for kemux: filename=kemux-0.1.0-py3-none-any.whl size=7341 sha256=45a87bde8dca95c75120779237c31079120a0d4193dc747ddfabe2966e4f139b
+#19 14.65   Stored in directory: /tmp/pip-ephem-wheel-cache-v02b6chv/wheels/6b/ab/5a/fdd633e97241a2cc209cec76ad38653ee6ed634034a75287b5
+#19 14.65   Building wheel for opentracing (setup.py): started
+#19 15.56   Building wheel for opentracing (setup.py): finished with status 'done'
+#19 15.56   Created wheel for opentracing: filename=opentracing-2.4.0-py3-none-any.whl size=51404 sha256=75eb23b1810c5d7b63f73d124326369307056eb63b012c07d35b9bb20be214f4
+#19 15.56   Stored in directory: /home/kemux/.cache/pip/wheels/d5/9a/0c/7189293233fd91d6e8f35bcd9a1ea76fb360f4344e5d8c4ec7
+#19 15.56   Building wheel for intervaltree (setup.py): started
+#19 16.45   Building wheel for intervaltree (setup.py): finished with status 'done'
+#19 16.45   Created wheel for intervaltree: filename=intervaltree-3.1.0-py2.py3-none-any.whl size=26099 sha256=1845f48e7d9f7eb2863466ea1d0d14d2ef2381a2d9cff0f90ea2a4fd70aee3fa
+#19 16.45   Stored in directory: /home/kemux/.cache/pip/wheels/31/d7/d9/eec6891f78cac19a693bd40ecb8365d2f4613318c145ec9816
+#19 16.45 Successfully built kemux opentracing intervaltree
+#19 16.62 Installing collected packages: sortedcontainers, opentracing, kafka-python, venusian, terminaltables, six, setuptools, pip, packaging, mypy-extensions, multidict, intervaltree, idna, frozenlist, colorlog, click, charset-normalizer, attrs, async-timeout, yarl, python-dateutil, aiosignal, aiokafka, croniter, aiohttp, mode-streaming, aiohttp-cors, faust-streaming, kemux
+#19 18.01   WARNING: The scripts pip, pip3 and pip3.11 are installed in '/home/kemux/.local/bin' which is not on PATH.
+#19 18.01   Consider adding this directory to PATH or, if you prefer to suppress this warning, use --no-warn-script-location.
+#19 18.21   WARNING: The script normalizer is installed in '/home/kemux/.local/bin' which is not on PATH.
+#19 18.21   Consider adding this directory to PATH or, if you prefer to suppress this warning, use --no-warn-script-location.
+#19 18.81   WARNING: The script faust is installed in '/home/kemux/.local/bin' which is not on PATH.
+#19 18.81   Consider adding this directory to PATH or, if you prefer to suppress this warning, use --no-warn-script-location.
+#19 18.95 Successfully installed aiohttp-3.8.5 aiohttp-cors-0.7.0 aiokafka-0.8.1 aiosignal-1.3.1 async-timeout-4.0.2 attrs-23.1.0 charset-normalizer-3.2.0 click-8.1.6 colorlog-6.7.0 croniter-1.4.1 faust-streaming-0.10.14 frozenlist-1.4.0 idna-3.4 intervaltree-3.1.0 kafka-python-2.0.2 kemux-0.1.0 mode-streaming-0.3.5 multidict-6.0.4 mypy-extensions-1.0.0 opentracing-2.4.0 packaging-23.1 pip-23.2.1 python-dateutil-2.8.2 setuptools-68.0.0 six-1.16.0 sortedcontainers-2.4.0 terminaltables-3.1.10 venusian-3.0.0 yarl-1.9.2
+#19 18.95 
+#19 18.95 [notice] A new release of pip is available: 23.1.2 -> 23.2.1
+#19 18.95 [notice] To update, run: pip install --upgrade pip
+#19 DONE 19.3s
+
+#20 [environment-kemux-splitter] exporting to image
+#20 exporting layers
+#20 exporting layers 0.4s done
+#20 writing image sha256:847c11cae4d82b8bbc0f274a9e1a7795e141c16bad7d692c0eec0be51d61f9f8
+#20 writing image sha256:847c11cae4d82b8bbc0f274a9e1a7795e141c16bad7d692c0eec0be51d61f9f8 done
+#20 naming to docker.io/library/environment-kemux-splitter done
+#20 DONE 0.6s
