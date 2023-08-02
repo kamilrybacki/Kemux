@@ -19,7 +19,8 @@ RUN \
   adduser \
     -h ${SPLITTER_USER_HOME} \
     -s /bin/bash \
-    ${SPLITTER_USER}
+    ${SPLITTER_USER} \
+    || true
 
 COPY \
   pyproject.toml \
