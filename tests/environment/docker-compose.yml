@@ -18,15 +18,16 @@ services:
     image: confluentinc/cp-kafka:7.3.2
     hostname: kemux-kafka
     networks:
-      - kemux
+      kemux:
+        ipv4_address: ${KEMUX_KAFKA_IP} 
     container_name: kemux-kafka
     ports:
-      - "9092:9092"
+      - "${KEMUX_KAFKA_PORT}:9092"
       - "29092:29092"
       - "9999:9999"
     environment:
-      KAFKA_LISTENERS: EXTERNAL_SAME_HOST://:29092,INTERNAL://:9092
-      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kemux-kafka:9092,EXTERNAL_SAME_HOST://localhost:29092
+      KAFKA_LISTENERS: EXTERNAL_SAME_HOST://:29092,INTERNAL://:${KEMUX_KAFKA_PORT}
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://${KEMUX_KAFKA_IP}:${KEMUX_KAFKA_PORT},EXTERNAL_SAME_HOST://localhost:29092
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL_SAME_HOST:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
       KAFKA_ZOOKEEPER_CONNECT: "kemux-zoo:2181"
@@ -44,27 +45,25 @@ services:
 
   kemux-producer:
     networks:
-      - kemux
-    build:
-      context: ../../
-      dockerfile: tests/environment/docker/Producer.Dockerfile
-      args:
-        KEMUX_KAFKA_ADDRESS: "kemux-kafka:9092"
+      kemux:
+        ipv4_address: ${KEMUX_PRODUCER_IP}
+    image: kemux/producer:latest
     depends_on:
       - kemux-kafka
       - kemux-zoo
 
   kemux-splitter:
     networks:
-      - kemux
-    build:
-      context: ../../
-      dockerfile: tests/environment/docker/Splitter.Dockerfile
-      args:
-        KEMUX_KAFKA_ADDRESS: "kafka://kemux-kafka:9092"
+      kemux:
+        ipv4_address: ${KEMUX_SPLITTER_IP}
+    image: kemux/splitter:latest
     depends_on:
       - kemux-producer
 
 networks:
   kemux:
-    name: kemux-test-stack-network
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.5.0.0/16
+          gateway: 10.5.0.1
