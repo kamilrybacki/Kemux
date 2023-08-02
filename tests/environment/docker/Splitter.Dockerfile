@@ -9,7 +9,6 @@ USER root
 
 RUN \
   adduser \
-    -m \
     -h ${SPLITTER_USER_HOME} \
     -s /bin/bash \
     ${SPLITTER_USER}\
