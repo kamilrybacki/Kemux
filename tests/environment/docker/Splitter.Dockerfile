@@ -13,10 +13,6 @@ RUN \
     -s /bin/bash \
     ${SPLITTER_USER}\
   && \
-  addgroup \
-    ${SPLITTER_USER} \
-    ${SPLITTER_USER} \
-  && \
   mkdir \
     -p \
     ${SPLITTER_USER_HOME}/lib \
@@ -44,7 +40,7 @@ COPY \
 RUN \
   chown \
     -R \
-    ${SPLITTER_USER}:${SPLITTER_USER}\
+    ${SPLITTER_USER}\
     ${SPLITTER_USER_HOME}
 
 USER ${SPLITTER_USER}
