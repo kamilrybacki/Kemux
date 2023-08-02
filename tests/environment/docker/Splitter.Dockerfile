@@ -8,16 +8,15 @@ ENV SPLITTER_USER_HOME=/home/${SPLITTER_USER}
 USER root
 
 RUN \
-  useradd \
+  adduser \
     -m \
-    -d ${SPLITTER_USER_HOME} \
+    -h ${SPLITTER_USER_HOME} \
     -s /bin/bash \
     ${SPLITTER_USER}\
   && \
-  usermod \
-    --append \
-    --groups ${SPLITTER_USER}\
-    ${SPLITTER_USER}\
+  addgroup \
+    ${SPLITTER_USER} \
+    ${SPLITTER_USER} \
   && \
   mkdir \
     -p \
