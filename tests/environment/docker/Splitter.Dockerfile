@@ -13,8 +13,9 @@ RUN \
     ${SPLITTER_USER_HOME}/lib \
     ${SPLITTER_USER_HOME}/lib/kemux \
     ${SPLITTER_USER_HOME}/streams \
-    ${SPLITTER_USER_HOME}/data \
-  && \
+    ${SPLITTER_USER_HOME}/data
+
+RUN \
   adduser \
     -h ${SPLITTER_USER_HOME} \
     -s /bin/bash \
