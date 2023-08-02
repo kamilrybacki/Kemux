@@ -21,6 +21,7 @@ jobs:
           file: ./tests/environment/docker/Producer.Dockerfile
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          outputs: type=registry,dest=producer.tar
           tags: kemux/producer:latest
           build-args:
             KEMUX_KAFKA_ADDRESS=${{ env.KEMUX_IP_SUBNET }}.2:${{ env.KEMUX_KAFKA_PORT }}
@@ -31,6 +32,7 @@ jobs:
           file: ./tests/environment/docker/Splitter.Dockerfile
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          outputs: type=registry,dest=splitter.tar
           tags: kemux/splitter:latest
           build-args:
             KEMUX_KAFKA_ADDRESS=${{ env.KEMUX_IP_SUBNET }}.2:${{ env.KEMUX_KAFKA_PORT }}
