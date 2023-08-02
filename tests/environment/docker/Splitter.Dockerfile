@@ -8,17 +8,17 @@ ENV SPLITTER_USER_HOME=/home/${SPLITTER_USER}
 USER root
 
 RUN \
-  adduser \
-    -h ${SPLITTER_USER_HOME} \
-    -s /bin/bash \
-    ${SPLITTER_USER}\
-  && \
   mkdir \
     -p \
     ${SPLITTER_USER_HOME}/lib \
     ${SPLITTER_USER_HOME}/lib/kemux \
     ${SPLITTER_USER_HOME}/streams \
-    ${SPLITTER_USER_HOME}/data
+    ${SPLITTER_USER_HOME}/data \
+  && \
+  adduser \
+    -h ${SPLITTER_USER_HOME} \
+    -s /bin/bash \
+    ${SPLITTER_USER}
 
 COPY \
   pyproject.toml \
