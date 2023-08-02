@@ -17,4 +17,4 @@ jobs:
             ./tests/environment/docker-compose.yml
       - name: Check connection to Kafka container
         run: |
-          docker ps
+          docker log environment-kemux-producer
