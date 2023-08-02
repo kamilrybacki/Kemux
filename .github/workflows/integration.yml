@@ -6,7 +6,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build-docker-images:
+  integration-tests:
     runs-on: ubuntu-latest
     env:
       KEMUX_KAFKA_IP: 10.5.0.2
