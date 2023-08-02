@@ -65,5 +65,5 @@ networks:
     driver: bridge
     ipam:
       config:
-        - subnet: ${KEMUX_IP_SUBNET}/16
+        - subnet: ${KEMUX_IP_SUBNET}.0/16
           gateway: 10.5.0.1
