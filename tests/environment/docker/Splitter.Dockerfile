@@ -35,11 +35,6 @@ COPY \
   kemux/ \ 
   ${SPLITTER_USER_HOME}/lib/kemux/
 
-RUN \
-  ls \
-    -la \
-    ${SPLITTER_USER_HOME}/lib/kemux
-
 COPY \
   tests/lib/splitter/start.py \
   ${SPLITTER_USER_HOME}/splitter.py
