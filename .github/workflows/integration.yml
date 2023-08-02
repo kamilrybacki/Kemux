@@ -34,6 +34,9 @@ jobs:
           tags: kemux/splitter:latest
           build-args:
             KEMUX_KAFKA_ADDRESS=${{ env.KEMUX_IP_SUBNET }}.2:${{ env.KEMUX_KAFKA_PORT }}
+      - name: Show images
+        run: |
+          docker images
       - name: Setup tests environment 
         uses: isbang/compose-action@v1.5.0
         env:
