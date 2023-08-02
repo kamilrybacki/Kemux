@@ -26,6 +26,11 @@ jobs:
           tags: kemux/producer:latest
           build-args:
             KEMUX_KAFKA_ADDRESS=${{ env.KEMUX_IP_SUBNET }}.2:${{ env.KEMUX_KAFKA_PORT }}
+      - name: Upload producer image as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: producer-image
+          path: /tmp/producer.tar
       - name: Build splitter image
         uses: docker/build-push-action@v2
         with:
@@ -37,11 +42,6 @@ jobs:
           tags: kemux/splitter:latest
           build-args:
             KEMUX_KAFKA_ADDRESS=${{ env.KEMUX_IP_SUBNET }}.2:${{ env.KEMUX_KAFKA_PORT }}
-      - name: Upload producerimage as artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: producer-image
-          path: /tmp/producer.tar
       - name: Upload splitter image as artifact
         uses: actions/upload-artifact@v3
         with:
@@ -56,12 +56,12 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: producer-image
-          path: /tmp/producer.tar
+          path: /tmp
       - name: Download splitter image
         uses: actions/download-artifact@v2
         with:
           name: splitter-image
-          path: /tmp/splitter.tar
+          path: /tmp
       - name: Load built images into Docker daemon
         run: |
           docker load -i /tmp/producer.tar
