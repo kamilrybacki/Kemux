@@ -5,12 +5,13 @@ concurrency:
   group: ${{ github.ref }}-it
   cancel-in-progress: true
 
+env:
+  KEMUX_IP_SUBNET: 10.5.0
+  KEMUX_KAFKA_PORT: 9092
+
 jobs:
-  integration-tests:
+  build-docker-images:
     runs-on: ubuntu-latest
-    env:
-      KEMUX_IP_SUBNET: 10.5.0
-      KEMUX_KAFKA_PORT: 9092
     steps:
       - uses: actions/checkout@v2
       - uses: docker/setup-buildx-action@v1
@@ -36,6 +37,31 @@ jobs:
           tags: kemux/splitter:latest
           build-args:
             KEMUX_KAFKA_ADDRESS=${{ env.KEMUX_IP_SUBNET }}.2:${{ env.KEMUX_KAFKA_PORT }}
+      - name: Upload producerimage as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: producer-image
+          path: ./producer.tar
+      - name: Upload splitter image as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: splitter-image
+          path: ./splitter.tar
+  integration-tests-with-kafka:
+    runs-on: ubuntu-latest
+    needs: build-docker-images
+    steps:
+      - uses: actions/checkout@v2
+      - name: Download producer image
+        uses: actions/download-artifact@v2
+        with:
+          name: producer-image
+          path: ./producer.tar
+      - name: Download splitter image
+        uses: actions/download-artifact@v2
+        with:
+          name: splitter-image
+          path: ./splitter.tar
       - name: Load built images into Docker daemon
         run: |
           docker load -i ./producer.tar
