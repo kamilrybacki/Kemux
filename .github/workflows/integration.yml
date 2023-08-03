@@ -75,11 +75,11 @@ jobs:
       - name: Load producer image
         run: |
           tar -cvf /tmp/producer.tar /tmp/producer
-          docker load -i /tmp/producer.tar
+          docker import /tmp/producer.tar 
       - name: Load splitter image
         run: |
           tar -cvf /tmp/splitter.tar /tmp/splitter
-          docker load -i /tmp/splitter
+          docker import /tmp/splitter.tar 
       
       - name: Setup tests environment 
         uses: isbang/compose-action@v1.5.0
