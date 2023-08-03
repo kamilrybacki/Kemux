@@ -21,22 +21,22 @@ jobs:
         id: producer-cache
         uses: actions/cache@v3
         with:
-          path: /tmp/producer.tar
+          path: /tmp/producer
           key: ${{runner.os}}-producer-image
           lookup-only: true
       - name: Restore producer image from cache
         uses: actions/cache/restore@v3
         if: steps.producer-cache.outputs.cache-hit == 'true'
         with:
-          path: /tmp/producer.tar
+          path: /tmp/producer
           key: ${{runner.os}}-producer-image
       - name: Build producer image
         uses: docker/build-push-action@v2
         with:
           context: .
           file: ./tests/environment/docker/Producer.Dockerfile
-          cache-from: type=tar,src=/tmp/producer.tar
-          outputs: type=tar,dest=/tmp/producer.tar
+          cache-from: type=local,src=/tmp/producer
+          outputs: type=local,dest=/tmp/producer
           tags: kemux/producer:latest
 
       - name: Lookup cache for splitter image
@@ -57,25 +57,25 @@ jobs:
         with:
           context: .
           file: ./tests/environment/docker/Splitter.Dockerfile
-          cache-from: type=tar,src=/tmp/splitter.tar
-          outputs: type=tar,dest=/tmp/splitter.tar
+          cache-from: type=local,src=/tmp/splitter
+          outputs: type=local,dest=/tmp/splitter
           tags: kemux/splitter:latest
 
       - name: Save producer image to cache
         uses: actions/cache@v3
         with:
-          path: /tmp/producer.tar
+          path: /tmp/producer
           key: ${{runner.os}}-producer-image
       - name: Save splitter image to cache
         uses: actions/cache@v3
         with:
-          path: /tmp/splitter.tar
+          path: /tmp/splitter
           key: ${{runner.os}}-splitter-image
 
       - name: Load producer image
-        run: docker load -i /tmp/producer.tar
+        run: docker load -i /tmp/producer
       - name: Load splitter image
-        run: docker load -i /tmp/splitter.tar
+        run: docker load -i /tmp/splitter
       
       - name: Setup tests environment 
         uses: isbang/compose-action@v1.5.0
