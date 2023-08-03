@@ -80,6 +80,10 @@ jobs:
           path: /tmp/splitter.tar
           key: splitter-image
 
+      - name: Show images
+        run: |
+          docker images
+
       - name: Setup tests environment 
         uses: isbang/compose-action@v1.5.0
         env:
