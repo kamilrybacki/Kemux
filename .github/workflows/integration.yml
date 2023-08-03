@@ -14,17 +14,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: docker/setup-buildx-action@v1
-      - name: Download producer image
-        uses: actions/download-artifact@v2
+      - name: Restore producer image from cache
+        uses: actions/cache/restore@v3
         with:
-          name: producer-image
-          path: /tmp
-      - name: Download splitter image
-        uses: actions/download-artifact@v2
+          path: /tmp/producer.tar
+          key: producer-image
+      - name: Restore splitter image from cache
+        uses: actions/cache/restore@v3
         with:
-          name: splitter-image
-          path: /tmp
+          path: /tmp/splitter.tar
+          key: splitter-image
       - name: Load built images into Docker daemon
         run: |
           docker load -i /tmp/producer.tar
@@ -37,11 +36,6 @@ jobs:
           cache-from: type=docker,ref=kemux/producer:latest
           outputs: type=docker,dest=/tmp/producer.tar
           tags: kemux/producer:latest
-      - name: Upload producer image as artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: producer-image
-          path: /tmp/producer.tar
       - name: Build splitter image
         uses: docker/build-push-action@v2
         with:
@@ -50,11 +44,16 @@ jobs:
           cache-from: type=docker,ref=kemux/splitter:latest
           outputs: type=docker,dest=/tmp/splitter.tar
           tags: kemux/splitter:latest
-      - name: Upload splitter image as artifact
-        uses: actions/upload-artifact@v3
+      - name: Save producer image to cache
+        uses: actions/cache/save@v3
         with:
-          name: splitter-image
+          path: /tmp/producer.tar
+          key: producer-image
+      - name: Save splitter image to cache
+        uses: actions/cache/save@v3
+        with:
           path: /tmp/splitter.tar
+          key: splitter-image
       - name: Setup tests environment 
         uses: isbang/compose-action@v1.5.0
         env:
