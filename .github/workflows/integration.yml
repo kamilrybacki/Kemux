@@ -14,20 +14,24 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Restore producer image from cache
-        uses: actions/cache/restore@v3
+
+      - name: Lookup cache for producer image
+        id: producer-cache
+        uses: actions/cache@v3
         with:
           path: /tmp/producer.tar
           key: producer-image
-      - name: Restore splitter image from cache
+          lookup-only: true
+      - name: Restore producer image from cache
         uses: actions/cache/restore@v3
+        if: steps.producer-cache.outputs.cache-hit != 'true'
         with:
-          path: /tmp/splitter.tar
-          key: splitter-image
-      - name: Load built images into Docker daemon
+          path: /tmp/producer.tar
+          key: producer-image
+      - name: Load producer image into Docker daemon
+        if: steps.producer-cache.outputs.cache-hit != 'true'
         run: |
           docker load -i /tmp/producer.tar
-          docker load -i /tmp/splitter.tar
       - name: Build producer image
         uses: docker/build-push-action@v2
         with:
@@ -36,6 +40,24 @@ jobs:
           cache-from: type=docker,ref=kemux/producer:latest
           outputs: type=docker,dest=/tmp/producer.tar
           tags: kemux/producer:latest
+
+      - name: Lookup cache for splitter image
+        id: splitter-cache
+        uses: actions/cache@v3
+        with:
+          path: /tmp/splitter.tar
+          key: splitter-image
+          lookup-only: true
+      - name: Restore splitter image from cache
+        uses: actions/cache/restore@v3
+        if: steps.splitter-cache.outputs.cache-hit != 'true'
+        with:
+          path: /tmp/splitter.tar
+          key: splitter-image
+      - name: Load splitter image into Docker daemon
+        if: steps.splitter-cache.outputs.cache-hit != 'true'
+        run: |
+          docker load -i /tmp/splitter.tar
       - name: Build splitter image
         uses: docker/build-push-action@v2
         with:
@@ -44,6 +66,7 @@ jobs:
           cache-from: type=docker,ref=kemux/splitter:latest
           outputs: type=docker,dest=/tmp/splitter.tar
           tags: kemux/splitter:latest
+
       - name: Save producer image to cache
         uses: actions/cache/save@v3
         with:
@@ -54,6 +77,7 @@ jobs:
         with:
           path: /tmp/splitter.tar
           key: splitter-image
+
       - name: Setup tests environment 
         uses: isbang/compose-action@v1.5.0
         env:
