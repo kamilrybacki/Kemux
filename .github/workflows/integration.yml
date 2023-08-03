@@ -72,9 +72,10 @@ jobs:
           path: /tmp/splitter.tar
           key: splitter-image
 
-      - name: Show images
-        run: |
-          docker images
+      - name: Load producer image
+        run: docker load -i /tmp/producer.tar
+      - name: Load splitter image
+        run: docker load -i /tmp/splitter.tar
 
       - name: Setup tests environment 
         uses: isbang/compose-action@v1.5.0
