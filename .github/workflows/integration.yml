@@ -24,12 +24,12 @@ jobs:
           lookup-only: true
       - name: Restore producer image from cache
         uses: actions/cache/restore@v3
-        if: steps.producer-cache.outputs.cache-hit != 'true'
+        if: steps.producer-cache.outputs.cache-hit == 'true'
         with:
           path: /tmp/producer.tar
           key: producer-image
       - name: Load producer image into Docker daemon
-        if: steps.producer-cache.outputs.cache-hit != 'true'
+        if: steps.producer-cache.outputs.cache-hit == 'true'
         run: |
           docker load -i /tmp/producer.tar
       - name: Build producer image
@@ -50,12 +50,12 @@ jobs:
           lookup-only: true
       - name: Restore splitter image from cache
         uses: actions/cache/restore@v3
-        if: steps.splitter-cache.outputs.cache-hit != 'true'
+        if: steps.splitter-cache.outputs.cache-hit == 'true'
         with:
           path: /tmp/splitter.tar
           key: splitter-image
       - name: Load splitter image into Docker daemon
-        if: steps.splitter-cache.outputs.cache-hit != 'true'
+        if: steps.splitter-cache.outputs.cache-hit == 'true'
         run: |
           docker load -i /tmp/splitter.tar
       - name: Build splitter image
