@@ -47,6 +47,8 @@ services:
     networks:
       kemux:
         ipv4_address: ${KEMUX_PRODUCER_IP}
+    environment:
+      - KEMUX_KAFKA_ADDRESS=${KEMUX_KAFKA_IP}:${KEMUX_KAFKA_PORT}
     image: kemux/producer:latest
     depends_on:
       - kemux-kafka
@@ -56,6 +58,8 @@ services:
     networks:
       kemux:
         ipv4_address: ${KEMUX_SPLITTER_IP}
+    environment:
+      - KEMUX_KAFKA_ADDRESS=${KEMUX_KAFKA_IP}:${KEMUX_KAFKA_PORT}
     image: kemux/splitter:latest
     depends_on:
       - kemux-producer

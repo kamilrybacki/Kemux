@@ -24,8 +24,6 @@ jobs:
           cache-to: type=gha,mode=max
           outputs: type=docker,dest=/tmp/producer.tar
           tags: kemux/producer:latest
-          build-args:
-            KEMUX_KAFKA_ADDRESS=${{ env.KEMUX_IP_SUBNET }}.2:${{ env.KEMUX_KAFKA_PORT }}
       - name: Upload producer image as artifact
         uses: actions/upload-artifact@v3
         with:
@@ -40,8 +38,6 @@ jobs:
           cache-to: type=gha,mode=max
           outputs: type=docker,dest=/tmp/splitter.tar
           tags: kemux/splitter:latest
-          build-args:
-            KEMUX_KAFKA_ADDRESS=${{ env.KEMUX_IP_SUBNET }}.2:${{ env.KEMUX_KAFKA_PORT }}
       - name: Upload splitter image as artifact
         uses: actions/upload-artifact@v3
         with:

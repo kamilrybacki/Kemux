@@ -49,7 +49,7 @@ class Processor:
             instance.__logger.info(f'Connecting to Kafka broker: {kafka_address}')
             app = faust.App(
                 'splitter_broker',
-                broker=kafka_address,
+                broker=f'kafka://{kafka_address}',
                 value_serializer='json',
                 datadir=instance.persistent_data_directory,
             )
