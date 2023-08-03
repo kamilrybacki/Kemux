@@ -73,9 +73,13 @@ jobs:
           key: ${{runner.os}}-splitter-image
 
       - name: Load producer image
-        run: docker load -i /tmp/producer
+        run: |
+          tar -cvf /tmp/producer.tar /tmp/producer
+          docker load -i /tmp/producer.tar
       - name: Load splitter image
-        run: docker load -i /tmp/splitter
+        run: |
+          tar -cvf /tmp/splitter.tar /tmp/splitter
+          docker load -i /tmp/splitter
       
       - name: Setup tests environment 
         uses: isbang/compose-action@v1.5.0
