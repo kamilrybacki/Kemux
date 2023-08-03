@@ -76,15 +76,15 @@ jobs:
         run: docker load -i /tmp/producer.tar
       - name: Load splitter image
         run: docker load -i /tmp/splitter.tar
-
+      
       - name: Setup tests environment 
         uses: isbang/compose-action@v1.5.0
         env:
           KEMUX_IP_SUBNET: ${{ env.KEMUX_IP_SUBNET }}
-          KEMUX_KAFKA_IP: ${{ env.KEMUX_IP_SUBNET }}.2
+          KEMUX_KAFKA_IP: ${{ env.KEMUX_IP_SUBNET }}.3
           KEMUX_KAFKA_PORT: ${{ env.KEMUX_KAFKA_PORT }}
-          KEMUX_PRODUCER_IP: ${{ env.KEMUX_IP_SUBNET }}.3
-          KEMUX_SPLITTER_IP: ${{ env.KEMUX_IP_SUBNET }}.4
+          KEMUX_PRODUCER_IP: ${{ env.KEMUX_IP_SUBNET }}.4
+          KEMUX_SPLITTER_IP: ${{ env.KEMUX_IP_SUBNET }}.5
         with:
           compose-file: |
             ./tests/environment/docker-compose.yml

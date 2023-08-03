@@ -19,7 +19,7 @@ services:
     hostname: kemux-kafka
     networks:
       kemux:
-        ipv4_address: ${KEMUX_KAFKA_IP} 
+        ipv4_address: ${KEMUX_KAFKA_IP}
     container_name: kemux-kafka
     ports:
       - "${KEMUX_KAFKA_PORT}:9092"
