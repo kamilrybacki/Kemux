@@ -62,12 +62,12 @@ jobs:
           tags: kemux/splitter:latest
 
       - name: Save producer image to cache
-        uses: actions/cache/save@v3
+        uses: actions/cache@v3
         with:
           path: /tmp/producer.tar
           key: producer-image
       - name: Save splitter image to cache
-        uses: actions/cache/save@v3
+        uses: actions/cache@v3
         with:
           path: /tmp/splitter.tar
           key: splitter-image
