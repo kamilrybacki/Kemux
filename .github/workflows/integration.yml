@@ -74,11 +74,11 @@ jobs:
 
       - name: Load producer image
         run: |
-          tar -cvf /tmp/producer.tar /tmp/producer
+          tar -cvf /tmp/producer.tar /tmp/producer > /dev/null
           docker import /tmp/producer.tar 
       - name: Load splitter image
         run: |
-          tar -cvf /tmp/splitter.tar /tmp/splitter
+          tar -cvf /tmp/splitter.tar /tmp/splitter > /dev/null
           docker import /tmp/splitter.tar 
       
       - name: Setup tests environment 
