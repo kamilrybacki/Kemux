@@ -35,8 +35,8 @@ jobs:
         with:
           context: .
           file: ./tests/environment/docker/Producer.Dockerfile
-          cache-from: type=spliter,src=/tmp/producer.tar
-          outputs: type=docker,dest=/tmp/producer.tar
+          cache-from: type=tar,src=/tmp/producer.tar
+          outputs: type=tar,dest=/tmp/producer.tar
           tags: kemux/producer:latest
 
       - name: Lookup cache for splitter image
@@ -57,8 +57,8 @@ jobs:
         with:
           context: .
           file: ./tests/environment/docker/Splitter.Dockerfile
-          cache-from: type=local,src=/tmp/splitter.tar
-          outputs: type=docker,dest=/tmp/splitter.tar
+          cache-from: type=tar,src=/tmp/splitter.tar
+          outputs: type=tar,dest=/tmp/splitter.tar
           tags: kemux/splitter:latest
 
       - name: Save producer image to cache
