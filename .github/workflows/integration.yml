@@ -21,7 +21,7 @@ jobs:
         id: producer-cache
         uses: actions/cache@v3
         with:
-          path: /tmp/producer
+          path: /tmp/producer.tar
           key: ${{runner.os}}-producer-image
           lookup-only: true
       - name: Restore producer image from cache
@@ -30,13 +30,16 @@ jobs:
         with:
           path: /tmp/producer
           key: ${{runner.os}}-producer-image
+      - name: Load producer image
+        if: steps.producer-cache.outputs.cache-hit == 'true'
+        run: docker load -i /tmp/producer.tar
       - name: Build producer image
         uses: docker/build-push-action@v2
         with:
           context: .
           file: ./tests/environment/docker/Producer.Dockerfile
-          cache-from: type=local,src=/tmp/producer
-          outputs: type=local,dest=/tmp/producer
+          cache-from: type=registry,ref=kemux/producer:latest
+          outputs: type=tar,dest=/tmp/producer.tar
           tags: kemux/producer:latest
 
       - name: Lookup cache for splitter image
@@ -52,13 +55,16 @@ jobs:
         with:
           path: /tmp/splitter.tar
           key: ${{runner.os}}-splitter-image
+      - name: Load splitter image
+        if: steps.splitter-cache.outputs.cache-hit == 'true'
+        run: docker load -i /tmp/splitter.tar
       - name: Build splitter image
         uses: docker/build-push-action@v2
         with:
           context: .
           file: ./tests/environment/docker/Splitter.Dockerfile
-          cache-from: type=local,src=/tmp/splitter
-          outputs: type=local,dest=/tmp/splitter
+          cache-from: type=registry,ref=kemux/splitter:latest
+          outputs: type=tar,dest=/tmp/splitter.tar
           tags: kemux/splitter:latest
 
       - name: Save producer image to cache
@@ -71,15 +77,6 @@ jobs:
         with:
           path: /tmp/splitter
           key: ${{runner.os}}-splitter-image
-
-      - name: Load producer image
-        run: |
-          tar -cvf /tmp/producer.tar /tmp/producer > /dev/null
-          docker import /tmp/producer.tar kemux/producer:latest
-      - name: Load splitter image
-        run: |
-          tar -cvf /tmp/splitter.tar /tmp/splitter > /dev/null
-          docker import /tmp/splitter.tar kemux/splitter:latest
       
       - name: Setup tests environment 
         uses: isbang/compose-action@v1.5.0
