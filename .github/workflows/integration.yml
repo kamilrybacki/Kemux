@@ -64,16 +64,17 @@ jobs:
           context: .
           file: ./tests/environment/docker/Splitter.Dockerfile
           cache-from: type=registry,ref=kemux/splitter:latest
+          cache-to:
           outputs: type=tar,dest=/tmp/splitter.tar
           tags: kemux/splitter:latest
 
       - name: Save producer image to cache
-        uses: actions/cache@v3
+        uses: actions/cache/save@v3
         with:
           path: /tmp/producer
           key: ${{runner.os}}-producer-image
       - name: Save splitter image to cache
-        uses: actions/cache@v3
+        uses: actions/cache/save@v3
         with:
           path: /tmp/splitter
           key: ${{runner.os}}-splitter-image
