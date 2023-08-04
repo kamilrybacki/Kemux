@@ -39,6 +39,7 @@ jobs:
           context: .
           file: ./tests/environment/docker/Producer.Dockerfile
           cache-from: type=registry,ref=kemux/producer:latest
+          cache-to: type=registry,ref=kemux/producer:latest
           outputs: type=tar,dest=/tmp/producer.tar
           tags: kemux/producer:latest
 
@@ -64,7 +65,7 @@ jobs:
           context: .
           file: ./tests/environment/docker/Splitter.Dockerfile
           cache-from: type=registry,ref=kemux/splitter:latest
-          cache-to:
+          cache-to: type=registry,ref=kemux/splitter:latest
           outputs: type=tar,dest=/tmp/splitter.tar
           tags: kemux/splitter:latest
 
