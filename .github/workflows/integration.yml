@@ -8,6 +8,8 @@ concurrency:
 env:
   KEMUX_IP_SUBNET: 10.5.0
   KEMUX_KAFKA_PORT: 9092
+  KEMUX_PRODUCER_IMAGE: ghcr.io/${{ github.actor }}/kemux-producer:latest
+  KEMUX_SPLITTER_IMAGE: ghcr.io/${{ github.actor }}/kemux-splitter:latest
 
 jobs:
   build-docker-images:
@@ -27,22 +29,22 @@ jobs:
         with:
           context: .
           file: ./tests/environment/docker/Producer.Dockerfile
-          cache-from: type=registry,ref=kemux/producer:latest
-          cache-to: type=registry,ref=kemux/producer:latest
-          outputs: type=tar,dest=/tmp/producer.tar
-          tags: ghcr.io/kemux/producer:latest
+          cache-from: type=registry,ref=${{ env.KEMUX_PRODUCER_IMAGE }}
+          cache-to: type=registry,ref=${{ env.KEMUX_PRODUCER_IMAGE }}
+          tags: ${{ env.KEMUX_PRODUCER_IMAGE }}
       - name: Build splitter image
         uses: docker/build-push-action@v2
         with:
           context: .
           file: ./tests/environment/docker/Splitter.Dockerfile
-          cache-from: type=registry,ref=kemux/splitter:latest
-          cache-to: type=registry,ref=kemux/splitter:latest
-          outputs: type=tar,dest=/tmp/splitter.tar
-          tags: ghcr.io/kemux/splitter:latest
+          cache-from: type=registry,ref=${{ env.KEMUX_SPLITTER_IMAGE }}
+          cache-to: type=registry,ref=${{ env.KEMUX_SPLITTER_IMAGE }}
+          tags: ${{ env.KEMUX_SPLITTER_IMAGE }}
       - name: Setup tests environment 
         uses: isbang/compose-action@v1.5.0
         env:
+          KEMUX_PRODUCER_IMAGE: ${{ env.KEMUX_PRODUCER_IMAGE }}
+          KEMUX_SPLITTER_IMAGE: ${{ env.KEMUX_SPLITTER_IMAGE }}
           KEMUX_IP_SUBNET: ${{ env.KEMUX_IP_SUBNET }}
           KEMUX_KAFKA_IP: ${{ env.KEMUX_IP_SUBNET }}.3
           KEMUX_KAFKA_PORT: ${{ env.KEMUX_KAFKA_PORT }}
