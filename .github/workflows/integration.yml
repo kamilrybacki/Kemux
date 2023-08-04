@@ -4,6 +4,9 @@ on: [push]
 concurrency:
   group: ${{ github.ref }}-it
   cancel-in-progress: true
+permissions:
+    contents: read
+    packages: write
 
 env:
   KEMUX_IP_SUBNET: 10.5.0
