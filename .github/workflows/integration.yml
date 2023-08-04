@@ -8,8 +8,9 @@ concurrency:
 env:
   KEMUX_IP_SUBNET: 10.5.0
   KEMUX_KAFKA_PORT: 9092
-  KEMUX_PRODUCER_IMAGE: ghcr.io/${{ github.actor }}/kemux-producer:latest
-  KEMUX_SPLITTER_IMAGE: ghcr.io/${{ github.actor }}/kemux-splitter:latest
+  KEMUX_GHCR_NAMESPACE: $(echo ${{ github.actor }} | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/-/g')
+  KEMUX_PRODUCER_IMAGE: ghcr.io/${ KEMUX_GHCR_NAMESPACE }/kemux-producer:latest
+  KEMUX_SPLITTER_IMAGE: ghcr.io/${ KEMUX_GHCR_NAMESPACE }/kemux-splitter:latest
 
 jobs:
   build-docker-images:

@@ -5,7 +5,8 @@ services:
     image: confluentinc/cp-zookeeper:7.3.2
     hostname: kemux-zoo
     networks:
-      - kemux
+      kemux:
+        ipv4_address: ${KEMUX_KAFKA_IP}.2
     container_name: kemux-zoo
     ports:
       - "2181:2181"
