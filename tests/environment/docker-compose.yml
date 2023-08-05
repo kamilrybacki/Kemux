@@ -2,17 +2,17 @@ version: '2.1'
 
 services:
   tests-zoo:
-    image: bitnami/zookeeper
+    image: confluentinc/cp-zookeeper
     hostname: tests-zoo
-    networks:
-      kemux:
-        ipv4_address: ${ZOOKEEPER_IP}
-    container_name: tests-zoo
     ports:
       - "2181:2181"
     environment:
-      ALLOW_ANONYMOUS_LOGIN: 1
-
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+      ZOOKEEPER_SYNC_LIMIT: 2
+    networks:
+      kemux:
+        ipv4_address: ${ZOOKEEPER_IP}
   tests-kafka:
     image: confluentinc/cp-zookeeper
     hostname: tests-kafka
