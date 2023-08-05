@@ -24,7 +24,7 @@ services:
       - KAFKA_ADDRESS=broker:9092
     image: ${PRODUCER_IMAGE}
     depends_on:
-      - tests-kafka
+      - broker
 
   tests-splitter:
     container_name: tests-splitter
@@ -32,4 +32,4 @@ services:
       - KAFKA_ADDRESS=broker:9092
     image: ${SPLITTER_IMAGE}
     depends_on:
-      - tests-kafka
+      - broker
