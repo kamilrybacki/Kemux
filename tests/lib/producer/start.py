@@ -33,7 +33,6 @@ def start_producer() -> None:
         raise ValueError('KAFKA_ADDRESS not set')
     test_producer = kafka.KafkaProducer(
         bootstrap_servers=kafka_host,
-        api_version=(2, 7, 0)
     )
     test_consumer = kafka.KafkaConsumer(
         TEST_TOPIC,
@@ -41,7 +40,6 @@ def start_producer() -> None:
         auto_offset_reset='earliest',
         enable_auto_commit=True,
         group_id='test_consumer',
-        api_version=(2, 7, 0)
     )
 
     try:
