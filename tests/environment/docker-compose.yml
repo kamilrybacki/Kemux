@@ -3,6 +3,9 @@ version: '2.1'
 services:
   tests-zoo:
     image: confluentinc/cp-zookeeper:7.3.2
+    networks:
+      kemux:
+        ipv4_address: ${ZOOKEEPER_IP}
     hostname: tests-zoo
     container_name: tests-zoo
     ports:
@@ -14,6 +17,9 @@ services:
 
   tests-kafka:
     image: confluentinc/cp-kafka:7.3.2
+    networks:
+      kemux:
+        ipv4_address: ${KAFKA_IP}
     hostname: tests-kafka
     container_name: tests-kafka
     ports:
