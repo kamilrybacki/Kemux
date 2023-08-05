@@ -9,10 +9,10 @@ permissions:
     packages: write
 
 env:
-  KEMUX_IP_SUBNET: 10.5.0
-  KEMUX_KAFKA_PORT: 9092
-  KEMUX_PRODUCER_IMAGE: ghcr.io/kamilrybacki/kemux-producer:latest
-  KEMUX_SPLITTER_IMAGE: ghcr.io/kamilrybacki/kemux-splitter:latest
+  IP_SUBNET: 10.5.0
+  KAFKA_PORT: 9092
+  PRODUCER_IMAGE: ghcr.io/kamilrybacki/${{ github.repository }}-producer:latest
+  SPLITTER_IMAGE: ghcr.io/kamilrybacki/${{ github.repository }}-splitter:latest
 
 jobs:
   build-docker-images:
@@ -27,23 +27,35 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Extract producer image Docker metadata
+        id: producer-meta
+        uses: docker/metadata-action@v4
+        with:
+          images: ${{ env.PRODUCER_IMAGE }}
+      - name: Extract producer image Docker metadata
+        id: splitter-meta
+        uses: docker/metadata-action@v4
+        with:
+          images: ${{ env.SPLITTER_IMAGE }} 
       - name: Build producer image
         uses: docker/build-push-action@v2
         with:
           context: .
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
           file: ./tests/environment/docker/Producer.Dockerfile
-          cache-from: type=registry,ref=${{ env.KEMUX_PRODUCER_IMAGE }}
-          cache-to: type=registry,ref=${{ env.KEMUX_PRODUCER_IMAGE }}
-          tags: ${{ env.KEMUX_PRODUCER_IMAGE }}
+          tags: ${{ steps.producer-meta.outputs.tags }}
+          labels: ${{ steps.producer-meta.outputs.labels }}
           push: true
       - name: Build splitter image
         uses: docker/build-push-action@v2
         with:
           context: .
           file: ./tests/environment/docker/Splitter.Dockerfile
-          cache-from: type=registry,ref=${{ env.KEMUX_SPLITTER_IMAGE }}
-          cache-to: type=registry,ref=${{ env.KEMUX_SPLITTER_IMAGE }}
-          tags: ${{ env.KEMUX_SPLITTER_IMAGE }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          tags: ${{ steps.splitter-meta.outputs.tags }}
+          labels: ${{ steps.splitter-meta.outputs.labels }}
           push: true
   integration-tests:
     runs-on: ubuntu-latest
@@ -53,13 +65,14 @@ jobs:
       - name: Setup tests environment 
         uses: isbang/compose-action@v1.5.0
         env:
-          KEMUX_PRODUCER_IMAGE: ${{ env.KEMUX_PRODUCER_IMAGE }}
-          KEMUX_SPLITTER_IMAGE: ${{ env.KEMUX_SPLITTER_IMAGE }}
-          KEMUX_IP_SUBNET: ${{ env.KEMUX_IP_SUBNET }}
-          KEMUX_KAFKA_IP: ${{ env.KEMUX_IP_SUBNET }}.3
-          KEMUX_KAFKA_PORT: ${{ env.KEMUX_KAFKA_PORT }}
-          KEMUX_PRODUCER_IP: ${{ env.KEMUX_IP_SUBNET }}.4
-          KEMUX_SPLITTER_IP: ${{ env.KEMUX_IP_SUBNET }}.5
+          PRODUCER_IMAGE: ${{ env.PRODUCER_IMAGE }}
+          SPLITTER_IMAGE: ${{ env.SPLITTER_IMAGE }}
+          IP_SUBNET: ${{ env.IP_SUBNET }}
+          KAFKA_PORT: ${{ env.KAFKA_PORT }}
+          ZOOKEEPER_IP: ${{ env.IP_SUBNET }}.2
+          KAFKA_IP: ${{ env.IP_SUBNET }}.3
+          PRODUCER_IP: ${{ env.IP_SUBNET }}.4
+          SPLITTER_IP: ${{ env.IP_SUBNET }}.5
         with:
           compose-file: |
             ./tests/environment/docker-compose.yml
