@@ -76,12 +76,6 @@ jobs:
         env:
           PRODUCER_IMAGE: ${{ needs.build-docker-images.outputs.producer-image }}
           SPLITTER_IMAGE: ${{ needs.build-docker-images.outputs.splitter-image }}
-          IP_SUBNET: ${{ env.IP_SUBNET }}
-          KAFKA_PORT: ${{ env.KAFKA_PORT }}
-          ZOOKEEPER_IP: ${{ env.IP_SUBNET }}.2
-          KAFKA_IP: ${{ env.IP_SUBNET }}.3
-          PRODUCER_IP: ${{ env.IP_SUBNET }}.4
-          SPLITTER_IP: ${{ env.IP_SUBNET }}.5
         with:
           compose-file: |
             ./tests/environment/docker-compose.yml

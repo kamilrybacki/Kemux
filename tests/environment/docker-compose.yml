@@ -3,9 +3,6 @@ version: '2.1'
 services:
   tests-zoo:
     image: confluentinc/cp-zookeeper:7.3.2
-    networks:
-      kemux:
-        ipv4_address: ${ZOOKEEPER_IP}
     hostname: tests-zoo
     container_name: tests-zoo
     ports:
@@ -17,13 +14,10 @@ services:
 
   tests-kafka:
     image: confluentinc/cp-kafka:7.3.2
-    networks:
-      kemux:
-        ipv4_address: ${KAFKA_IP}
     hostname: tests-kafka
     container_name: tests-kafka
     ports:
-      - "${KAFKA_PORT}:9092"
+      - "9092:9092"
       - "29092:29092"
       - "9999:9999"
     environment:
@@ -45,11 +39,8 @@ services:
 
   tests-producer:
     container_name: tests-producer
-    networks:
-      kemux:
-        ipv4_address: ${PRODUCER_IP}
     environment:
-      - KAFKA_ADDRESS=tests-kafka:${KAFKA_PORT}
+      - KAFKA_ADDRESS=tests-kafka:9092
     image: ${PRODUCER_IMAGE}
     depends_on:
       - tests-kafka
@@ -57,19 +48,8 @@ services:
 
   tests-splitter:
     container_name: tests-splitter
-    networks:
-      kemux:
-        ipv4_address: ${SPLITTER_IP}
     environment:
-      - KAFKA_ADDRESS=tests-kafka:${KAFKA_PORT}
+      - KAFKA_ADDRESS=tests-kafka:9092
     image: ${SPLITTER_IMAGE}
     depends_on:
       - tests-producer
-
-networks:
-  kemux:
-    driver: bridge
-    ipam:
-      config:
-        - subnet: ${IP_SUBNET}.0/16
-          gateway: 10.5.0.1
