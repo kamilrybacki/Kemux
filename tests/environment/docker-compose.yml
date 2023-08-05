@@ -19,7 +19,7 @@ services:
       - zookeeper
 
   tests-producer:
-    container_name: tests-producer
+    container_name: producer
     environment:
       - KAFKA_ADDRESS=broker:9092
     image: ${PRODUCER_IMAGE}
@@ -27,7 +27,7 @@ services:
       - broker
 
   tests-splitter:
-    container_name: tests-splitter
+    container_name: splitter
     environment:
       - KAFKA_ADDRESS=broker:9092
     image: ${SPLITTER_IMAGE}

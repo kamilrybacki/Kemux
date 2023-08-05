@@ -78,8 +78,8 @@ jobs:
           compose-file: |
             ./tests/environment/docker-compose.yml
       - name: Print Kafka container logs
-        run: docker logs tests-kafka
+        run: docker logs broker
       - name: Print producer logs
-        run: docker logs tests-producer
+        run: docker logs producer
       - name: Print splitter logs
-        run: docker logs tests-splitter
+        run: docker logs splitter
