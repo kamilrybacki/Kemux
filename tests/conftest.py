@@ -1,8 +1,15 @@
+import os
+import sys
+import yaml
+
 import pytest
 import kafka
 
 import lib.splitter.streams.primary
 import lib.splitter.streams.secondary
+
+
+COMPOSE_FILE_PATH = os.path.join(os.path.dirname(__file__), "./environment/docker-compose.yml")
 
 
 @pytest.fixture(scope="session")
@@ -32,3 +39,9 @@ def topics() -> list:
             )
         ]
     )]
+
+
+@pytest.fixture(scope="session")
+def compose_file() -> dict:
+    with open(COMPOSE_FILE_PATH, "r", encoding="utf-8") as compose_file:
+        return yaml.safe_load(compose_file)

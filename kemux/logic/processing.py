@@ -113,7 +113,7 @@ class Processor:
         output_schema._construct_output_record_class()
         output_io.schema = output_schema
         return output_io
-    
+
     def _extract_schema_and_io(self, source: type) -> tuple[
         kemux.data.schema.base.SchemaBase,
         kemux.data.io.base.IOBase
