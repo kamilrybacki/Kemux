@@ -19,10 +19,15 @@ services:
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://broker:9092
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    healthcheck:
+      test: ["CMD", "kafka-topics", "--bootstrap-server", "broker:9092", "--list"]
+      interval: 30s
+      timeout: 10s
+      retries: 10
     depends_on:
       - zookeeper
 
-  tests-producer:
+  producer:
     networks:
       - tests
     container_name: producer
@@ -30,9 +35,10 @@ services:
       - KAFKA_ADDRESS=broker:9092
     image: ${PRODUCER_IMAGE}
     depends_on:
-      - broker
+      broker:
+        condition: service_healthy
 
-  tests-splitter:
+  splitter:
     networks:
       - tests
     container_name: splitter
@@ -40,7 +46,7 @@ services:
       - KAFKA_ADDRESS=broker:9092
     image: ${SPLITTER_IMAGE}
     depends_on:
-      - broker
+      - producer
 
 networks:
   tests:
