@@ -2,11 +2,13 @@ version: '2.1'
 
 services:
   tests-zoo:
+    container_name: tests-zoo
     image: wurstmeister/zookeeper:3.4.6
     expose:
       - 2181
 
   tests-kafka:
+    container_name: tests-kafka
     image: wurstmeister/kafka:latest
     expose:
       - 9092
@@ -15,6 +17,11 @@ services:
       KAFKA_ZOOKEEPER_CONNECT: tests-zoo:2181
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://tests-kafka:29092
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    healthcheck:
+      test: ["CMD", "kafka-topics.sh", "--list", "--zookeeper", "tests-zoo:2181"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
     depends_on:
       - tests-zoo
 
@@ -24,7 +31,8 @@ services:
       - KAFKA_ADDRESS=tests-kafka:9092
     image: ${PRODUCER_IMAGE}
     depends_on:
-      - tests-kafka
+      tests-kafka:
+        condition: service_healthy
 
   tests-splitter:
     container_name: tests-splitter
@@ -32,4 +40,5 @@ services:
       - KAFKA_ADDRESS=tests-kafka:9092
     image: ${SPLITTER_IMAGE}
     depends_on:
-      - tests-kafka
+      tests-kafka:
+        condition: service_healthy
