@@ -1,29 +1,27 @@
 version: '2.1'
 
 services:
-  tests-zoo:
-    container_name: tests-zoo
-    image: wurstmeister/zookeeper:3.4.6
-    expose:
-      - 2181
+  zookeeper:
+    image: confluentinc/cp-zookeeper:5.5.0
+    container_name: zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
 
-  tests-kafka:
-    container_name: tests-kafka
-    image: wurstmeister/kafka:latest
-    expose:
-      - 9092
+  broker:
+    image: confluentinc/cp-kafka:5.5.0
+    container_name: broker
     environment:
       KAFKA_BROKER_ID: 1
-      KAFKA_ZOOKEEPER_CONNECT: tests-zoo:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://tests-kafka:29092
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://broker:9092
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
     depends_on:
-      - tests-zoo
+      - zookeeper
 
   tests-producer:
     container_name: tests-producer
     environment:
-      - KAFKA_ADDRESS=tests-kafka:9092
+      - KAFKA_ADDRESS=broker:9092
     image: ${PRODUCER_IMAGE}
     depends_on:
       - tests-kafka
@@ -31,7 +29,7 @@ services:
   tests-splitter:
     container_name: tests-splitter
     environment:
-      - KAFKA_ADDRESS=tests-kafka:9092
+      - KAFKA_ADDRESS=broker:9092
     image: ${SPLITTER_IMAGE}
     depends_on:
       - tests-kafka
