@@ -6,9 +6,9 @@ services:
     hostname: tests-zoo
     container_name: tests-zoo
     ports:
-      - "32181:32181"
+      - "2181:2181"
     environment:
-      ZOOKEEPER_CLIENT_PORT: 32181
+      ZOOKEEPER_CLIENT_PORT: 2181
 
   tests-kafka:
     image: confluentinc/cp-kafka:7.2.6
@@ -16,14 +16,16 @@ services:
     container_name: tests-kafka
     ports:
       - "9092:9092"
-      - "29092:29092"
     environment:
       KAFKA_BROKER_ID: 1
-      KAFKA_ZOOKEEPER_CONNECT: tests-zoo:32181
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
-      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://tests-kafka:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_ZOOKEEPER_CONNECT: tests-zoo:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://tests-kafka:29092
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    healthcheck:
+      test: ["CMD", "kafka-topics.sh", "--list", "--zookeeper", "tests-zoo:2181"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
     depends_on:
       - tests-zoo
 
@@ -33,8 +35,8 @@ services:
       - KAFKA_ADDRESS=tests-kafka:9092
     image: ${PRODUCER_IMAGE}
     depends_on:
-      - tests-kafka
-      - tests-zoo
+      tests-kafka:
+        condition: service_healthy
 
   tests-splitter:
     container_name: tests-splitter
@@ -42,4 +44,5 @@ services:
       - KAFKA_ADDRESS=tests-kafka:9092
     image: ${SPLITTER_IMAGE}
     depends_on:
-      - tests-producer
+      tests-kafka:
+        condition: service_healthy

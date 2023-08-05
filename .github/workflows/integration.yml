@@ -9,8 +9,6 @@ permissions:
     packages: write
 
 env:
-  IP_SUBNET: 10.5.0
-  KAFKA_PORT: 9092
   PRODUCER_IMAGE: ghcr.io/${{ github.actor }}/test-kafka-producer
   SPLITTER_IMAGE: ghcr.io/${{ github.actor }}/test-kafka-splitter
 
