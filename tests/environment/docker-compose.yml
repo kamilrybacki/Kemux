@@ -6,15 +6,15 @@ services:
     hostname: tests-zoo
     ports:
       - "2181:2181"
+    networks:
+      kemux:
+        ipv4_address: ${ZOOKEEPER_IP}
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
       ZOOKEEPER_SYNC_LIMIT: 2
-    networks:
-      kemux:
-        ipv4_address: ${ZOOKEEPER_IP}
   tests-kafka:
-    image: confluentinc/cp-zookeeper
+    image: confluentinc/cp-kafka
     hostname: tests-kafka
     networks:
       kemux:
