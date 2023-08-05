@@ -35,6 +35,7 @@ jobs:
           cache-from: type=registry,ref=${{ env.KEMUX_PRODUCER_IMAGE }}
           cache-to: type=registry,ref=${{ env.KEMUX_PRODUCER_IMAGE }}
           tags: ${{ env.KEMUX_PRODUCER_IMAGE }}
+          push: true
       - name: Build splitter image
         uses: docker/build-push-action@v2
         with:
@@ -43,6 +44,11 @@ jobs:
           cache-from: type=registry,ref=${{ env.KEMUX_SPLITTER_IMAGE }}
           cache-to: type=registry,ref=${{ env.KEMUX_SPLITTER_IMAGE }}
           tags: ${{ env.KEMUX_SPLITTER_IMAGE }}
+          push: true
+  integration-tests:
+    runs-on: ubuntu-latest
+    needs: build-docker-images
+    steps:
       - name: Setup tests environment 
         uses: isbang/compose-action@v1.5.0
         env:
