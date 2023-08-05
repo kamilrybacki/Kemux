@@ -2,7 +2,7 @@ version: '2.1'
 
 services:
   tests-zoo:
-    image: confluentinc/cp-zookeeper:7.3.2
+    image: bitnami/zookeeper
     hostname: tests-zoo
     networks:
       kemux:
@@ -11,12 +11,10 @@ services:
     ports:
       - "2181:2181"
     environment:
-      ZOOKEEPER_CLIENT_PORT: 2181
-      ZOOKEEPER_SERVER_ID: 1
-      ZOOKEEPER_SERVERS: tests-zoo:2888:3888
+      ALLOW_ANONYMOUS_LOGIN: yes
 
   tests-kafka:
-    image: confluentinc/cp-kafka:7.3.2
+    image: bitnami/kafka
     hostname: tests-kafka
     networks:
       kemux:
@@ -27,12 +25,12 @@ services:
       - "29092:29092"
       - "9999:9999"
     environment:
-      KAFKA_BROKER_ID: 1
-      KAFKA_ZOOKEEPER_CONNECT: tests-zoo:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://${KAFKA_IP}:9092,PLAINTEXT_HOST://${KAFKA_IP}:29092
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
-      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_CFG_KAFKA_ZOOKEEPER_CONNECT: "tests-zoo:2181"
+      ALLOW_PLAINTEXT_LISTENER: yes
+      KAFKA_CFG_LISTENERS: "CLIENT://:9092,INTERNAL://:9093"
+      KAFKA_CFG_ADVERTISED_LISTENERS: "CLIENT://${KAFKA_IP}:9092,INTERNAL://${KAFKA_IP}:9093"
+      KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP: "CLIENT:PLAINTEXT,INTERNAL:PLAINTEXT"
+      KAFKA_CFG_INTER_BROKER_LISTENER_NAME: INTERNAL
     depends_on:
       - tests-zoo
 
