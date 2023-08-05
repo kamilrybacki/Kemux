@@ -11,7 +11,7 @@ services:
     ports:
       - "2181:2181"
     environment:
-      ALLOW_ANONYMOUS_LOGIN: yes
+      ALLOW_ANONYMOUS_LOGIN: 1
 
   tests-kafka:
     image: bitnami/kafka
@@ -26,7 +26,7 @@ services:
       - "9999:9999"
     environment:
       KAFKA_CFG_ZOOKEEPER_CONNECT: tests-zoo:2181
-      ALLOW_PLAINTEXT_LISTENER: yes
+      ALLOW_PLAINTEXT_LISTENER: 1
       KAFKA_CFG_LISTENERS: PLAINTEXT://:9092
       KAFKA_CFG_ADVERTISED_LISTENERS: PLAINTEXT://${KAFKA_IP}:9092
     depends_on:
