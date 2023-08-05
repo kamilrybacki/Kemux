@@ -47,7 +47,7 @@ services:
       kemux:
         ipv4_address: ${PRODUCER_IP}
     environment:
-      - KAFKA_ADDRESS=${KAFKA_IP}:${KAFKA_PORT}
+      - KAFKA_ADDRESS=tests-kafka:${KAFKA_PORT}
     image: ${PRODUCER_IMAGE}
     depends_on:
       - tests-kafka
@@ -59,7 +59,7 @@ services:
       kemux:
         ipv4_address: ${SPLITTER_IP}
     environment:
-      - KAFKA_ADDRESS=${KAFKA_IP}:${KAFKA_PORT}
+      - KAFKA_ADDRESS=tests-kafka:${KAFKA_PORT}
     image: ${SPLITTER_IMAGE}
     depends_on:
       - tests-producer
