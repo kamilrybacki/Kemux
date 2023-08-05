@@ -85,7 +85,8 @@ jobs:
         with:
           compose-file: |
             ./tests/environment/docker-compose.yml
-      - name: Print producer logs
-        run: docker logs tests-producer
-      - name: Print splitter logs
-        run: docker logs tests-splitter
+      - name: Print container logs
+        run: |
+          docker logs tests-kafka
+          docker logs tests-producer
+          docker logs tests-splitter
