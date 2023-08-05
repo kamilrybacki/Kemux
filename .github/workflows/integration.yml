@@ -17,6 +17,9 @@ env:
 jobs:
   build-docker-images:
     runs-on: ubuntu-latest
+    outputs:
+      producer-image: ${{ steps.producer-meta.outputs.tags }}
+      splitter-image: ${{ steps.splitter-meta.outputs.tags }}
     steps:
       - uses: actions/checkout@v2
       - name: Set up Docker Buildx
@@ -71,8 +74,8 @@ jobs:
       - name: Setup tests environment 
         uses: isbang/compose-action@v1.5.0
         env:
-          PRODUCER_IMAGE: ${{ env.PRODUCER_IMAGE }}
-          SPLITTER_IMAGE: ${{ env.SPLITTER_IMAGE }}
+          PRODUCER_IMAGE: ${{ needs.build-docker-images.outputs.producer-image }}
+          SPLITTER_IMAGE: ${{ needs.build-docker-images.outputs.splitter-image }}
           IP_SUBNET: ${{ env.IP_SUBNET }}
           KAFKA_PORT: ${{ env.KAFKA_PORT }}
           ZOOKEEPER_IP: ${{ env.IP_SUBNET }}.2
