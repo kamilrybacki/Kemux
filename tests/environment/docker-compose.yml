@@ -2,12 +2,16 @@ version: '2.1'
 
 services:
   zookeeper:
+    networks:
+      - tests
     image: confluentinc/cp-zookeeper:5.5.0
     container_name: zookeeper
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
 
   broker:
+    networks:
+      - tests
     image: confluentinc/cp-kafka:5.5.0
     container_name: broker
     environment:
@@ -19,6 +23,8 @@ services:
       - zookeeper
 
   tests-producer:
+    networks:
+      - tests
     container_name: producer
     environment:
       - KAFKA_ADDRESS=broker:9092
@@ -27,9 +33,15 @@ services:
       - broker
 
   tests-splitter:
+    networks:
+      - tests
     container_name: splitter
     environment:
       - KAFKA_ADDRESS=broker:9092
     image: ${SPLITTER_IMAGE}
     depends_on:
       - broker
+
+networks:
+  tests:
+    name: tests
