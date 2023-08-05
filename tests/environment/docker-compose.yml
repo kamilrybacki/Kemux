@@ -14,7 +14,7 @@ services:
       ALLOW_ANONYMOUS_LOGIN: 1
 
   tests-kafka:
-    image: bitnami/kafka
+    image: confluentinc/cp-zookeeper
     hostname: tests-kafka
     networks:
       kemux:
@@ -24,12 +24,11 @@ services:
       - "${KAFKA_PORT}:9092"
       - "9094:9094"
     environment:
-      KAFKA_CFG_ZOOKEEPER_CONNECT: tests-zoo:2181
-      ALLOW_PLAINTEXT_LISTENER: 1
-      KAFKA_CFG_LISTENERS: INTERNAL://0.0.0.0:9092,OUTSIDE://0.0.0.0:9094
-      KAFKA_CFG_ADVERTISED_LISTENERS: INTERNAL://tests-kafka:9092,OUTSIDE://localhost:9094
-      KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,OUTSIDE:PLAINTEXT
-      KAFKA_CFG_INTER_BROKER_LISTENER_NAME: INTERNAL
+      KAFKA_ZOOKEEPER_CONNECT: tests-zoo:2181
+      KAFKA_LISTENERS: INTERNAL://0.0.0.0:9092,OUTSIDE://0.0.0.0:9094
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://tests-kafka:9092,OUTSIDE://localhost:9094
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,OUTSIDE:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
     depends_on:
       - tests-zoo
 
