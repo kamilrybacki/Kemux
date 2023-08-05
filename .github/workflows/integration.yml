@@ -77,7 +77,20 @@ jobs:
         with:
           compose-file: |
             ./tests/environment/docker-compose.yml
-      - name: Print splitter container logs for 30 seconds
+      - name: Setup Python 3.11
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.11
+      - name: Install dependencies
         run: |
-          docker logs splitter -f --tail 100
-          sleep 30
+          pip \
+            install \
+              -r requirements-ci.txt \
+              .
+      - name: Run integration tests
+        run: |
+          python \
+            -m \
+              pytest \
+                -c \
+                  pytest.ini

@@ -68,6 +68,7 @@ class Processor:
         return {
             module_filename.removesuffix('.py'): self._load_stream_module(module_filename)
             for module_filename in present_modules_filenames
+            if module_filename != '__init__.py'
         }
 
     def _load_stream_module(self, module_filename: str) -> kemux.data.stream.StreamBase:
