@@ -2,7 +2,7 @@ version: '2.1'
 
 services:
   tests-zoo:
-    image: confluentinc/cp-zookeeper:7.3.2
+    image: confluentinc/cp-zookeeper:7.2.6
     hostname: tests-zoo
     container_name: tests-zoo
     ports:
@@ -11,7 +11,7 @@ services:
       ZOOKEEPER_CLIENT_PORT: 32181
 
   tests-kafka:
-    image: confluentinc/cp-kafka:7.3.2
+    image: confluentinc/cp-kafka:7.2.6
     hostname: tests-kafka
     container_name: tests-kafka
     ports:
