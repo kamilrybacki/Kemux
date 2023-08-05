@@ -45,6 +45,7 @@ services:
       - tests-zoo
 
   tests-producer:
+    container_name: tests-producer
     networks:
       kemux:
         ipv4_address: ${PRODUCER_IP}
@@ -56,6 +57,7 @@ services:
       - tests-zoo
 
   tests-splitter:
+    container_name: tests-splitter
     networks:
       kemux:
         ipv4_address: ${SPLITTER_IP}

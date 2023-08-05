@@ -85,6 +85,7 @@ jobs:
         with:
           compose-file: |
             ./tests/environment/docker-compose.yml
-      - name: Check connection to Kafka container
-        run: |
-          docker ps
+      - name: Print producer logs
+        run: docker logs tests-producer
+      - name: Print splitter logs
+        run: docker logs tests-splitter
