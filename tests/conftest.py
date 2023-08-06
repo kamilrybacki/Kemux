@@ -31,12 +31,12 @@ def get_consumer() -> ConsumerFactory:
 
 
 @pytest.fixture(scope="session")
-def topics() -> list:
+def topics() -> set[str]:
     all_outputs = {
         **lib.splitter.streams.primary.Outputs.__dict__,
         **lib.splitter.streams.secondary.Outputs.__dict__,
     }
-    return [*map(
+    return {*map(
         lambda output_class:
             output_class.IO.topic,
         [
@@ -46,7 +46,7 @@ def topics() -> list:
                 list(all_outputs.values())
             )
         ]
-    )]
+    )}
 
 
 @pytest.fixture(scope="session")
