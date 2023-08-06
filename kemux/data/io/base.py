@@ -18,16 +18,16 @@ class IOBase:
     _topic_handler: faust.types.TopicT | None = dataclasses.field(init=False, default=None)
 
     @classmethod
-    async def _get_handler(cls, app: faust.App) -> faust.TopicT:
+    def _get_handler(cls, app: faust.App) -> faust.TopicT:
         if cls._topic_handler is None:
-            await cls._initialize_handler(app)
+            cls._initialize_handler(app)
         return cls._topic_handler  # type: ignore
 
     @classmethod
-    async def _initialize_handler(cls, app: faust.App) -> None:
+    def _initialize_handler(cls, app: faust.App) -> None:
         schema: kemux.data.schema.base.SchemaBase = cls.schema
         cls._topic_handler = app.topic(
             cls.topic,
             value_type=schema._record_class,
         )
-        await cls._topic_handler.declare()  # type: ignore
+        cls._topic_handler.declare()  # type: ignore
