@@ -1,14 +1,12 @@
 import os
 import typing
 import yaml
-import logging
 
 import docker
 import pytest
 import kafka
 
 import lib.splitter.streams.primary
-import lib.splitter.streams.secondary
 
 
 COMPOSE_FILE_PATH = os.path.join(os.path.dirname(__file__), "./environment/docker-compose.yml")
@@ -32,10 +30,6 @@ def get_consumer() -> ConsumerFactory:
 
 @pytest.fixture(scope="session")
 def topics() -> set[str]:
-    all_outputs = {
-        **lib.splitter.streams.primary.Outputs.__dict__,
-        **lib.splitter.streams.secondary.Outputs.__dict__,
-    }
     return {*map(
         lambda output_class:
             output_class.IO.topic,
@@ -43,7 +37,7 @@ def topics() -> set[str]:
             *filter(
                 lambda output_class_field:
                     isinstance(output_class_field, type),
-                list(all_outputs.values())
+                list(lib.splitter.streams.primary.Outputs.__dict__.values())
             )
         ]
     )}
