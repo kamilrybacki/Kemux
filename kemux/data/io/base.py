@@ -24,7 +24,7 @@ class IOBase:
         return cls._topic_handler  # type: ignore
 
     @classmethod
-    async def _initialize_handler(cls, app: faust.App) -> None:
+    def _initialize_handler(cls, app: faust.App) -> None:
         schema: kemux.data.schema.base.SchemaBase = cls.schema
         cls._topic_handler = app.topic(
             cls.topic,
