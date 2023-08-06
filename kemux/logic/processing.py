@@ -143,7 +143,7 @@ class Processor:
                 self.__logger.info('Processing messages')
                 output: kemux.data.io.output.StreamOutput
                 for output in stream.outputs:
-                    output._initialize_handler(self._app)
+                    await output._initialize_handler(self._app)
                     if output._topic_handler is not None:
                         await output._topic_handler.send(
                             key='init',
