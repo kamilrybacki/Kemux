@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import dataclasses
+import datetime
 import importlib.machinery
 import inspect
 import logging
@@ -144,6 +145,10 @@ class Processor:
 
             async def _process_input_stream_message(messages: faust.StreamT[kemux.data.schema.input.InputSchema]) -> None:
                 self.__logger.info('Processing messages')
+                await input_topics_handler.send(
+                    key='init',
+                    value=datetime.datetime.now().isoformat()
+                )
                 async for message in messages:
                     await stream.process(message)  # type: ignore
 
