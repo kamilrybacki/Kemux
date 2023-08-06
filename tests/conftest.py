@@ -1,6 +1,7 @@
 import os
 import typing
 import yaml
+import logging
 
 import docker
 import pytest
@@ -58,5 +59,6 @@ def compose_file() -> dict:
 def broker_ip(compose_file: dict) -> str:
     broker_container_name: str = f"{compose_file['services']['broker']['container_name']}"
     broker_container = docker.from_env().containers.get(broker_container_name)
+    logging.info(f"Broker container: {broker_container}")
     broker_ip: str = broker_container.attrs['NetworkSettings']['IPAddress']
     return broker_ip
