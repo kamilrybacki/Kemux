@@ -2,29 +2,36 @@ import logging
 
 import docker
 import kafka
+import pytest
+
+import conftest
 
 
-def test_services_list(docker_compose: dict):
+@pytest.mark.order(1)
+def test_services_list(compose_file: dict):
     logging.info("Testing containers setup")
-    current_containers: list[str] = {
+    current_containers: set[str] = {
         container.name
         for container in docker.from_env().containers.list()
     }
     logging.info(f"Current containers: {current_containers}")
-    expected_containers: list[str] = {
-        f"{docker_compose['services'][service]['container_name']}"
-        for service in docker_compose['services']
+    expected_containers: set[str] = {
+        f"{compose_file['services'][service]['container_name']}"
+        for service in compose_file['services']
     }
     logging.info(f"Expected containers: {expected_containers}")
     assert expected_containers == current_containers
 
 
-def test_connection_to_kafka_broker(consumer: kafka.KafkaConsumer):
+@pytest.mark.order(2)
+def test_connection_to_kafka_broker(get_consumer: conftest.ConsumerFactory, broker_ip: str):
+    consumer: kafka.KafkaConsumer = get_consumer(f'{broker_ip}:9092')
     logging.info("Testing connection to Kafka broker")
     assert consumer.bootstrap_connected()
 
 
-def test_topics_exist(consumer: kafka.KafkaConsumer, topics: list):
+@pytest.mark.order(3)
+def test_topics_exist(get_consumer: kafka.KafkaConsumer, broker_ip: str, topics: list):
     logging.info("Testing topics exist")
-    topics_present_in_kafka: list[str] = consumer.topics()
+    topics_present_in_kafka: list[str] = get_consumer(f'{broker_ip}:9092').topics()
     assert set(topics).issubset(topics_present_in_kafka)
