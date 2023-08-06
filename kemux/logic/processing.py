@@ -129,7 +129,7 @@ class Processor:
             raise ValueError(f'Invalid input {source.__name__} - no io found')
         return schema, io
 
-    async def start(self) -> None:
+    def start(self) -> None:
         self.__logger.info('Starting receiver')
         stream: kemux.data.stream.StreamBase
         for stream_name, stream in self.__streams.items():
@@ -138,12 +138,11 @@ class Processor:
             input_topics_handler: faust.TopicT = stream_input._get_handler(self._app)  # pylint: disable=protected-access
             self.__logger.info(f'Activating output streams: {stream_name}')
 
-            output: kemux.data.io.output.StreamOutput
-            for output in stream.outputs:
-                await output._initialize_handler(self._app)
-
             async def _process_input_stream_message(messages: faust.StreamT[kemux.data.schema.input.InputSchema]) -> None:
                 self.__logger.info('Processing messages')
+                output: kemux.data.io.output.StreamOutput
+                for output in stream.outputs:
+                    await output._initialize_handler(self._app)
                 async for message in messages:
                     await stream.process(message)  # type: ignore
 
