@@ -30,4 +30,3 @@ class IOBase:
             cls.topic,
             value_type=schema._record_class,
         )
-        cls._topic_handler.declare()  # type: ignore
