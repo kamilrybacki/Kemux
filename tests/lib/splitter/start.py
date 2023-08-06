@@ -1,9 +1,10 @@
+import asyncio
 import os
 
 import kemux.logic.processing
 
 
-def start() -> None:
+async def start_splitter() -> None:
     if not (streams_dir := os.getenv('STREAMS_DIR')):
         raise ValueError('STREAMS_DIR environment variable not set')
     if not (data_dir := os.getenv('DATA_DIR')):
@@ -15,8 +16,7 @@ def start() -> None:
         data_dir,
         streams_dir,
     )
-    receiver.start()
+    await receiver.start()
 
-
-if __name__ == '__main__':
-    start()
+loop = asyncio.get_event_loop()
+loop.run_until_complete(start_splitter())
