@@ -98,11 +98,11 @@ class Processor:
         return input_io
 
     def _load_outputs(self, outputs: type) -> list[kemux.data.io.output.StreamOutput]:
-            return [
-                self._load_output(output)
-                for output in outputs.__dict__.values()
-                if inspect.isclass(output)
-            ]
+        return [
+            self._load_output(output)
+            for output in outputs.__dict__.values()
+            if inspect.isclass(output)
+        ]
 
     def _load_output(self, output_class: type) -> kemux.data.io.output.StreamOutput:
         output_schema: kemux.data.schema.output.OutputSchema
@@ -132,6 +132,7 @@ class Processor:
     def start(self) -> None:
         self.__logger.info('Starting receiver')
         stream: kemux.data.stream.StreamBase
+        self.__logger.info(f'Initializing streams: {", ".join(self.__streams.keys())}')
         for stream_name, stream in self.__streams.items():
             stream_input: kemux.data.io.input.StreamInput = stream.input
             self.__logger.info(f'Activating input stream: {stream_name}')
