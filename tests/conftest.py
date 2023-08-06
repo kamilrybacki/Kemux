@@ -11,6 +11,7 @@ import lib.splitter.streams.secondary
 
 
 COMPOSE_FILE_PATH = os.path.join(os.path.dirname(__file__), "./environment/docker-compose.yml")
+TESTS_NETWORK_NAME = "tests"
 
 
 ConsumerFactory = typing.Callable[[str], kafka.KafkaConsumer]
@@ -57,5 +58,5 @@ def compose_file() -> dict:
 def broker_ip(compose_file: dict) -> str:
     broker_container_name: str = f"{compose_file['services']['broker']['container_name']}"
     broker_container = docker.from_env().containers.get(broker_container_name)
-    broker_ip: str = broker_container.attrs['NetworkSettings']['Networks']['environment_default']['IPAddress']
+    broker_ip: str = broker_container.attrs['NetworkSettings']['IPAddress']
     return broker_ip
