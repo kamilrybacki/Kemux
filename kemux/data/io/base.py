@@ -1,5 +1,4 @@
 import dataclasses
-import datetime
 import logging
 
 import faust
@@ -19,9 +18,9 @@ class IOBase:
     _topic_handler: faust.types.TopicT | None = dataclasses.field(init=False, default=None)
 
     @classmethod
-    async def _get_handler(cls, app: faust.App) -> faust.TopicT:
+    def _get_handler(cls, app: faust.App) -> faust.TopicT:
         if cls._topic_handler is None:
-            await cls._initialize_handler(app)
+            cls._initialize_handler(app)
         return cls._topic_handler  # type: ignore
 
     @classmethod
@@ -30,9 +29,5 @@ class IOBase:
         cls._topic_handler = app.topic(
             cls.topic,
             value_type=schema._record_class,
-        )
-        await cls._topic_handler.send(
-            key='init',
-            value=datetime.datetime.now().isoformat()
         )
         cls._topic_handler.maybe_declare()  # type: ignore

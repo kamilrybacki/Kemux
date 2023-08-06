@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import dataclasses
+import datetime
 import importlib.machinery
 import inspect
 import logging
@@ -142,7 +143,12 @@ class Processor:
                 self.__logger.info('Processing messages')
                 output: kemux.data.io.output.StreamOutput
                 for output in stream.outputs:
-                    await output._initialize_handler(self._app)
+                    output._initialize_handler(self._app)
+                    if output._topic_handler is not None:
+                        await output._topic_handler.send(
+                            key='init',
+                            value=datetime.datetime.now().isoformat(),
+                        )
                 async for message in messages:
                     await stream.process(message)  # type: ignore
 
