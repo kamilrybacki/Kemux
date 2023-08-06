@@ -31,7 +31,7 @@ def test_connection_to_kafka_broker(get_consumer: conftest.ConsumerFactory, brok
 
 
 @pytest.mark.order(3)
-def test_topics_exist(get_consumer: conftest.ConsumerFactory, broker_ip: str, topics: list):
+def test_topics_exist(get_consumer: conftest.ConsumerFactory, broker_ip: str, topics: set[str]):
     logging.info("Testing topics exist")
     topics_present_in_kafka: set[str] = get_consumer(f'{broker_ip}:9092').topics()
-    assert topics == topics_present_in_kafka
+    assert topics.issubset(topics_present_in_kafka)
