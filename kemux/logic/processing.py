@@ -140,7 +140,6 @@ class Processor:
 
             output: kemux.data.io.output.StreamOutput
             for output in stream.outputs:
-                output._initialize_handler(self._app)
                 output_topics_handler: faust.TopicT = output._get_handler(self._app)
                 output_topics_handler.send_soon(
                     key='__init__',
