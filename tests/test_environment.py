@@ -24,14 +24,14 @@ def test_services_list(compose_file: dict):
 
 
 @pytest.mark.order(2)
-def test_connection_to_kafka_broker(get_consumer: conftest.ConsumerFactory, broker_ip: str):
-    consumer: kafka.KafkaConsumer = get_consumer(f'{broker_ip}:9092')
+def test_connection_to_kafka_broker(use_consumer: conftest.ConsumerFactory):
+    consumer: kafka.KafkaConsumer = use_consumer()
     logging.info("Testing connection to Kafka broker")
     assert consumer.bootstrap_connected()
 
 
 @pytest.mark.order(3)
-def test_topics_exist(get_consumer: conftest.ConsumerFactory, broker_ip: str, topics: set[str]):
+def test_topics_exist(use_consumer: conftest.ConsumerFactory, topics: set[str]):
     logging.info("Testing topics exist")
-    topics_present_in_kafka: set[str] = get_consumer(f'{broker_ip}:9092').topics()
+    topics_present_in_kafka: set[str] = use_consumer().topics()
     assert topics.issubset(topics_present_in_kafka)

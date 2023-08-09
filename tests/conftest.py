@@ -13,14 +13,21 @@ COMPOSE_FILE_PATH = os.path.join(os.path.dirname(__file__), "./environment/docke
 TESTS_NETWORK_NAME = "environment_default"
 
 
-ConsumerFactory = typing.Callable[[str], kafka.KafkaConsumer]
+ConsumerFactory = typing.Callable[[], kafka.KafkaConsumer]
 
 
 @pytest.fixture(scope="session")
-def get_consumer() -> ConsumerFactory:
-    def consumer_factory(broker_address: str) -> kafka.KafkaConsumer:
+def broker_ip(compose_file: dict) -> str:
+    broker_container_name: str = f"{compose_file['services']['broker']['container_name']}"
+    broker_container = docker.from_env().containers.get(broker_container_name)
+    return broker_container.attrs['NetworkSettings']['Networks'][TESTS_NETWORK_NAME]['IPAddress']
+
+
+@pytest.fixture(scope="session")
+def use_consumer(broker_ip: str) -> ConsumerFactory:
+    def consumer_factory() -> kafka.KafkaConsumer:
         return kafka.KafkaConsumer(
-            bootstrap_servers=broker_address,
+            bootstrap_servers=broker_ip,
             auto_offset_reset='earliest',
             enable_auto_commit=True,
             group_id='tests',
@@ -53,8 +60,3 @@ def compose_file() -> dict:
         return yaml.safe_load(compose_file)
 
 
-@pytest.fixture(scope="session")
-def broker_ip(compose_file: dict) -> str:
-    broker_container_name: str = f"{compose_file['services']['broker']['container_name']}"
-    broker_container = docker.from_env().containers.get(broker_container_name)
-    return broker_container.attrs['NetworkSettings']['Networks'][TESTS_NETWORK_NAME]['IPAddress']
