@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import dataclasses
-import datetime
 import importlib.machinery
 import inspect
 import logging
@@ -140,11 +139,7 @@ class Processor:
 
             output: kemux.data.io.output.StreamOutput
             for output in stream.outputs:
-                output_topics_handler: faust.TopicT = output._get_handler(self._app)
-                output_topics_handler.send_soon(
-                    key='__init__',
-                    value=datetime.datetime.now(),
-                )
+                output._initialize_handler(self._app)
 
             async def _process_input_stream_message(messages: faust.StreamT[kemux.data.schema.input.InputSchema]) -> None:
                 self.__logger.info('Processing messages')
