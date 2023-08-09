@@ -49,7 +49,7 @@ class Processor:
             instance.__logger.info(f'Connecting to Kafka broker: {kafka_address}')
             app = faust.App(
                 'splitter_broker',
-                broker=f'kafka://{kafka_address}',
+                broker=kafka_address,
                 value_serializer='json',
                 datadir=instance.persistent_data_directory,
             )
@@ -68,7 +68,6 @@ class Processor:
         return {
             module_filename.removesuffix('.py'): self._load_stream_module(module_filename)
             for module_filename in present_modules_filenames
-            if module_filename != '__init__.py'
         }
 
     def _load_stream_module(self, module_filename: str) -> kemux.data.stream.StreamBase:
@@ -98,11 +97,11 @@ class Processor:
         return input_io
 
     def _load_outputs(self, outputs: type) -> list[kemux.data.io.output.StreamOutput]:
-        return [
-            self._load_output(output)
-            for output in outputs.__dict__.values()
-            if inspect.isclass(output)
-        ]
+            return [
+                self._load_output(output)
+                for output in outputs.__dict__.values()
+                if inspect.isclass(output)
+            ]
 
     def _load_output(self, output_class: type) -> kemux.data.io.output.StreamOutput:
         output_schema: kemux.data.schema.output.OutputSchema
@@ -129,24 +128,23 @@ class Processor:
             raise ValueError(f'Invalid input {source.__name__} - no io found')
         return schema, io
 
-    def start(self) -> None:
+    async def start(self) -> None:
         self.__logger.info('Starting receiver')
         stream: kemux.data.stream.StreamBase
-        self.__logger.info(f'Initializing streams: {", ".join(self.__streams.keys())}')
         for stream_name, stream in self.__streams.items():
             stream_input: kemux.data.io.input.StreamInput = stream.input
             self.__logger.info(f'Activating input stream: {stream_name}')
             input_topics_handler: faust.TopicT = stream_input._get_handler(self._app)  # pylint: disable=protected-access
+            self.__logger.info(f'Activating output streams: {stream_name}')
 
             output: kemux.data.io.output.StreamOutput
             for output in stream.outputs:
-                self.__logger.info(f'Activating output stream: {output.topic}')
                 output._initialize_handler(self._app)
 
-            def _process_input_stream_message(messages: faust.StreamT[kemux.data.schema.input.InputSchema]) -> None:
+            async def _process_input_stream_message(messages: faust.StreamT[kemux.data.schema.input.InputSchema]) -> None:
                 self.__logger.info('Processing messages')
                 async for message in messages:
-                    stream.process(message)  # type: ignore
+                    await stream.process(message)  # type: ignore
 
             self.__logger.info('Activating agent for input stream')
             self.__agents[stream_name] = self._app.agent(input_topics_handler)(_process_input_stream_message)
