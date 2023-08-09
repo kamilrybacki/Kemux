@@ -33,6 +33,6 @@ class IOBase:
         )
         cls._topic_handler.send_soon(
             key='__init__',
-            value=cls.schema.make_init_message()
+            value=cls.schema.make_init_message(cls.topic)
         )
         cls.logger.info(f'Initialized topic handler for {cls.topic}')
