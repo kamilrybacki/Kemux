@@ -1,4 +1,5 @@
 import dataclasses
+import datetime
 import logging
 import re
 
@@ -42,7 +43,8 @@ class SchemaBase:
     @classmethod
     def make_init_message(cls, topic: str) -> dict:
         cls._logger.info(f'Sending initial message to topic: {topic}')
-        return cls._record_class.from_data({
-            field: None
-            for field in cls._fields
-        })
+        initial_message = {
+            field_name: field_type()
+            for field_name, field_type in cls._fields.items()
+        }
+        return cls._record_class.from_data(initial_message)

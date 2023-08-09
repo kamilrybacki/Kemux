@@ -10,13 +10,13 @@ import kemux.data.schema.output
 class Input:
     @dataclasses.dataclass
     class Schema(kemux.data.schema.input.InputSchema):
-        _timestamp_ : datetime.datetime
+        _timestamp_ : str
         _name_ : str
         _value_ : int
         _labels_ : dict[str, str]
 
         @staticmethod
-        def _timestamp_validator(timestamp: datetime.datetime) -> None:
+        def _timestamp_validator(timestamp: str) -> None:
             pass
 
         @staticmethod
