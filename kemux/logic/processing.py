@@ -143,10 +143,10 @@ class Processor:
                 self.__logger.info(f'Activating output stream: {output.topic}')
                 output._initialize_handler(self._app)
 
-            async def _process_input_stream_message(messages: faust.StreamT[kemux.data.schema.input.InputSchema]) -> None:
+            def _process_input_stream_message(messages: faust.StreamT[kemux.data.schema.input.InputSchema]) -> None:
                 self.__logger.info('Processing messages')
                 async for message in messages:
-                    await stream.process(message)  # type: ignore
+                    stream.process(message)  # type: ignore
 
             self.__logger.info('Activating agent for input stream')
             self.__agents[stream_name] = self._app.agent(input_topics_handler)(_process_input_stream_message)
