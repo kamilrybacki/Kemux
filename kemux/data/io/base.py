@@ -1,5 +1,4 @@
 import dataclasses
-import datetime
 import logging
 
 import faust
