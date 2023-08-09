@@ -12,7 +12,7 @@ class StreamBase:
 
     async def process(self, message: kemux.data.schema.input.InputRecordT) -> None:
         message._validate()
-        raw_message = message.to_dict() 
+        raw_message = message.to_dict()
         ingested_message = self.input.ingest(raw_message)
         for output in self.outputs:
             await output.send(ingested_message)
