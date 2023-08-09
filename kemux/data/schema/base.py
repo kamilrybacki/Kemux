@@ -43,5 +43,5 @@ class SchemaBase:
     def make_init_message(cls) -> dict:
         return cls._record_class({
             field: None
-            for field in cls._fields.keys()
+            for field in cls._fields
         })
