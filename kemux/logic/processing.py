@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import dataclasses
+import datetime
 import importlib.machinery
 import inspect
 import logging
@@ -112,7 +113,7 @@ class Processor:
         output_schema._construct_output_record_class()
         output_io.schema = output_schema
         return output_io
-    
+
     def _extract_schema_and_io(self, source: type) -> tuple[
         kemux.data.schema.base.SchemaBase,
         kemux.data.io.base.IOBase
@@ -128,7 +129,7 @@ class Processor:
             raise ValueError(f'Invalid input {source.__name__} - no io found')
         return schema, io
 
-    def start(self) -> None:
+    async def start(self) -> None:
         self.__logger.info('Starting receiver')
         stream: kemux.data.stream.StreamBase
         for stream_name, stream in self.__streams.items():
@@ -140,6 +141,11 @@ class Processor:
             output: kemux.data.io.output.StreamOutput
             for output in stream.outputs:
                 output._initialize_handler(self._app)
+                output_topics_handler: faust.TopicT = output._get_handler(self._app)
+                output_topics_handler.send_soon(
+                    key='__init__',
+                    value=datetime.datetime.now(),
+                )
 
             async def _process_input_stream_message(messages: faust.StreamT[kemux.data.schema.input.InputSchema]) -> None:
                 self.__logger.info('Processing messages')

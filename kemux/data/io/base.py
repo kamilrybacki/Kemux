@@ -1,4 +1,5 @@
 import dataclasses
+import datetime
 import logging
 
 import faust
@@ -22,7 +23,7 @@ class IOBase:
         if cls._topic_handler is None:
             cls._initialize_handler(app)
         return cls._topic_handler  # type: ignore
-    
+
     @classmethod
     def _initialize_handler(cls, app: faust.App) -> None:
         schema: kemux.data.schema.base.SchemaBase = cls.schema
@@ -30,4 +31,3 @@ class IOBase:
             cls.topic,
             value_type=schema._record_class,
         )
-        cls._topic_handler.maybe_declare()  # type: ignore
