@@ -128,7 +128,7 @@ class Processor:
             raise ValueError(f'Invalid input {source.__name__} - no io found')
         return schema, io
 
-    async def start(self) -> None:
+    def start(self) -> None:
         self.__logger.info('Starting receiver')
         stream: kemux.data.stream.StreamBase
         for stream_name, stream in self.__streams.items():
