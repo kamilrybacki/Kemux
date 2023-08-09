@@ -112,7 +112,7 @@ class Processor:
         output_schema._construct_output_record_class()
         output_io.schema = output_schema
         return output_io
-
+    
     def _extract_schema_and_io(self, source: type) -> tuple[
         kemux.data.schema.base.SchemaBase,
         kemux.data.io.base.IOBase
@@ -128,7 +128,7 @@ class Processor:
             raise ValueError(f'Invalid input {source.__name__} - no io found')
         return schema, io
 
-    async def start(self) -> None:
+    def start(self) -> None:
         self.__logger.info('Starting receiver')
         stream: kemux.data.stream.StreamBase
         for stream_name, stream in self.__streams.items():
