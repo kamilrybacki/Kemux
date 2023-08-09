@@ -18,8 +18,8 @@ class InputSchema(kemux.data.schema.base.SchemaBase):
     @classmethod
     def _construct_input_record_class(cls) -> None:
         class InputRecord(
-            faust.Record, 
-            serializer='json', 
+            faust.Record,
+            serializer='json',
             date_parser=dateutil.parser.parse
         ):
             _decorated_fields: dict[str, type] = faust.models.fields.FieldDescriptor(required=False, exclude=True, default=cls._decorated_fields)  # type: ignore
@@ -35,11 +35,11 @@ class InputSchema(kemux.data.schema.base.SchemaBase):
                     if not isinstance(validator, types.FunctionType):
                         raise ValueError(f'Validator: {validator_name} is not callable')
                     actual_field_value = getattr(
-                        self, 
+                        self,
                         field.strip('_')
                     )
                     validator(actual_field_value)
-            
+
             def to_dict(self) -> dict:
                 return {
                     field_name: getattr(self, field_name)
