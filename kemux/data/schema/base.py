@@ -47,4 +47,4 @@ class SchemaBase:
             field_name: field_type()
             for field_name, field_type in cls._fields.items()
         }
-        return cls._record_class.from_data(initial_message)
+        return cls._record_class(**initial_message)
