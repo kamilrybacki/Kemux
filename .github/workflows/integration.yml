@@ -81,6 +81,11 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: 3.11
+      - name: Show spliter logs
+        run: |
+          docker \
+            logs \
+              splitter
       - name: Install dependencies
         run: |
           pip \
@@ -94,8 +99,3 @@ jobs:
               pytest \
                 -c \
                   pytest.ini
-      - name: Show spliter logs
-        run: |
-          docker \
-            logs \
-              splitter
