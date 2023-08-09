@@ -41,6 +41,8 @@ class SchemaBase:
 
     @classmethod
     def make_init_message(cls) -> dict:
+        cls._logger.info(cls._record_class.__annotations__)
+        cls._logger.info(cls._fields)
         return cls._record_class({
             field: None
             for field in cls._fields
