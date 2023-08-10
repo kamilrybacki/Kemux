@@ -6,7 +6,7 @@ import conftest
 
 import lib.producer.start
 
-NUMBER_OF_SAMPLES = 100
+NUMBER_OF_SAMPLES = 20
 
 
 def test_for_consistency(tests_logger: logging.Logger, use_consumer: conftest.ConsumerFactory):

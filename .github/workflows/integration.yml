@@ -87,11 +87,6 @@ jobs:
             install \
               -r requirements-ci.txt \
               .
-      - name: Show spliter logs
-        run: |
-          docker \
-            logs \
-              splitter
       - name: Run integration tests
         run: |
           python \
