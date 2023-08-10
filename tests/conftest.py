@@ -16,7 +16,7 @@ TESTS_NETWORK_NAME = "environment_default"
 TESTS_LOGGER_NAME = "Kemux (integration tests)"
 
 
-ConsumerFactory = typing.Callable[[], kafka.KafkaConsumer]
+ConsumerFactory = typing.Callable[[str], kafka.KafkaConsumer]
 
 
 @pytest.fixture(scope='session')
@@ -43,8 +43,16 @@ def broker_ip(compose_file: dict) -> str:
 
 @pytest.fixture(scope="session")
 def use_consumer(broker_ip: str) -> ConsumerFactory:
-    def consumer_factory() -> kafka.KafkaConsumer:
+    def consumer_factory(topic: str | None = None) -> kafka.KafkaConsumer:
+        if topic is None:
+            return kafka.KafkaConsumer(
+                bootstrap_servers=broker_ip,
+                auto_offset_reset='earliest',
+                enable_auto_commit=True,
+                group_id='tests',
+            )
         return kafka.KafkaConsumer(
+            topic,
             bootstrap_servers=broker_ip,
             auto_offset_reset='earliest',
             enable_auto_commit=True,
