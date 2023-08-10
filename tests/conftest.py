@@ -1,6 +1,8 @@
+import logging
 import os
 import typing
 import yaml
+
 import docker
 import pytest
 import kafka
@@ -11,9 +13,25 @@ import lib.splitter.streams.secondary
 
 COMPOSE_FILE_PATH = os.path.join(os.path.dirname(__file__), "./environment/docker-compose.yml")
 TESTS_NETWORK_NAME = "environment_default"
+TESTS_LOGGER_NAME = "Kemux (integration tests)"
 
 
 ConsumerFactory = typing.Callable[[], kafka.KafkaConsumer]
+
+
+@pytest.fixture(scope='session')
+def tests_logger() -> logging.Logger:
+    logging.basicConfig(
+        level=logging.INFO,
+        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    )
+    return logging.getLogger(TESTS_LOGGER_NAME)
+
+
+@pytest.fixture(scope="session")
+def compose_file() -> dict:
+    with open(COMPOSE_FILE_PATH, "r", encoding="utf-8") as file:
+        return yaml.safe_load(file)
 
 
 @pytest.fixture(scope="session")
@@ -52,11 +70,3 @@ def topics() -> set[str]:
             )
         ]
     )}
-
-
-@pytest.fixture(scope="session")
-def compose_file() -> dict:
-    with open(COMPOSE_FILE_PATH, "r", encoding="utf-8") as compose_file:
-        return yaml.safe_load(compose_file)
-
-
