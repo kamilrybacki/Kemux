@@ -94,7 +94,7 @@ def test_for_message_splitting(tests_logger: logging.Logger, use_consumer: conft
     tests_logger.info(f'Expecting {expected_number_of_messages} messages filtered to {topic}')
 
     tests_logger.info(
-        new_topic_consumer._metrics
+        new_topic_consumer._metrics.metrics
     )
 
     new_topic_messages_names: list[str] = []
