@@ -1,3 +1,4 @@
+import ast
 import logging
 
 import kafka
@@ -28,7 +29,7 @@ def test_for_consistency(tests_logger: logging.Logger, use_consumer: conftest.Co
 
     for _ in range(NUMBER_OF_SAMPLES):
         message = next(consumer)
-        decoded_json = message.value.decode('utf-8')
+        decoded_json = ast.literal_eval(message.value.decode('utf-8'))
         tests_logger.info(f'Received JSON: {decoded_json}')
 
         helpers.verify_schema(
