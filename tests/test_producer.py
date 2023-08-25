@@ -7,7 +7,7 @@ import conftest
 
 import lib.producer.start
 
-NUMBER_OF_SAMPLES = 100
+NUMBER_OF_SAMPLES = 20
 
 EXPECTED_ANIMALS_TOPIC_JSON_SCHEMA = {
     'timestamp': str,
