@@ -80,7 +80,7 @@ def test_for_message_splitting(tests_logger: logging.Logger, use_consumer: conft
     producer_consumer: kafka.KafkaConsumer = use_consumer(lib.producer.start.TEST_TOPIC)
 
     produced_messages_names: list[str] = []
-    while set(produced_messages_names) != {*lib.producer.start.POSSIBLE_KEYS}:
+    while True:
         produced_message = next(producer_consumer)
         produced_json = ast.literal_eval(
             produced_message.value.decode('utf-8')
@@ -89,6 +89,6 @@ def test_for_message_splitting(tests_logger: logging.Logger, use_consumer: conft
             produced_messages_names.append(
                 produced_json.get('name')
             )
-        if len(produced_messages_names) == NUMBER_OF_PRODUCED_MESSAGES_SAMPLES:
+        if len(produced_messages_names) == NUMBER_OF_PRODUCED_MESSAGES_SAMPLES and set(produced_messages_names) == {*lib.producer.start.POSSIBLE_KEYS}:
             break
     tests_logger.info(f'Produced messages: {produced_messages_names}')
