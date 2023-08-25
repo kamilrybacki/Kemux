@@ -26,7 +26,7 @@ def test_for_consistency(tests_logger: logging.Logger, use_consumer: conftest.Co
     previous_value = 0
     sum_of_values = 0
 
-    for _ in range(NUMBER_OF_SAMPLES):
+    for _ in range(NUMBER_OF_SAMPLES + 1):
         message = next(consumer)
         decoded_json = ast.literal_eval(message.value.decode('utf-8'))
         tests_logger.info(f'Received JSON: {decoded_json}')
