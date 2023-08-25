@@ -65,6 +65,8 @@ def test_for_message_filtering(tests_logger: logging.Logger, use_consumer: conft
         produced_json = ast.literal_eval(
             produced_message.value.decode('utf-8')
         )
+        if '__faust' in produced_json:
+            continue
         tests_logger.info(f'{topic}: {produced_json["name"]}')
         if time.time() - filtering_start_time > FILTERING_TIMEOUT:
             raise TimeoutError(f'Filtering function for {topic} timed out (timeout: {FILTERING_TIMEOUT})')
