@@ -86,7 +86,8 @@ def test_for_message_splitting(tests_logger: logging.Logger, use_consumer: conft
     ]
     tests_logger.info(f'Manually filtered messages: {manually_filtered_messages_names}')
 
-    new_topic_consumer: kafka.KafkaConsumer = use_consumer(topic)
+    outputs_class_name_for_topic = topic.title().replace('-', '')
+    new_topic_consumer: kafka.KafkaConsumer = use_consumer(outputs_class_name_for_topic)
     assert new_topic_consumer.bootstrap_connected()
     tests_logger.info(f'Connected to {topic} successfully')
 
