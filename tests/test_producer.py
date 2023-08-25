@@ -13,7 +13,7 @@ EXPECTED_ANIMALS_TOPIC_JSON_SCHEMA = {
     'timestamp': str,
     'value': int,
     'name': str,
-    'labels': dict[str, str],
+    'labels': dict,
 }
 
 
