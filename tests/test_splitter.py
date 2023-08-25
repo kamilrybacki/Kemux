@@ -61,6 +61,7 @@ def test_for_message_filtering(tests_logger: logging.Logger, use_consumer: conft
         produced_message.value.decode('utf-8')
     )
     while not filtering_function(produced_json):
+        produced_message = next(producer_consumer)
         produced_json = ast.literal_eval(
             produced_message.value.decode('utf-8')
         )
