@@ -25,14 +25,26 @@ def test_for_message_filtering(tests_logger: logging.Logger, use_consumer: conft
     producer_consumer: kafka.KafkaConsumer = use_consumer(lib.producer.start.TEST_TOPIC)
     tests_logger.info(f'Connected to {lib.producer.start.TEST_TOPIC} successfully')
 
-    filtering_function: typing.Callable[[dict], bool] = getattr(
-        getattr(
+    try:
+        outputs_class = getattr(
             getattr(
                 lib.splitter.streams.primary,
                 'Outputs',
             ),
             topic.title(),
-        ),
+        )
+    except AttributeError:
+        outputs_class = getattr(
+            getattr(
+                lib.splitter.streams.secondary,
+                'Outputs',
+            ),
+            topic.title(),
+        )
+    assert isinstance(outputs_class, type)
+
+    filtering_function: typing.Callable[[dict], bool] = getattr(
+        outputs_class,
         'IO',
     ).filter
     assert filtering_function.__annotations__.get('message')
