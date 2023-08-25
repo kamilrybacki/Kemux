@@ -34,7 +34,7 @@ def test_for_consistency(tests_logger: logging.Logger, use_consumer: conftest.Co
         for key, value in EXPECTED_ANIMALS_TOPIC_JSON_SCHEMA.items():
             tests_logger.info(f'Checking key: {key} (expected type: {value})')
             assert key in decoded_json
-            assert decoded_json[key] is value
+            assert isinstance(decoded_json[key], value)  # type: ignore
 
         current_message_value = int(decoded_json.get('value', 0))
         sum_of_values += abs(current_message_value - previous_value)
