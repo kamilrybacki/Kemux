@@ -1,4 +1,5 @@
 import ast
+import time
 import logging
 import typing
 
@@ -51,11 +52,17 @@ def test_for_message_filtering(tests_logger: logging.Logger, use_consumer: conft
     assert filtering_function.__annotations__.get('message')
     tests_logger.info(f'Filtering function for {topic} found')
 
+    filtering_start_time = time.time()
     produced_message = next(producer_consumer)
     produced_json = ast.literal_eval(
         produced_message.value.decode('utf-8')
     )
-    assert filtering_function(produced_json)
+    while not filtering_function(produced_json):
+        produced_json = ast.literal_eval(
+            produced_message.value.decode('utf-8')
+        )
+        if time.time() - filtering_start_time > 10:
+            raise TimeoutError(f'Filtering function for {topic} is not working')
     tests_logger.info(f'Filtering function for {topic} works as expected')
 
 
