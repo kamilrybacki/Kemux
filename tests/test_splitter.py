@@ -48,7 +48,6 @@ def test_for_message_filtering(tests_logger: logging.Logger, use_consumer: conft
         )
         if '__faust' in produced_json:
             continue
-        tests_logger.info(f'{topic}: {produced_json["name"]}')
         if time.time() - filtering_start_time > FILTERING_TIMEOUT:
             raise TimeoutError(f'Filtering function for {topic} timed out (timeout: {FILTERING_TIMEOUT})')
     tests_logger.info(f'Filtering function for {topic} works as expected')
@@ -73,7 +72,8 @@ def test_for_message_splitting(tests_logger: logging.Logger, use_consumer: conft
             break
     tests_logger.info(f'Produced messages: {produced_messages_names}')
 
-    filtering_function = helpers.get_filtering_function_for_topic(topic)
+    outputs_class_name_for_topic = topic.title().replace('-', '')
+    filtering_function = helpers.get_filtering_function_for_topic(outputs_class_name_for_topic)
 
     manually_filtered_messages_names: list[str] = [
         produced_message_name
@@ -86,8 +86,7 @@ def test_for_message_splitting(tests_logger: logging.Logger, use_consumer: conft
     ]
     tests_logger.info(f'Manually filtered messages: {manually_filtered_messages_names}')
 
-    outputs_class_name_for_topic = topic.title().replace('-', '')
-    new_topic_consumer: kafka.KafkaConsumer = use_consumer(outputs_class_name_for_topic)
+    new_topic_consumer: kafka.KafkaConsumer = use_consumer(topic)
     assert new_topic_consumer.bootstrap_connected()
     tests_logger.info(f'Connected to {topic} successfully')
 
