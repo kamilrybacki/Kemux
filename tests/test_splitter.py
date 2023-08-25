@@ -21,8 +21,8 @@ def test_for_existence_of_new_topic(tests_logger: logging.Logger, use_consumer: 
 
 @pytest.mark.order(6)
 @pytest.mark.parametrize('topic', helpers.get_splitter_output_topics())
-def test_for_message_filtering(tests_logger: logging.Logger, topic: str):
-    producer_consumer: kafka.KafkaConsumer = conftest.use_consumer(lib.producer.start.TEST_TOPIC)
+def test_for_message_filtering(tests_logger: logging.Logger, use_consumer: conftest.ConsumerFactory, topic: str):
+    producer_consumer: kafka.KafkaConsumer = use_consumer(lib.producer.start.TEST_TOPIC)
     tests_logger.info(f'Connected to {lib.producer.start.TEST_TOPIC} successfully')
 
     filtering_function: typing.Callable[[dict], bool] = getattr(
@@ -36,12 +36,14 @@ def test_for_message_filtering(tests_logger: logging.Logger, topic: str):
         'IO',
     ).filter
     assert filtering_function.__annotations__.get('message')
+    tests_logger.info(f'Filtering function for {topic} found')
 
     produced_message = next(producer_consumer)
     produced_json = ast.literal_eval(
         produced_message.value.decode('utf-8')
     )
     assert filtering_function(produced_json)
+    tests_logger.info(f'Filtering function for {topic} works as expected')
 
 
 @pytest.mark.order(7)
