@@ -17,5 +17,6 @@ def start_splitter() -> None:
     )
     receiver.start()
 
+
 if __name__ == '__main__':
     start_splitter()
