@@ -12,6 +12,9 @@ import helpers
 import lib.producer.start
 
 
+FILTERING_TIMEOUT = 10
+
+
 @pytest.mark.order(5)
 @pytest.mark.parametrize('topic', helpers.get_splitter_output_topics())
 def test_for_existence_of_new_topic(tests_logger: logging.Logger, use_consumer: conftest.ConsumerFactory, topic: str) -> None:
@@ -61,8 +64,9 @@ def test_for_message_filtering(tests_logger: logging.Logger, use_consumer: conft
         produced_json = ast.literal_eval(
             produced_message.value.decode('utf-8')
         )
-        if time.time() - filtering_start_time > 10:
-            raise TimeoutError(f'Filtering function for {topic} is not working')
+        tests_logger.info(f'{topic}: {produced_json["name"]}')
+        if time.time() - filtering_start_time > FILTERING_TIMEOUT:
+            raise TimeoutError(f'Filtering function for {topic} timed out (timeout: {FILTERING_TIMEOUT})')
     tests_logger.info(f'Filtering function for {topic} works as expected')
 
 
