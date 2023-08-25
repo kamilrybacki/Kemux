@@ -6,6 +6,9 @@ services:
     container_name: zookeeper
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
+    networks:
+      default:
+        ipv4_address: 10.5.0.3
 
   broker:
     image: confluentinc/cp-kafka:5.5.0
@@ -26,14 +29,20 @@ services:
     ports:
       - 9092:9092
       - 29092:29092
+    networks:
+      default:
+        ipv4_address: 10.5.0.4
     depends_on:
       - zookeeper
 
   producer:
     container_name: producer
     environment:
-      - KAFKA_ADDRESS=broker:9092
+      - KAFKA_ADDRESS=10.5.0.4:9092
     image: ${PRODUCER_IMAGE}
+    networks:
+      default:
+        ipv4_address: 10.5.0.5
     depends_on:
       broker:
         condition: service_healthy
@@ -43,5 +52,16 @@ services:
     environment:
       - KAFKA_ADDRESS=broker:9092
     image: ${SPLITTER_IMAGE}
+    networks:
+      default:
+        ipv4_address: 10.5.0.6
     depends_on:
       - producer
+
+networks:
+  default:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.5.0.0/16
+          gateway: 10.5.0.1
