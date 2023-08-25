@@ -15,7 +15,7 @@ services:
     container_name: broker
     environment:
       KAFKA_BROKER_ID: 1
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ZOOKEEPER_CONNECT: 10.5.0.3:2181
       KAFKA_LISTENERS: PLAINTEXT://:9092,PLAINTEXT_HOST://:29092
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://broker:9092,PLAINTEXT_HOST://localhost:29092
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
@@ -50,7 +50,7 @@ services:
   splitter:
     container_name: splitter
     environment:
-      - KAFKA_ADDRESS=broker:9092
+      - KAFKA_ADDRESS=10.5.0.4:9092
     image: ${SPLITTER_IMAGE}
     networks:
       default:
