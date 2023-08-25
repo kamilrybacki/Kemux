@@ -31,28 +31,8 @@ def test_for_message_filtering(tests_logger: logging.Logger, use_consumer: conft
     tests_logger.info(f'Connected to {lib.producer.start.TEST_TOPIC} successfully')
 
     outputs_class_name_for_topic = topic.title().replace('-', '')
-    try:
-        outputs_class = getattr(
-            getattr(
-                lib.splitter.streams.primary,
-                'Outputs',
-            ),
-            outputs_class_name_for_topic
-        )
-    except AttributeError:
-        outputs_class = getattr(
-            getattr(
-                lib.splitter.streams.secondary,
-                'Outputs',
-            ),
-            outputs_class_name_for_topic
-        )
-    assert isinstance(outputs_class, type)
+    filtering_function = helpers.get_filtering_function_for_topic(outputs_class_name_for_topic)
 
-    filtering_function: typing.Callable[[dict], bool] = getattr(
-        outputs_class,
-        'IO',
-    ).filter
     assert filtering_function.__annotations__.get('message')
     tests_logger.info(f'Filtering function for {topic} found')
 
@@ -92,3 +72,32 @@ def test_for_message_splitting(tests_logger: logging.Logger, use_consumer: conft
         if len(produced_messages_names) == NUMBER_OF_PRODUCED_MESSAGES_SAMPLES and set(produced_messages_names) == {*lib.producer.start.POSSIBLE_KEYS}:
             break
     tests_logger.info(f'Produced messages: {produced_messages_names}')
+
+    filtering_function = helpers.get_filtering_function_for_topic(topic)
+
+    manually_filtered_messages_names: list[str] = [
+        produced_message_name
+        for produced_message_name in produced_messages_names
+        if filtering_function(
+            {
+                'name': produced_message_name,
+            }
+        )
+    ]
+    tests_logger.info(f'Manually filtered messages: {manually_filtered_messages_names}')
+
+    new_topic_consumer: kafka.KafkaConsumer = use_consumer(topic)
+    assert new_topic_consumer.bootstrap_connected()
+    tests_logger.info(f'Connected to {topic} successfully')
+
+    expected_number_of_messages = len(manually_filtered_messages_names)
+
+    new_topic_messages_names: list[str] = [
+        ast.literal_eval(
+            next(new_topic_consumer).value.decode('utf-8')
+        ).get('name')
+        for _ in range(expected_number_of_messages)
+    ]
+
+    assert new_topic_messages_names == manually_filtered_messages_names
+    tests_logger.info('Splitting works as expected')

@@ -1,12 +1,9 @@
-import logging
+import typing
 
 import functools
 
 import lib.splitter.streams.primary
 import lib.splitter.streams.secondary
-
-import kemux.data.schema.output
-import kemux.data.io.output
 
 
 @functools.lru_cache
@@ -26,3 +23,29 @@ def get_splitter_output_topics() -> list[str]:
         ]
         for topic in sublist
     ]
+
+
+@functools.lru_cache
+def get_filtering_function_for_topic(topic: str) -> typing.Callable[[dict], bool]:
+    try:
+        outputs_class = getattr(
+            getattr(
+                lib.splitter.streams.primary,
+                'Outputs',
+            ),
+            topic
+        )
+    except AttributeError:
+        outputs_class = getattr(
+            getattr(
+                lib.splitter.streams.secondary,
+                'Outputs',
+            ),
+            topic
+        )
+    assert isinstance(outputs_class, type)
+
+    return getattr(
+        outputs_class,
+        'IO',
+    ).filter
