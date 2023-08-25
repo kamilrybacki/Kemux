@@ -97,7 +97,7 @@ def test_for_message_splitting(tests_logger: logging.Logger, use_consumer: conft
         split_message = next(new_topic_consumer)
         message_name = ast.literal_eval(
             split_message.value.decode('utf-8')
-        ).get('name')
+        )
         tests_logger.info(f'Got message: {message_name}')
         new_topic_messages_names.append(message_name)
 
