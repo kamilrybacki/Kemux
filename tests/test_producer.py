@@ -30,6 +30,9 @@ def test_for_consistency(tests_logger: logging.Logger, use_consumer: conftest.Co
         message = next(consumer)
         decoded_json = ast.literal_eval(message.value.decode('utf-8'))
         tests_logger.info(f'Received JSON: {decoded_json}')
+        if '__faust' in decoded_json:
+            tests_logger.info('Skipping Faust topic init message')
+            continue
 
         for key, value in EXPECTED_ANIMALS_TOPIC_JSON_SCHEMA.items():
             tests_logger.info(f'Checking key: {key} (expected type: {value})')
