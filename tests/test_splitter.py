@@ -95,7 +95,7 @@ def test_for_message_splitting(tests_logger: logging.Logger, use_consumer: conft
 
     new_topic_messages_names: list[str] = []
     while len(new_topic_messages_names) < expected_number_of_messages:
-        split_message = new_topic_consumer.poll(timeout_ms=1000)
+        split_message = next(new_topic_consumer)
         tests_logger.info(f'Got message: {split_message}')
         if message_name := ast.literal_eval(
             split_message.value.decode('utf-8')
