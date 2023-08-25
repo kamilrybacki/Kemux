@@ -13,6 +13,7 @@ import lib.producer.start
 
 
 FILTERING_TIMEOUT = 10
+NUMBER_OF_PRODUCED_MESSAGES_SAMPLES = 100
 
 
 @pytest.mark.order(5)
@@ -88,4 +89,6 @@ def test_for_message_splitting(tests_logger: logging.Logger, use_consumer: conft
             produced_messages_names.append(
                 produced_json.get('name')
             )
-        break
+        if len(produced_messages_names) == NUMBER_OF_PRODUCED_MESSAGES_SAMPLES:
+            break
+    tests_logger.info(f'Produced messages: {produced_messages_names}')
