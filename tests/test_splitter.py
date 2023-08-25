@@ -97,6 +97,11 @@ def test_for_message_splitting(tests_logger: logging.Logger, use_consumer: conft
     while len(new_topic_messages_names) < expected_number_of_messages:
         split_message = new_topic_consumer.poll(timeout_ms=1000)
         tests_logger.info(f'Got message: {split_message.value}')
+        if message_name := ast.literal_eval(
+            split_message.value.decode('utf-8')
+        ).get('name'):
+            tests_logger.info(f'Got message: {message_name}')
+            new_topic_messages_names.append(message_name)
 
     assert new_topic_messages_names == manually_filtered_messages_names
     tests_logger.info('Splitting works as expected')
