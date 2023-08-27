@@ -94,3 +94,8 @@ jobs:
               pytest \
                 -c \
                   pytest.ini
+      - name: Print splitter logs
+        run: |
+          docker \
+            logs \
+              splitter
