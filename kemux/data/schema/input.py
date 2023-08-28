@@ -48,6 +48,7 @@ class InputSchema(kemux.data.schema.base.SchemaBase):
 
         for field_name, field_type in cls._fields.items():
             InputRecord.__annotations__[field_name] = field_type
+            cls._logger.info(f'Added field: {field_name} to {cls.__name__}')
             setattr(
                 InputRecord,
                 field_name,
