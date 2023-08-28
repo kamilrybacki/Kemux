@@ -26,6 +26,7 @@ class IOBase:
     @classmethod
     def _initialize_handler(cls, app: faust.App) -> None:
         schema: kemux.data.schema.base.SchemaBase = cls.schema
+        cls.logger.info(schema._record_class.asdict())
         cls._topic_handler = app.topic(
             cls.topic,
             value_type=schema._record_class,
