@@ -26,8 +26,8 @@ class InputSchema(kemux.data.schema.base.SchemaBase):
             _fields: dict[str, type] = faust.models.fields.FieldDescriptor(required=False, exclude=True, default=cls._fields, type=dict)  # type: ignore
 
             def _validate(self) -> None:
+                cls._logger.info(self.__dict__)
                 for field in self._decorated_fields.keys():
-                    cls._logger.info(f'Validating {field}')
                     validator_name = f'{field}validator'
                     validator = getattr(
                         self.__class__,
