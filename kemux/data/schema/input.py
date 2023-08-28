@@ -27,7 +27,7 @@ class InputSchema(kemux.data.schema.base.SchemaBase):
 
             def _validate(self) -> None:
                 for field in self._decorated_fields.keys():
-                    cls._logger.debug(f'Validating {field}')
+                    cls._logger.info(f'Validating {field}')
                     validator_name = f'{field}validator'
                     validator = getattr(
                         self.__class__,
