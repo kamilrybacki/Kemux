@@ -1,5 +1,4 @@
 import dataclasses
-import logging
 
 import kemux.data.io.input
 import kemux.data.io.output
@@ -40,7 +39,6 @@ class Input:
 
         @staticmethod
         def ingest(message: dict) -> dict:
-            logging.info(f'Ingesting message: {message}')
             return message
 
 
