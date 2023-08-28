@@ -135,7 +135,7 @@ class Processor:
             stream_input: kemux.data.io.input.StreamInput = stream.input
             self.__logger.info(f'Activating input stream: {stream_name}')
             input_topics_handler: faust.TopicT = stream_input._get_handler(self._app)  # pylint: disable=protected-access
-            self.__logger.info(input_topics_handler.schema.__dict__['value_type'].__dict__)
+            self.__logger.info(input_topics_handler.schema.__dict__['value_type'])
             self.__logger.info(f'Activating output streams: {stream_name}')
 
             output: kemux.data.io.output.StreamOutput
