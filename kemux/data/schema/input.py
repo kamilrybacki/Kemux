@@ -48,7 +48,6 @@ class InputSchema(kemux.data.schema.base.SchemaBase):
 
         for field_name, field_type in cls._fields.items():
             InputRecord.__annotations__[field_name] = field_type
-            cls._logger.info(f'Added field: {field_name} to {cls.__name__}')
             setattr(
                 InputRecord,
                 field_name,
@@ -59,6 +58,8 @@ class InputSchema(kemux.data.schema.base.SchemaBase):
                     type=field_type
                 )
             )
+        
+        cls._logger.info(f'Constructed InputRecord: {InputRecord.__annotations__}')
 
         implemented_validators = [
             getattr(cls, field)
