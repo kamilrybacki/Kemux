@@ -16,4 +16,5 @@ class StreamBase:
         raw_message = message.to_dict()
         ingested_message = self.input.ingest(raw_message)
         for output in self.outputs:
-            await output.send(ingested_message)
+            if output.filter(message):
+                await output.send(ingested_message)

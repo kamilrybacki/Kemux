@@ -31,3 +31,16 @@ class OutputSchema(kemux.data.schema.base.SchemaBase):
                 (faust.Record, ),
                 {'__annotations__': target_fields_annotations},
             )  # type: ignore
+
+    @classmethod
+    def validate(cls, message: dict) -> bool:
+        field_descriptions = cls._record_class.__annotations__.items()
+        for field_name, field_type in field_descriptions:
+            if field_name not in message:
+                return False
+            if not isinstance(
+                message[field_name],
+                field_type
+            ):
+                return False
+        return True

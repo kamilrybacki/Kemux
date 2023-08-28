@@ -48,6 +48,16 @@ class InputSchema(kemux.data.schema.base.SchemaBase):
 
         for field_name, field_type in cls._fields.items():
             InputRecord.__annotations__[field_name] = field_type
+            setattr(
+                InputRecord,
+                field_name,
+                faust.models.fields.FieldDescriptor(
+                    required=True,
+                    exclude=False,
+                    default=None,
+                    type=field_type
+                )
+            )
 
         implemented_validators = [
             getattr(cls, field)

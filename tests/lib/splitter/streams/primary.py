@@ -70,7 +70,7 @@ class Outputs:
             @staticmethod
             def transform(message: dict) -> dict:
                 return message
-        
+
         @dataclasses.dataclass
         class IO(kemux.data.io.output.StreamOutput):
             topic = 'spooky'
@@ -78,7 +78,7 @@ class Outputs:
             @staticmethod
             def filter(message: dict) -> bool:
                 return message.get('name') in ['bat', 'spider']
-    
+
     class Flying:
         @dataclasses.dataclass
         class Schema(kemux.data.schema.output.OutputSchema):
@@ -88,7 +88,7 @@ class Outputs:
             @staticmethod
             def transform(message: dict) -> dict:
                 return message
-        
+
         @dataclasses.dataclass
         class IO(kemux.data.io.output.StreamOutput):
             topic = 'flying'

@@ -1,7 +1,6 @@
 import ast
 import time
 import logging
-import typing
 
 import kafka
 import pytest
