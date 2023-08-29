@@ -20,17 +20,18 @@ class OutputSchema(kemux.data.schema.base.SchemaBase):
 
     @classmethod
     def _construct_output_record_class(cls) -> None:
-        if not getattr(cls, '_output_constructor', None):
-            target_fields_annotations = {
-                target_field: (target_field_annotation, ...)
-                for target_field, target_field_annotation in cls.__annotations__.items()
-                if target_field in cls._fields
-            }
-            cls._record_class = type(
-                cls.__name__,
-                (faust.Record, ),
-                {'__annotations__': target_fields_annotations},
-            )  # type: ignore
+        cls._record_class = type(
+            cls.__name__,
+            (faust.Record, ),
+            {
+                '__annotations__': {
+                    target_field: (target_field_annotation, ...)
+                    for target_field, target_field_annotation in cls.__annotations__.items()
+                    if target_field in cls._fields
+                }
+            },
+        )  # type: ignore
+        cls._logger.info(f'Constructed output record class: {cls._record_class.__annotations__}')
 
     @classmethod
     def validate(cls, message: dict) -> bool:
