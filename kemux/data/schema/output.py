@@ -20,15 +20,13 @@ class OutputSchema(kemux.data.schema.base.SchemaBase):
 
     @classmethod
     def _construct_output_record_class(cls) -> None:
-        cls._logger.info(cls._fields)
         cls._record_class = type(
             cls.__name__,
             (faust.Record, ),
             {
                 '__annotations__': {
                     target_field: (target_field_annotation, ...)
-                    for target_field, target_field_annotation in cls.__annotations__.items()
-                    if target_field in cls._fields
+                    for target_field, target_field_annotation in cls._fields.items()
                 }
             },
         )  # type: ignore
