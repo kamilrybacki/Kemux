@@ -38,12 +38,3 @@ class SchemaBase:
         }
         cls._logger = logging.getLogger(cls.__name__)
         cls._logger.info('Found schema fields: %s', ', '.join(cls._fields))
-
-    @classmethod
-    def make_init_message(cls, topic: str) -> dict:
-        cls._logger.info(f'Sending initial message to topic: {topic}')
-        initial_message = {
-            field_name: field_type()
-            for field_name, field_type in cls._fields.items()
-        }
-        return cls._record_class.from_data(initial_message)
