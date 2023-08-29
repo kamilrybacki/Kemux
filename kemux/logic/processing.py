@@ -163,8 +163,10 @@ class Processor:
             stream.topics()
             for stream in self.__streams.values()
         ]
-        streams_info = self.sort_streams_info(streams_info)
-        return self.__streams
+        return {
+            stream_info[0]: self.__streams[stream_info[0]]
+            for stream_info in self.sort_streams_info(streams_info)
+        }
 
     @staticmethod
     def sort_streams_info(info: list[tuple]) -> list[tuple]:
