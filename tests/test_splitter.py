@@ -92,9 +92,6 @@ def test_for_message_splitting(tests_logger: logging.Logger, use_consumer: conft
     expected_number_of_messages = len(manually_filtered_messages_names)
     tests_logger.info(f'Expecting {expected_number_of_messages} messages filtered to {topic}')
 
-    assert True
-    return
-
     new_topic_messages_names: list[str] = []
     while len(new_topic_messages_names) < expected_number_of_messages:
         split_message = next(new_topic_consumer)
