@@ -25,8 +25,8 @@ class OutputSchema(kemux.data.schema.base.SchemaBase):
             (faust.Record, ),
             {
                 '__annotations__': {
-                    target_field: (target_field_annotation, ...)
-                    for target_field, target_field_annotation in cls._fields.items()
+                    **faust.Record.__annotations__,
+                    **cls._fields
                 }
             },
         )  # type: ignore
