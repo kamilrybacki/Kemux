@@ -44,6 +44,6 @@ def test_for_consistency(tests_logger: logging.Logger, use_consumer: conftest.Co
         sum_of_values += abs(current_message_value - previous_value)
         previous_value = current_message_value
 
-    average_difference = sum_of_values / NUMBER_OF_SAMPLES
+    average_difference = sum_of_values / (NUMBER_OF_SAMPLES + 1)
     tests_logger.info(f'Average difference: {average_difference}')
     assert average_difference == 1  # Value should be incremented by 1 each time
