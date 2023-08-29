@@ -24,5 +24,6 @@ class IOBase:
         cls._topic_handler = app.topic(
             cls.topic,
             value_type=schema._record_class,
+            allow_empty=True,
         )
-        cls.logger.info(f'Initialized topic handler for {cls.topic}')
+        cls.logger.info(f'{cls.topic}: topic handler initialized')

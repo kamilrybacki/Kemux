@@ -8,4 +8,4 @@ import kemux.data.schema.input
 class StreamInput(kemux.data.io.base.IOBase):
     @staticmethod
     def ingest(message: dict) -> dict:
-        raise NotImplementedError(f'{__name__}.recieve() must be implemented!')
+        raise NotImplementedError(f'{__name__}.ingest() must be implemented!')
