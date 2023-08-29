@@ -25,8 +25,8 @@ class InputSchema(kemux.data.schema.base.SchemaBase):
             date_parser=dateutil.parser.parse
         ):
             def _validate(self) -> None:
-                for field in cls._decorated_fields:
-                    validator_name = f'{field}validator'
+                for field in cls._fields:
+                    validator_name = f'_{field}_validator'
                     validator = getattr(
                         self.__class__,
                         validator_name
@@ -34,10 +34,7 @@ class InputSchema(kemux.data.schema.base.SchemaBase):
                     if not isinstance(validator, types.FunctionType):
                         raise ValueError(f'Validator: {validator_name} is not callable')
                     cls._logger.info(f'Validating field: {field}')
-                    actual_field_value = getattr(
-                        self,
-                        field.strip('_')
-                    )
+                    actual_field_value = getattr(self, field)
                     validator(actual_field_value)
 
             def to_dict(self) -> dict:
