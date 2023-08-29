@@ -1,4 +1,5 @@
 import logging
+import time
 
 import docker
 import kafka
@@ -33,5 +34,6 @@ def test_connection_to_kafka_broker(tests_logger: logging.Logger, use_consumer: 
 @pytest.mark.order(3)
 def test_topics_exist(tests_logger: logging.Logger, use_consumer: conftest.ConsumerFactory, topics: set[str]):
     tests_logger.info("Testing topics exist")
+    time.sleep(5)
     topics_present_in_kafka: set[str] = use_consumer().topics()
     assert topics.issubset(topics_present_in_kafka)
