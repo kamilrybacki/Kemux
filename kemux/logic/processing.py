@@ -133,21 +133,24 @@ class Processor:
         stream: kemux.data.stream.StreamBase
         for stream_name, stream in self.__streams.items():
             stream_input: kemux.data.io.input.StreamInput = stream.input
-            self.__logger.info(f'Activating input stream: {stream_name}')
-            input_topics_handler: faust.TopicT | None = stream_input._topic_handler  # pylint: disable=protected-access
-            if not input_topics_handler:
-                raise ValueError(f'Invalid input stream handler: {stream_name}')
-            self.__logger.info(f'Activating output streams: {stream_name}')
+            self.__logger.info(f'{stream_name}: activating input topic handler')
+            stream_input._initialize_handler(self._app)  # pylint: disable=protected-access
 
             # pylint: disable=protected-access, cell-var-from-loop
             async def _process_input_stream_message(messages: faust.StreamT[kemux.data.schema.input.InputSchema]) -> None:
-                self.__logger.info('Processing messages')
                 output: kemux.data.io.output.StreamOutput
                 for output in stream.outputs:
-                    await output._initialize_handler(self._app)
+                    output._initialize_handler(self._app)
+                    if not output._topic_handler:
+                        raise ValueError(f'Invalid output stream topic handler: {stream_name}')
+                    await output._topic_handler.declare()
                 async for message in messages:
                     await stream.process(message)  # type: ignore
 
-            self.__logger.info('Activating agent for input stream')
+            input_topics_handler: faust.TopicT | None = stream_input._topic_handler  # pylint: disable=protected-access
+            if not input_topics_handler:
+                raise ValueError(f'Invalid input stream topic handler: {stream_name}')
+
+            self.__logger.info(f'{stream_name}: activating agent')
             self.__agents[stream_name] = self._app.agent(input_topics_handler)(_process_input_stream_message)
         self._app.main()
