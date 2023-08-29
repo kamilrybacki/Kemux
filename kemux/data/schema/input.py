@@ -1,7 +1,8 @@
+# pylint: disable=abstract-method
 import dataclasses
-import dateutil.parser
 import types
 
+import dateutil.parser
 import faust
 import faust.models.fields
 
@@ -13,6 +14,7 @@ class InputRecordT(kemux.data.schema.base.StreamRecordT):
         ...
 
 
+# pylint: disable=protected-access
 @dataclasses.dataclass
 class InputSchema(kemux.data.schema.base.SchemaBase):
     @classmethod
@@ -22,11 +24,8 @@ class InputSchema(kemux.data.schema.base.SchemaBase):
             serializer='json',
             date_parser=dateutil.parser.parse
         ):
-            _decorated_fields: dict[str, type] = faust.models.fields.FieldDescriptor(required=False, exclude=True, default=cls._decorated_fields)  # type: ignore
-            _fields: dict[str, type] = faust.models.fields.FieldDescriptor(required=False, exclude=True, default=cls._fields, type=dict)  # type: ignore
-
             def _validate(self) -> None:
-                for field in self._decorated_fields.keys():
+                for field in cls._decorated_fields:
                     validator_name = f'{field}validator'
                     validator = getattr(
                         self.__class__,
@@ -44,7 +43,7 @@ class InputSchema(kemux.data.schema.base.SchemaBase):
             def to_dict(self) -> dict:
                 return {
                     field_name: getattr(self, field_name)
-                    for field_name in self._fields.keys()
+                    for field_name in cls._fields
                 }
 
         for field_name, field_type in cls._fields.items():
