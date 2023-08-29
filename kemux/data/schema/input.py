@@ -24,7 +24,7 @@ class InputSchema(kemux.data.schema.base.SchemaBase):
             serializer='json',
             date_parser=dateutil.parser.parse
         ):
-            def validate(self) -> None:
+            def validate_message(self) -> None:
                 for field in cls.fields:
                     validator_name = f'_{field}_validator'
                     validator = getattr(
