@@ -69,7 +69,6 @@ def test_for_message_splitting(tests_logger: logging.Logger, use_consumer: conft
             )
         if len(produced_messages_names) == NUMBER_OF_PRODUCED_MESSAGES_SAMPLES and set(produced_messages_names) == {*lib.producer.start.POSSIBLE_KEYS}:
             break
-    tests_logger.info(f'Produced messages: {produced_messages_names}')
 
     outputs_class_name_for_topic = topic.title().replace('-', '')
     filtering_function = helpers.get_filtering_function_for_topic(outputs_class_name_for_topic)
@@ -83,7 +82,6 @@ def test_for_message_splitting(tests_logger: logging.Logger, use_consumer: conft
             }
         )
     ]
-    tests_logger.info(f'Manually filtered messages: {manually_filtered_messages_names}')
 
     new_topic_consumer: kafka.KafkaConsumer = use_consumer(topic)
     assert new_topic_consumer.bootstrap_connected()
@@ -93,14 +91,21 @@ def test_for_message_splitting(tests_logger: logging.Logger, use_consumer: conft
     tests_logger.info(f'Expecting {expected_number_of_messages} messages filtered to {topic}')
 
     new_topic_messages_names: list[str] = []
+    stop_iteration_hits = 0
     while len(new_topic_messages_names) < expected_number_of_messages:
-        split_message = next(new_topic_consumer)
-        tests_logger.info(f'Got message: {split_message}')
-        if message_name := ast.literal_eval(
-            split_message.value.decode('utf-8')
-        ).get('name'):
-            tests_logger.info(f'Got message: {message_name}')
-            new_topic_messages_names.append(message_name)
+        try:
+            split_message = next(new_topic_consumer)
+            tests_logger.info(f'Got message: {split_message}')
+            if message_name := ast.literal_eval(
+                split_message.value.decode('utf-8')
+            ).get('name'):
+                tests_logger.info(f'Got message: {message_name}')
+                new_topic_messages_names.append(message_name)
+        except StopIteration:
+            tests_logger.info(f'Waiting for more messages in {topic}')
+            stop_iteration_hits += 1
+        if stop_iteration_hits > 10:
+            raise TimeoutError(f'Waiting for more messages in {topic} timed out')
 
     assert new_topic_messages_names == manually_filtered_messages_names
     tests_logger.info('Splitting works as expected')
