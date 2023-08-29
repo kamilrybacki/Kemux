@@ -34,6 +34,7 @@ class InputSchema(kemux.data.schema.base.SchemaBase):
                     )
                     if not isinstance(validator, types.FunctionType):
                         raise ValueError(f'Validator: {validator_name} is not callable')
+                    cls._logger.info(f'Validating field: {field}')
                     actual_field_value = getattr(
                         self,
                         field.strip('_')
