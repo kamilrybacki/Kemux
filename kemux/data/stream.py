@@ -11,8 +11,10 @@ class StreamBase:
     outputs: list[kemux.data.io.output.StreamOutput]
 
     async def process(self, message: kemux.data.schema.input.InputRecordT) -> None:
-        message._validate()
         raw_message = message.to_dict()
+        if '__kemux_init__' in raw_message:
+            return
+        message._validate()  # pylint: disable=protected-access
         ingested_message = self.input.ingest(raw_message)
         for output in self.outputs:
             if output.filter(message):
