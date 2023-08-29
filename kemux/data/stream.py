@@ -20,10 +20,10 @@ class StreamBase:
             if output.filter(message):
                 await output.send(ingested_message)
 
-    def topics(self) -> dict[str, list[str]]:
-        return {
-            self.input.topic: [
+    def topics(self) -> tuple[str, list[str]]:
+        return (
+            self.input.topic, [
                 output.topic
                 for output in self.outputs
             ]
-        }
+        )
