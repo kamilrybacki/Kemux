@@ -137,12 +137,13 @@ class Processor:
             input_topics_handler: faust.TopicT = stream_input._get_handler(self._app)  # pylint: disable=protected-access
             self.__logger.info(f'Activating output streams: {stream_name}')
 
-            output: kemux.data.io.output.StreamOutput
-            for output in stream.outputs:
-                output._initialize_handler(self._app)
-
+            # pylint: disable=protected-access, cell-var-from-loop
             async def _process_input_stream_message(messages: faust.StreamT[kemux.data.schema.input.InputSchema]) -> None:
                 self.__logger.info('Processing messages')
+                output: kemux.data.io.output.StreamOutput
+                for output in stream.outputs:
+                    output._initialize_handler(self._app)
+                    await output._get_handler(self._app).declare()
                 async for message in messages:
                     await stream.process(message)  # type: ignore
 
