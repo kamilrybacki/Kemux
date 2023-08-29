@@ -23,8 +23,8 @@ TEST_STREAMS_INFO: list[tuple] = [
 ]
 EXPECTED_STREAMS_ORDER = [
     ('1', ['2', '3', '4']),
-    ('2', ['5', '6', '7']),
     ('3', ['5', '6', '7']),
+    ('2', ['5', '6', '7']),
     ('7', ['8', '9', '10']),
 ]
 
@@ -125,7 +125,7 @@ def test_for_message_splitting(tests_logger: logging.Logger, use_consumer: conft
         except StopIteration:
             tests_logger.info(f'Waiting for more messages in {topic}')
             stop_iteration_hits += 1
-        if stop_iteration_hits > 10:
+        if stop_iteration_hits > 3:
             raise TimeoutError(f'Waiting for more messages in {topic} timed out')
 
     assert new_topic_messages_names == manually_filtered_messages_names
