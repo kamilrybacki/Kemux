@@ -163,10 +163,14 @@ class Processor:
             stream.topics()
             for stream in self.__streams.values()
         ]
-        return {
-            stream_info[0]: self.__streams[stream_info[0]]
-            for stream_info in self.sort_streams_info(streams_info)
-        }
+        sorted_streams = {}
+        for stream_info in self.sort_streams_info(streams_info):
+            input_topic = stream_info[0]
+            for stream_name, stream in self.__streams.items():
+                if stream.input.topic == input_topic:
+                    sorted_streams[stream_name] = stream
+                    break
+        return sorted_streams
 
     @staticmethod
     def sort_streams_info(info: list[tuple]) -> list[tuple]:
