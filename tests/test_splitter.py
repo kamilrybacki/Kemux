@@ -15,7 +15,7 @@ FILTERING_TIMEOUT = 10
 NUMBER_OF_PRODUCED_MESSAGES_SAMPLES = 100
 
 
-@pytest.mark.order(5)
+@pytest.mark.order(4)
 @pytest.mark.parametrize('topic', helpers.get_splitter_output_topics())
 def test_for_existence_of_new_topic(tests_logger: logging.Logger, use_consumer: conftest.ConsumerFactory, topic: str) -> None:
     new_topic_consumer: kafka.KafkaConsumer = use_consumer(topic)
@@ -23,7 +23,7 @@ def test_for_existence_of_new_topic(tests_logger: logging.Logger, use_consumer: 
     tests_logger.info(f'Connected to {topic} successfully')
 
 
-@pytest.mark.order(6)
+@pytest.mark.order(5)
 @pytest.mark.parametrize('topic', helpers.get_splitter_output_topics())
 def test_for_message_filtering(tests_logger: logging.Logger, use_consumer: conftest.ConsumerFactory, topic: str):
     producer_consumer: kafka.KafkaConsumer = use_consumer(lib.producer.start.TEST_TOPIC)
@@ -52,7 +52,7 @@ def test_for_message_filtering(tests_logger: logging.Logger, use_consumer: conft
     tests_logger.info(f'Filtering function for {topic} works as expected')
 
 
-@pytest.mark.order(7)
+@pytest.mark.order(6)
 @pytest.mark.parametrize('topic', helpers.get_splitter_output_topics())
 def test_for_message_splitting(tests_logger: logging.Logger, use_consumer: conftest.ConsumerFactory, topic: str):
     producer_consumer: kafka.KafkaConsumer = use_consumer(lib.producer.start.TEST_TOPIC)

@@ -18,7 +18,7 @@ EXPECTED_ANIMALS_TOPIC_JSON_SCHEMA = {
 }
 
 
-@pytest.mark.order(4)
+@pytest.mark.order(3)
 def test_for_consistency(tests_logger: logging.Logger, use_consumer: conftest.ConsumerFactory) -> None:
     consumer: kafka.KafkaConsumer = use_consumer(lib.producer.start.TEST_TOPIC)
     assert consumer.bootstrap_connected()
