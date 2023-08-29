@@ -19,21 +19,21 @@ class OutputSchema(kemux.data.schema.base.SchemaBase):
         raise NotImplementedError(f'{__name__}.transform() must be implemented!')
 
     @classmethod
-    def _construct_output_record_class(cls) -> None:
-        cls._record_class = type(
+    def construct_output_record_class(cls) -> None:
+        cls.record_class = type(
             cls.__name__,
             (faust.Record, ),
             {
                 '__annotations__': {
                     **faust.Record.__annotations__,
-                    **cls._fields
+                    **cls.fields
                 }
             },
         )  # type: ignore
 
     @classmethod
     def validate(cls, message: dict) -> bool:
-        field_descriptions = cls._record_class.__annotations__.items()
+        field_descriptions = cls.record_class.__annotations__.items()
         for field_name, field_type in field_descriptions:
             if field_name not in message:
                 return False

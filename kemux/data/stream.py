@@ -14,8 +14,16 @@ class StreamBase:
         raw_message = message.to_dict()
         if '__kemux_init__' in raw_message:
             return
-        message._validate()  # pylint: disable=protected-access
+        message.validate()
         ingested_message = self.input.ingest(raw_message)
         for output in self.outputs:
             if output.filter(message):
                 await output.send(ingested_message)
+
+    def topics(self) -> dict[str, list[str]]:
+        return {
+            self.input.topic: [
+                output.topic
+                for output in self.outputs
+            ]
+        }

@@ -1,3 +1,4 @@
+# sourcery skip: no-conditionals-in-tests,no-loop-in-tests
 import ast
 import time
 import logging
