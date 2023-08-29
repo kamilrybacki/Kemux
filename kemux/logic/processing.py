@@ -134,7 +134,9 @@ class Processor:
         for stream_name, stream in self.__streams.items():
             stream_input: kemux.data.io.input.StreamInput = stream.input
             self.__logger.info(f'Activating input stream: {stream_name}')
-            input_topics_handler: faust.TopicT = stream_input._topic_handler  # pylint: disable=protected-access
+            input_topics_handler: faust.TopicT | None = stream_input._topic_handler  # pylint: disable=protected-access
+            if not input_topics_handler:
+                raise ValueError(f'Invalid input stream handler: {stream_name}')
             self.__logger.info(f'Activating output streams: {stream_name}')
 
             # pylint: disable=protected-access, cell-var-from-loop
