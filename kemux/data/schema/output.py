@@ -20,6 +20,7 @@ class OutputSchema(kemux.data.schema.base.SchemaBase):
 
     @classmethod
     def _construct_output_record_class(cls) -> None:
+        cls._logger.info(cls._fields)
         cls._record_class = type(
             cls.__name__,
             (faust.Record, ),
@@ -31,7 +32,6 @@ class OutputSchema(kemux.data.schema.base.SchemaBase):
                 }
             },
         )  # type: ignore
-        cls._logger.info(f'Constructed output record class: {cls._record_class.__annotations__}')
 
     @classmethod
     def validate(cls, message: dict) -> bool:
