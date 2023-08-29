@@ -1,3 +1,4 @@
+# pylint: disable=consider-using-enumerate
 from __future__ import annotations
 
 import dataclasses
@@ -158,15 +159,19 @@ class Processor:
         self._app.main()
 
     def order_streams(self) -> dict[str, kemux.data.stream.StreamBase]:
-        streams_info = [
+        streams_info: list[tuple] = [
             stream.topics()
             for stream in self.__streams.values()
         ]
-        for stream_index in range(len(streams_info)):
-            stream_input_topic = streams_info[stream_index][0]
-            for other_stream_index in range(stream_index + 1, len(streams_info)):
-                other_stream_output_topics = streams_info[other_stream_index][1]
-                if stream_input_topic in other_stream_output_topics:
-                    streams_info[stream_index], streams_info[other_stream_index] = streams_info[other_stream_index], streams_info[stream_index]
-        self.__logger.info(f'Streams info: {streams_info}')
+        streams_info = self.sort_streams_info(streams_info)
         return self.__streams
+
+    @staticmethod
+    def sort_streams_info(info: list[tuple]) -> list[tuple]:
+        for stream_index in range(len(info)):
+            stream_input_topic = info[stream_index][0]
+            for other_stream_index in range(stream_index + 1, len(info)):
+                other_stream_output_topics = info[other_stream_index][1]
+                if stream_input_topic in other_stream_output_topics:
+                    info[stream_index], info[other_stream_index] = info[other_stream_index], info[stream_index]
+        return info

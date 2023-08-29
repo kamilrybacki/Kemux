@@ -10,13 +10,33 @@ import conftest
 import helpers
 
 import lib.producer.start
+import kemux.logic.processing
 
 
 FILTERING_TIMEOUT = 10
 NUMBER_OF_PRODUCED_MESSAGES_SAMPLES = 100
-
+TEST_STREAMS_INFO: list[tuple] = [
+    ('2', ['5', '6', '7']),
+    ('3', ['5', '6', '7']),
+    ('1', ['2', '3', '4']),
+    ('7', ['8', '9', '10']),
+]
+EXPECTED_STREAMS_ORDER = [
+    ('1', ['2', '3', '4']),
+    ('2', ['5', '6', '7']),
+    ('3', ['5', '6', '7']),
+    ('7', ['8', '9', '10']),
+]
 
 @pytest.mark.order(4)
+def test_streams_ordering(tests_logger: logging.Logger):
+    streams_info = TEST_STREAMS_INFO.copy()
+    streams_info = kemux.logic.processing.Processor.sort_streams_info(streams_info)
+    assert streams_info == EXPECTED_STREAMS_ORDER
+    tests_logger.info('Streams are ordered correctly')
+
+
+@pytest.mark.order(5)
 @pytest.mark.parametrize('topic', helpers.get_splitter_output_topics())
 def test_for_existence_of_new_topic(tests_logger: logging.Logger, use_consumer: conftest.ConsumerFactory, topic: str) -> None:
     new_topic_consumer: kafka.KafkaConsumer = use_consumer(topic)
@@ -24,7 +44,7 @@ def test_for_existence_of_new_topic(tests_logger: logging.Logger, use_consumer: 
     tests_logger.info(f'Connected to {topic} successfully')
 
 
-@pytest.mark.order(5)
+@pytest.mark.order(6)
 @pytest.mark.parametrize('topic', helpers.get_splitter_output_topics())
 def test_for_message_filtering(tests_logger: logging.Logger, use_consumer: conftest.ConsumerFactory, topic: str):
     producer_consumer: kafka.KafkaConsumer = use_consumer(lib.producer.start.TEST_TOPIC)
@@ -53,7 +73,7 @@ def test_for_message_filtering(tests_logger: logging.Logger, use_consumer: conft
     tests_logger.info(f'Filtering function for {topic} works as expected')
 
 
-@pytest.mark.order(6)
+@pytest.mark.order(7)
 @pytest.mark.parametrize('topic', helpers.get_splitter_output_topics())
 def test_for_message_splitting(tests_logger: logging.Logger, use_consumer: conftest.ConsumerFactory, topic: str):
     producer_consumer: kafka.KafkaConsumer = use_consumer(lib.producer.start.TEST_TOPIC)
