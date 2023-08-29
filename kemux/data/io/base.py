@@ -24,11 +24,12 @@ class IOBase:
         return cls._topic_handler  # type: ignore
 
     @classmethod
-    def _initialize_handler(cls, app: faust.App) -> None:
+    async def _initialize_handler(cls, app: faust.App) -> None:
         schema: kemux.data.schema.base.SchemaBase = cls.schema
         cls.logger.info(f'Handler schema for {cls.topic}: {schema._record_class.__annotations__}')
         cls._topic_handler = app.topic(
             cls.topic,
             value_type=schema._record_class,
         )
+        await cls._topic_handler.declare()
         cls.logger.info(f'Initialized topic handler for {cls.topic}')

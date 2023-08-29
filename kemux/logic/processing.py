@@ -142,8 +142,7 @@ class Processor:
                 self.__logger.info('Processing messages')
                 output: kemux.data.io.output.StreamOutput
                 for output in stream.outputs:
-                    output._initialize_handler(self._app)
-                    await output._get_handler(self._app).declare()
+                    await output._initialize_handler(self._app)
                 async for message in messages:
                     await stream.process(message)  # type: ignore
 
