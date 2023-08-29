@@ -157,7 +157,7 @@ class Processor:
             self.__agents[stream_name] = self._app.agent(input_topics_handler)(_process_input_stream_message)
         self._app.main()
 
-    def sort_streams(self) -> dict[str, kemux.data.stream.StreamBase]:
+    def order_streams(self) -> dict[str, kemux.data.stream.StreamBase]:
         streams_info = [
             stream.topics()
             for stream in self.__streams.values()
