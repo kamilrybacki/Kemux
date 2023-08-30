@@ -11,7 +11,7 @@ services:
         ipv4_address: 10.5.0.3
 
   broker:
-    image: confluentinc/cp-kafka:4.0.0
+    image: confluentinc/cp-kafka:5.5.0
     container_name: broker
     environment:
       KAFKA_BROKER_ID: 1
