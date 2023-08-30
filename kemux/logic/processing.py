@@ -109,12 +109,15 @@ class Processor:
         input_io.schema = input_schema
         return input_io
 
-    def load_outputs(self, outputs: type) -> list[kemux.data.io.output.StreamOutput]:
-        return [
-            self.load_output(output)
-            for output in outputs.__dict__.values()
-            if inspect.isclass(output)
-        ]
+    def load_outputs(self, outputs: type) -> dict[str, kemux.data.io.output.StreamOutput]:
+        return {
+            output.topic: output
+            for output in [
+                self.load_output(output)
+                for output in outputs.__dict__.values()
+                if inspect.isclass(output)
+            ]
+        }
 
     def load_output(self, output_class: type) -> kemux.data.io.output.StreamOutput:
         output_schema: kemux.data.schema.output.OutputSchema
@@ -175,10 +178,10 @@ class Processor:
             stream_input.initialize_handler(self._app)
 
             output: kemux.data.io.output.StreamOutput
-            for output in stream.outputs:
+            for output_name, output in stream.outputs.items():
                 output.initialize_handler(self._app)
                 if not output.topic_handler:
-                    raise ValueError(f'Invalid output stream topic handler: {stream_name}')
+                    raise ValueError(f'{stream_name}: invalid {output_name} output topic handler')
                 try:
                     asyncio.get_event_loop().run_until_complete(
                         output.topic_handler.declare()
@@ -196,7 +199,7 @@ class Processor:
 
             input_topics_handler: faust.TopicT | None = stream_input.topic_handler
             if not input_topics_handler:
-                raise ValueError(f'Invalid input stream topic handler: {stream_name}')
+                raise ValueError(f'{stream_name}: invalid {stream.input.topic} input topic handler')
 
             self.logger.info(f'{stream_name}: activating stream agent')
             self.agents[stream_name] = self._app.agent(input_topics_handler)(_process_input_stream_message)

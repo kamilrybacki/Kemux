@@ -10,7 +10,7 @@ import kemux.data.schema.output
 @dataclasses.dataclass
 class StreamBase:
     input: kemux.data.io.input.StreamInput | None = dataclasses.field(default=None)
-    outputs: list[kemux.data.io.output.StreamOutput] = dataclasses.field(default_factory=list)
+    outputs: dict[str, kemux.data.io.output.StreamOutput] = dataclasses.field(default_factory=dict)
     logger: logging.Logger = dataclasses.field(
         init=False,
         default=logging.getLogger(__name__)
@@ -22,7 +22,7 @@ class StreamBase:
             return
         message.validate()
         ingested_message = self.input.ingest(raw_message)  # type: ignore
-        for output in self.outputs:
+        for output in self.outputs.values():
             if output.filter(message):
                 await output.send(ingested_message)
 
@@ -31,16 +31,20 @@ class StreamBase:
             return (
                 self.input.topic, [
                     output.topic
-                    for output in self.outputs
+                    for output in self.outputs.values()
                 ]
             )
         raise ValueError('Stream not initialized. Check your inputs and outputs configuration.')
 
-    def add_input(
+    def set_input(
         self,
         stream_input: kemux.data.io.input.StreamInput,
         input_schema: kemux.data.schema.input.InputSchema | None = None,
     ) -> None:
+        if self.input:
+            self.logger.warning(
+                'Input already defined. Overwriting with new input.'
+            )
         self.input = stream_input
         if input_schema:
             if self.input.schema:
@@ -60,11 +64,12 @@ class StreamBase:
                     'Output schema already defined. Overwriting with new schema.'
                 )
             stream_output.schema = output_schema
-        self.outputs.append(stream_output)
+        self.outputs[stream_output.topic] = stream_output
 
     def remove_output(self, output_topic_name: str) -> None:
-        for output in self.outputs:
-            if output.topic == output_topic_name:
-                self.outputs.remove(output)
-                self.logger.info(f'Removed output: {output_topic_name}')
-                return
+        if output_topic_name not in self.outputs:
+            self.logger.warning(f'No output found with name: {output_topic_name}')
+            return
+        del self.outputs[output_topic_name]
+        self.logger.info(f'Removed output: {output_topic_name}')
+        return
