@@ -40,6 +40,9 @@ class InputSchema(kemux.data.schema.base.SchemaBase):
             def to_dict(self) -> dict:
                 cls.logger.info(f'Converting record to dict: {self}')
                 cls.logger.info(cls.fields)
+                for field_name in cls.fields:
+                    cls.logger.info(f'Field: {field_name}')
+                    cls.logger.info(f'Value: {getattr(self, field_name)}')
                 return {
                     field_name: getattr(self, field_name)
                     for field_name in cls.fields
