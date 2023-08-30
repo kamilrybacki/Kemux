@@ -15,6 +15,7 @@ class StreamOutput(kemux.data.io.base.IOBase):
     async def send(cls, message: dict) -> None:
         transformed_message = cls.schema.transform(message=message)  # type: ignore
         if cls.schema.validate(message=transformed_message):  # type: ignore
+            cls.logger.info(f'Sending message: {transformed_message}')
             await cls.topic_handler.send(value=transformed_message)  # type: ignore
         else:
             cls.logger.warning(f'Invalid message: {message}')
