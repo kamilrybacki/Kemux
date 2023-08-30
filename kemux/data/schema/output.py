@@ -36,10 +36,12 @@ class OutputSchema(kemux.data.schema.base.SchemaBase):
         field_descriptions = cls.record_class.__annotations__.items()
         for field_name, field_type in field_descriptions:
             if field_name not in message:
+                cls.logger.warning(f'Missing field: {field_name}')
                 return False
             if not isinstance(
                 message[field_name],
                 field_type
             ):
+                cls.logger.warning(f'Invalid field type: {field_name}')
                 return False
         return True
