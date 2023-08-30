@@ -38,7 +38,7 @@ class InputSchema(kemux.data.schema.base.SchemaBase):
                     validator(actual_field_value)
 
             def to_dict(self) -> dict:
-                dictlike = self.asdict()
+                dictlike = self.__dict__
                 cls.logger.info(f'Converting to dict: {dictlike}')
                 return dictlike
 
