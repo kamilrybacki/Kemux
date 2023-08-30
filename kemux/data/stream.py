@@ -24,7 +24,7 @@ class StreamBase:
         message.validate()
         ingested_message = self.input.ingest(raw_message)  # type: ignore
         for output in self.outputs.values():
-            if output.filter(message):
+            if output.filter(ingested_message):
                 await output.send(ingested_message)
 
     def topics(self) -> tuple[str, list[str]]:

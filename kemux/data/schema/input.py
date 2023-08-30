@@ -38,9 +38,10 @@ class InputSchema(kemux.data.schema.base.SchemaBase):
                     validator(actual_field_value)
 
             def to_dict(self) -> dict:
-                dictlike = self.__dict__
-                cls.logger.info(f'Converting to dict: {dictlike}')
-                return dictlike
+                return {
+                    field: self.__dict__.get(field)
+                    for field in cls.fields
+                }
 
         for field_name, field_type in cls.fields.items():
             InputRecord.__annotations__[field_name] = field_type
