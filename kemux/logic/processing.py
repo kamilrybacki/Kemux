@@ -103,7 +103,7 @@ class Processor:
         input_schema: kemux.data.schema.input.InputSchema
         input_io: kemux.data.io.input.StreamInput
 
-        input_schema, input_io = self.extract_schema_and_io(input_class)  # type: ignore
+        input_schema, input_io = self.get_schema_and_io(input_class)  # type: ignore
         input_schema.find_decorated_fields()
         input_schema.construct_input_record_class()
         input_io.schema = input_schema
@@ -120,13 +120,13 @@ class Processor:
         output_schema: kemux.data.schema.output.OutputSchema
         output_io: kemux.data.io.output.StreamOutput
 
-        output_schema, output_io = self.extract_schema_and_io(output_class)  # type: ignore
+        output_schema, output_io = self.get_schema_and_io(output_class)  # type: ignore
         output_schema.find_decorated_fields()
         output_schema.construct_output_record_class()
         output_io.schema = output_schema
         return output_io
 
-    def extract_schema_and_io(self, source: type) -> tuple[
+    def get_schema_and_io(self, source: type) -> tuple[
         kemux.data.schema.base.SchemaBase,
         kemux.data.io.base.IOBase
     ]:
@@ -144,16 +144,23 @@ class Processor:
     def add_stream(self, name: str, stream_input_class: type, stream_outputs_class: type) -> None:
         stream_input = self.load_input(stream_input_class)
         stream_outputs = self.load_outputs(stream_outputs_class)
-        self.streams[name] = kemux.data.stream.StreamBase(
-            input=stream_input,
-            outputs=stream_outputs,
-        )
+        self.streams = {
+            **self.streams,
+            name: kemux.data.stream.StreamBase(
+                input=stream_input,
+                outputs=stream_outputs,
+            )
+        }
 
     def remove_stream(self, name: str) -> None:
         if name not in self.streams:
             self.logger.warning(f'No stream found with name: {name}')
             return
-        del self.streams[name]
+        self.streams = {
+            stream_name: stream
+            for stream_name, stream in self.streams.items()
+            if stream_name != name
+        }
 
     def start(self) -> None:
         if not self.streams.keys():
@@ -162,7 +169,8 @@ class Processor:
         self.logger.info('Starting receiver')
         stream: kemux.data.stream.StreamBase
         for stream_name, stream in self.streams.items():
-            stream_input: kemux.data.io.input.StreamInput = stream.input
+            if (stream_input := stream.input) is None:
+                raise ValueError(f'Invalid stream input: {stream_name}')
             self.logger.info(f'{stream_name}: activating input topic handler')
             stream_input.initialize_handler(self._app)
 
@@ -202,6 +210,8 @@ class Processor:
         ]):
             input_topic = stream_info[0]
             for stream_name, stream in streams.items():
+                if stream.input is None:
+                    raise ValueError(f'Invalid stream input: {stream_name}')
                 if stream.input.topic == input_topic:
                     ordered_streams[stream_name] = stream
                     break
