@@ -1,6 +1,7 @@
 # pylint: disable=consider-using-enumerate
 from __future__ import annotations
 
+import asyncio
 import dataclasses
 import importlib.machinery
 import inspect
@@ -138,15 +139,23 @@ class Processor:
             self.__logger.info(f'{stream_name}: activating input topic handler')
             stream_input.initialize_handler(self._app)
 
+            output: kemux.data.io.output.StreamOutput
+            for output in stream.outputs:
+                output.initialize_handler(self._app)
+                if not output.topic_handler:
+                    raise ValueError(f'Invalid output stream topic handler: {stream_name}')
+                try:
+                    asyncio.get_event_loop().run_until_complete(
+                        output.topic_handler.declare()
+                    )
+                except RuntimeError:
+                    asyncio.run(
+                        output.topic_handler.declare()
+                    )
+
             # pylint: disable=cell-var-from-loop
             async def _process_input_stream_message(messages: faust.StreamT[kemux.data.schema.input.InputSchema]) -> None:
                 self.__logger.info(f'{stream_name}: activating output topic handlers')
-                output: kemux.data.io.output.StreamOutput
-                for output in stream.outputs:
-                    output.initialize_handler(self._app)
-                    if not output.topic_handler:
-                        raise ValueError(f'Invalid output stream topic handler: {stream_name}')
-                    await output.topic_handler.declare()
                 async for message in messages:
                     await stream.process(message)  # type: ignore
 
