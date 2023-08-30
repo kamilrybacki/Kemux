@@ -202,9 +202,9 @@ class Processor:
                 raise ValueError(f'{stream_name}: invalid {stream_input.topic} input topic handler')
 
             self.logger.info(f'{stream_name}: activating stream agent')
+            _process_input_stream_message.__name__ = stream_input.topic
             self.agents[stream_name] = self._app.agent(input_topics_handler)(_process_input_stream_message)
         self.logger.info('Starting receiver loop')
-        self.logger.info(self.agents)
         self._app.main()
 
     def order_streams(self, streams: StreamsMap) -> StreamsMap:
