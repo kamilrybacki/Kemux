@@ -47,7 +47,7 @@ class Outputs:
         @dataclasses.dataclass
         class Schema(kemux.data.schema.output.OutputSchema):
             _name_: str
-            _value_: float
+            _value_: int
 
             @staticmethod
             def transform(message: dict) -> dict:
@@ -65,7 +65,7 @@ class Outputs:
         @dataclasses.dataclass
         class Schema(kemux.data.schema.output.OutputSchema):
             _name_: str
-            _value_: float
+            _value_: int
 
             @staticmethod
             def transform(message: dict) -> dict:
@@ -83,7 +83,7 @@ class Outputs:
         @dataclasses.dataclass
         class Schema(kemux.data.schema.output.OutputSchema):
             _name_: str
-            _value_: float
+            _value_: int
 
             @staticmethod
             def transform(message: dict) -> dict:

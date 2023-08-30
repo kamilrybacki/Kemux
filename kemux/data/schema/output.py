@@ -35,9 +35,6 @@ class OutputSchema(kemux.data.schema.base.SchemaBase):
     def validate(cls, message: dict) -> bool:
         field_descriptions = cls.record_class.__annotations__.items()
         for field_name, field_type in field_descriptions:
-            cls.logger.info(f'Validating field: {field_name}')
-            cls.logger.info(f'Field type: {field_type}')
-            cls.logger.info(f'Field value: {message.get(field_name)}')
             if field_name not in message:
                 return False
             if not isinstance(
