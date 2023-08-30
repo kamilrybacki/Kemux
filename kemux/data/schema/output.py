@@ -42,6 +42,6 @@ class OutputSchema(kemux.data.schema.base.SchemaBase):
                 message[field_name],
                 field_type
             ):
-                cls.logger.warning(f'Invalid field type: {field_name}')
+                cls.logger.warning(f'Invalid field type: {field_name} ({field_type})')
                 return False
         return True
