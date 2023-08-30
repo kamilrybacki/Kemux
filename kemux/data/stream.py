@@ -20,6 +20,7 @@ class StreamBase:
         raw_message = message.to_dict()
         if '__kemux_init__' in raw_message:
             return
+        self.logger.info(f'Processing message: {message}')
         message.validate()
         ingested_message = self.input.ingest(raw_message)  # type: ignore
         for output in self.outputs.values():
