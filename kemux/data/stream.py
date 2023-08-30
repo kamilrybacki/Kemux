@@ -17,6 +17,7 @@ class StreamBase:
     )
 
     async def process(self, message: kemux.data.schema.input.InputRecordT) -> None:
+        self.logger.info(f'Processing message: {message}')
         raw_message = message.to_dict()
         if '__kemux_init__' in raw_message:
             return
