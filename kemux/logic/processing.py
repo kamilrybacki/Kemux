@@ -199,7 +199,7 @@ class Processor:
 
             input_topics_handler: faust.TopicT | None = stream_input.topic_handler
             if not input_topics_handler:
-                raise ValueError(f'{stream_name}: invalid {stream.input.topic} input topic handler')
+                raise ValueError(f'{stream_name}: invalid {stream_input.topic} input topic handler')
 
             self.logger.info(f'{stream_name}: activating stream agent')
             self.agents[stream_name] = self._app.agent(input_topics_handler)(_process_input_stream_message)
