@@ -38,6 +38,8 @@ class InputSchema(kemux.data.schema.base.SchemaBase):
                     validator(actual_field_value)
 
             def to_dict(self) -> dict:
+                cls.logger.info(f'Converting record to dict: {self}')
+                cls.logger.info(cls.fields)
                 return {
                     field_name: getattr(self, field_name)
                     for field_name in cls.fields
