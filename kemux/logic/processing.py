@@ -206,7 +206,7 @@ class Processor:
             self.agents[stream_name] = self._app.agent(input_topics_handler)(_process_input_stream_message)
         self.logger.info('Starting receiver loop')
         for agent in self.agents.values():
-            self.logger.info(f'Starting agent: {agent.info}')
+            self.logger.info(f'Starting agent: {agent.info()}')
         self._app.main()
 
     def order_streams(self, streams: StreamsMap) -> StreamsMap:
