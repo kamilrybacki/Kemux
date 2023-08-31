@@ -200,13 +200,21 @@ class Processor:
             input_topics_handler: faust.TopicT | None = stream_input.topic_handler
             if not input_topics_handler:
                 raise ValueError(f'{stream_name}: invalid {stream_input.topic} input topic handler')
+            _process_input_stream_message.__name__ = stream_input.topic
 
             self.logger.info(f'{stream_name}: activating stream agent')
-            _process_input_stream_message.__name__ = stream_input.topic
             self.agents[stream_name] = self._app.agent(input_topics_handler)(_process_input_stream_message)
+
         self.logger.info('Starting receiver loop')
         for agent in self.agents.values():
-            self.logger.info(f'Starting agent: {agent.info()}')
+            try:
+                asyncio.get_event_loop().run_until_complete(
+                    agent.start()
+                )
+            except RuntimeError:
+                asyncio.run(
+                    agent.start()
+                )
         self._app.main()
 
     def order_streams(self, streams: StreamsMap) -> StreamsMap:
