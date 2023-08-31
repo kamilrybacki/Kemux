@@ -16,7 +16,7 @@ class StreamBase:
         default=logging.getLogger(__name__)
     )
 
-    async def process(self, message: kemux.data.schema.input.InputRecordT) -> None:
+    def process(self, message: kemux.data.schema.input.InputRecordT) -> None:
         raw_message = message.to_dict()
         if '__kemux_init__' in raw_message:
             return
@@ -25,7 +25,7 @@ class StreamBase:
         self.logger.info(f'Processing {self.input.topic} message: {ingested_message}')  # type: ignore
         for output in self.outputs.values():
             if output.filter(ingested_message):
-                await output.send(ingested_message)
+                output.send(ingested_message)
 
     def topics(self) -> tuple[str, list[str]]:
         if self.input:
