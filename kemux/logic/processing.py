@@ -195,6 +195,7 @@ class Processor:
             async def _process_input_stream_message(messages: faust.StreamT[kemux.data.schema.input.InputSchema]) -> None:
                 self.logger.info(f'{stream_name}: activating output topic handlers')
                 async for message in messages:
+                    self.logger.info(stream_input.topic)
                     await stream.process(message)  # type: ignore
 
             input_topics_handler: faust.TopicT | None = stream_input.topic_handler
