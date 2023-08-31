@@ -29,6 +29,7 @@ StreamsMap = dict[str, kemux.data.stream.StreamBase]
 
 @dataclasses.dataclass(kw_only=True)
 class Processor:
+    name: str
     kafka_address: str
     streams_dir: str | None
     persistent_data_directory: str
@@ -38,7 +39,6 @@ class Processor:
     _app: faust.App = dataclasses.field(init=False)
     _executor: ThreadPoolExecutor = dataclasses.field(
         init=False,
-        default=ThreadPoolExecutor(max_workers=2)
     )
 
     __instance: Processor | None = dataclasses.field(init=False, default=None)
@@ -52,9 +52,10 @@ class Processor:
         self.__streams = self.order_streams(streams)
 
     @classmethod
-    def init(cls, kafka_address: str, data_dir: str, streams_dir: str | None = None) -> Processor:
+    def init(cls, name: str, kafka_address: str, data_dir: str, streams_dir: str | None = None) -> Processor:
         if cls.__instance is None:
             instance: Processor = cls(
+                name=name,
                 kafka_address=kafka_address,
                 streams_dir=streams_dir,
                 persistent_data_directory=data_dir,
@@ -67,10 +68,11 @@ class Processor:
             )
             instance.logger.info(f'Connecting to Kafka broker: {kafka_address}')
             app = faust.App(
-                'splitter_broker',
+                name,
                 broker=kafka_address,
                 value_serializer='json',
                 datadir=instance.persistent_data_directory,
+                stream_wait_empty=False
             )
             instance.streams = instance.load_streams() if streams_dir else {}
             instance._app = app
@@ -174,6 +176,11 @@ class Processor:
     def start(self) -> None:
         if not self.streams.keys():
             raise ValueError('No streams have been loaded!')
+
+        self.logger.info('Initializing thread pool for agents concurrency')
+        self._executor = ThreadPoolExecutor(
+            max_workers=len(self.streams)
+        )
 
         self.logger.info('Starting receiver')
         stream: kemux.data.stream.StreamBase
