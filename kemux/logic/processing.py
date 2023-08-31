@@ -193,6 +193,7 @@ class Processor:
 
             # pylint: disable=cell-var-from-loop
             async def _process_input_stream_message(messages: faust.StreamT[kemux.data.schema.input.InputSchema]) -> None:
+                self.logger.info((stream_input.topic, stream.outputs.keys()))
                 self.logger.info(f'{stream_name}: activating output topic handlers')
                 async for message in messages:
                     await stream.process(message)  # type: ignore
