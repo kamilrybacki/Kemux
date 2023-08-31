@@ -21,6 +21,8 @@ import kemux.data.schema.base
 import kemux.data.schema.input
 import kemux.data.schema.output
 import kemux.data.stream
+import kemux.logic.concurrency
+
 
 DEFAULT_MODELS_PATH = 'streams'
 
@@ -197,14 +199,9 @@ class Processor:
                 output.initialize_handler(self._app)
                 if not output.topic_handler:
                     raise ValueError(f'{stream_name}: invalid {output_name} output topic handler')
-                try:
-                    asyncio.get_event_loop().run_until_complete(
-                        output.topic_handler.declare()
-                    )
-                except RuntimeError:
-                    asyncio.run(
-                        output.topic_handler.declare()
-                    )
+                kemux.logic.concurrency.try_in_event_loop(
+                    output.topic_handler.declare
+                )
 
             # pylint: disable=cell-var-from-loop
             async def _process_input_stream_message(messages: faust.StreamT[kemux.data.schema.input.InputSchema]) -> None:
@@ -226,14 +223,10 @@ class Processor:
 
         self.logger.info('Starting receiver loop')
         for agent in self.agents.values():
-            try:
-                asyncio.get_event_loop().run_until_complete(
-                    agent.start()
-                )
-            except RuntimeError:
-                asyncio.run(
-                    agent.start()
-                )
+            kemux.logic.concurrency.try_in_event_loop(
+                agent.start
+            )
+
         self._app.main()
 
     def order_streams(self, streams: StreamsMap) -> StreamsMap:

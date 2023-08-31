@@ -5,6 +5,7 @@ import kemux.data.io.input
 import kemux.data.io.output
 import kemux.data.schema.input
 import kemux.data.schema.output
+import kemux.logic.concurrency
 
 
 @dataclasses.dataclass
@@ -25,7 +26,10 @@ class StreamBase:
         self.logger.info(f'Processing {self.input.topic} message: {ingested_message}')  # type: ignore
         for output in self.outputs.values():
             if output.filter(ingested_message):
-                output.send(ingested_message)
+                kemux.logic.concurrency.try_in_event_loop(
+                    output.send,
+                    ingested_message
+                )
 
     def topics(self) -> tuple[str, list[str]]:
         if self.input:
