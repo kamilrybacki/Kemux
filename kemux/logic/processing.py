@@ -168,8 +168,6 @@ class Processor:
     def start(self) -> None:
         if not self.streams.keys():
             raise ValueError('No streams have been loaded!')
-        
-        self.logger.info(self.streams)
 
         self.logger.info('Starting receiver')
         stream: kemux.data.stream.StreamBase
@@ -207,6 +205,7 @@ class Processor:
             _process_input_stream_message.__name__ = stream_input.topic
             self.agents[stream_name] = self._app.agent(input_topics_handler)(_process_input_stream_message)
         self.logger.info('Starting receiver loop')
+        self.logger.info(self._app.agents)
         self._app.main()
 
     def order_streams(self, streams: StreamsMap) -> StreamsMap:
