@@ -1,7 +1,7 @@
 import asyncio
 import typing
 
-import kemux.types
+import kemux.data.stream
 
 
 def try_in_event_loop(function: typing.Callable, *args, **kwargs) -> None:
@@ -15,7 +15,7 @@ def try_in_event_loop(function: typing.Callable, *args, **kwargs) -> None:
         )
 
 
-def order_streams(streams: kemux.types.StreamsMap) -> kemux.types.StreamsMap:
+def order_streams(streams: dict[str, kemux.data.stream.StreamBase]) -> dict[str, kemux.data.stream.StreamBase]:
     ordered_streams = {}
     for stream_info in find_streams_order([
         stream.topics()

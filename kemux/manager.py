@@ -20,7 +20,6 @@ import kemux.data.stream
 import kemux.logic.concurrency
 import kemux.logic.imports
 
-import kemux.types
 
 DEFAULT_MODELS_PATH = 'streams'
 
@@ -42,11 +41,11 @@ class Manager:
     __instance: Manager | None = dataclasses.field(init=False, default=None)
 
     @property
-    def streams(self) -> kemux.types.StreamsMap:
+    def streams(self) -> dict[str, kemux.data.stream.StreamBase]:
         return self.__streams
 
     @streams.setter
-    def streams(self, streams: kemux.types.StreamsMap) -> None:
+    def streams(self, streams: dict[str, kemux.data.stream.StreamBase]) -> None:
         self.__streams = kemux.logic.concurrency.order_streams(streams)
 
     @classmethod

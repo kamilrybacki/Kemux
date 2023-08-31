@@ -11,10 +11,9 @@ import kemux.data.io.output
 import kemux.data.schema.base
 import kemux.data.schema.input
 import kemux.data.schema.output
-import kemux.types
 
 
-def load_streams(streams_dir: str) -> kemux.types.StreamsMap:
+def load_streams(streams_dir: str) -> dict[str, kemux.data.stream.StreamBase]:
     if not os.path.isdir(streams_dir):  # type: ignore
         raise ValueError(f'Invalid streams directory: {streams_dir}')
     present_modules_filenames = filter(
