@@ -22,7 +22,7 @@ class StreamBase:
             return
         message.validate()
         ingested_message = self.input.ingest(raw_message)  # type: ignore
-        self.logger.info(f'Processing {self.input.topic} message: {ingested_message}')
+        self.logger.info(f'Processing {self.input.topic} message: {ingested_message}')  # type: ignore
         for output in self.outputs.values():
             if output.filter(ingested_message):
                 await output.send(ingested_message)
