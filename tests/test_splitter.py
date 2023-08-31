@@ -10,7 +10,7 @@ import conftest
 import helpers
 
 import lib.producer.start
-import kemux.logic.processing
+import kemux.manager
 
 
 FILTERING_TIMEOUT = 10
@@ -31,7 +31,7 @@ EXPECTED_STREAMS_ORDER = [
 @pytest.mark.order(4)
 def test_streams_ordering(tests_logger: logging.Logger):
     streams_info = TEST_STREAMS_INFO.copy()
-    streams_info = kemux.logic.processing.Processor.find_streams_order(streams_info)
+    streams_info = kemux.manager.Manager.find_streams_order(streams_info)
     assert streams_info == EXPECTED_STREAMS_ORDER
     tests_logger.info('Streams are ordered correctly')
 

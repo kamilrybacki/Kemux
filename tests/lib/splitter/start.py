@@ -1,6 +1,6 @@
 import os
 
-import kemux.logic.processing
+import kemux.manager
 
 
 def start_splitter() -> None:
@@ -10,7 +10,7 @@ def start_splitter() -> None:
         raise ValueError('DATA_DIR environment variable not set')
     if not (kafka_address := os.getenv('KAFKA_ADDRESS')):
         raise ValueError('KAFKA_ADDRESS environment variable not set')
-    receiver = kemux.logic.processing.Processor.init(
+    receiver = kemux.manager.Manager.init(
         'test_splitter',
         kafka_address,
         data_dir,
