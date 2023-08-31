@@ -33,7 +33,7 @@ class Processor:
     kafka_address: str
     streams_dir: str | None
     persistent_data_directory: str
-    logger: logging.Logger = dataclasses.field(init=False, default=logging.getLogger(__name__))
+    logger: logging.Logger = dataclasses.field(init=False)
     agents: dict[str, faust.types.AgentT] = dataclasses.field(init=False, default_factory=dict)
 
     _app: faust.App = dataclasses.field(init=False)
@@ -60,6 +60,7 @@ class Processor:
                 streams_dir=streams_dir,
                 persistent_data_directory=data_dir,
             )
+            instance.logger = faust.app.base.logger
             instance.logger.info('Initialized receiver')
             logging.basicConfig(
                 level=logging.INFO,
@@ -76,6 +77,7 @@ class Processor:
             )
             instance.streams = instance.load_streams() if streams_dir else {}
             instance._app = app
+            instance._app.logger = instance.logger
             cls.__instance = instance
         return cls.__instance
 
