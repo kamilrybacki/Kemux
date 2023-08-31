@@ -209,7 +209,7 @@ class Processor:
 
     def order_streams(self, streams: StreamsMap) -> StreamsMap:
         ordered_streams = {}
-        for stream_info in self.finds_streams_order([
+        for stream_info in self.find_streams_order([
             stream.topics()
             for stream in streams.values()
         ]):
@@ -223,7 +223,7 @@ class Processor:
         return ordered_streams
 
     @staticmethod
-    def finds_streams_order(info: list[tuple]) -> list[tuple]:
+    def find_streams_order(info: list[tuple]) -> list[tuple]:
         for stream_index in range(len(info)):
             stream_input_topic = info[stream_index][0]
             for other_stream_index in range(stream_index + 1, len(info)):

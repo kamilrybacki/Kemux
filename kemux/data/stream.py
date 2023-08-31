@@ -17,12 +17,13 @@ class StreamBase:
     )
 
     async def process(self, message: kemux.data.schema.input.InputRecordT) -> None:
-        self.logger.info(f'Processing message: {message}')
         raw_message = message.to_dict()
         if '__kemux_init__' in raw_message:
             return
         message.validate()
         ingested_message = self.input.ingest(raw_message)  # type: ignore
+        self.logger.info(f'Processing message: {ingested_message}')
+        self.logger.info(self.outputs.keys())
         for output in self.outputs.values():
             if output.filter(ingested_message):
                 await output.send(ingested_message)

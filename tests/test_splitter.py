@@ -31,7 +31,7 @@ EXPECTED_STREAMS_ORDER = [
 @pytest.mark.order(4)
 def test_streams_ordering(tests_logger: logging.Logger):
     streams_info = TEST_STREAMS_INFO.copy()
-    streams_info = kemux.logic.processing.Processor.finds_streams_order(streams_info)
+    streams_info = kemux.logic.processing.Processor.find_streams_order(streams_info)
     assert streams_info == EXPECTED_STREAMS_ORDER
     tests_logger.info('Streams are ordered correctly')
 
@@ -116,11 +116,9 @@ def test_for_message_splitting(tests_logger: logging.Logger, use_consumer: conft
     while len(new_topic_messages_names) < expected_number_of_messages:
         try:
             split_message = next(new_topic_consumer)
-            tests_logger.info(f'Got message: {split_message}')
             if message_name := ast.literal_eval(
                 split_message.value.decode('utf-8')
             ).get('name'):
-                tests_logger.info(f'Got message: {message_name}')
                 new_topic_messages_names.append(message_name)
         except StopIteration:
             tests_logger.info(f'Waiting for more messages in {topic}')
