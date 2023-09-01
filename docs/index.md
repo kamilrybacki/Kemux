@@ -8,7 +8,7 @@ Kemux is a Kafka topics demultiplexer. It allows you to consume messages from a 
 
 ## How does it work?
 
-The main entrypoint for using Kemux is the `Manager` class that imports the predefined routing strategies and manage the [`Faust`] application,
+The main entrypoint for using Kemux is the `Manager` class that imports the predefined routing strategies and manage the [`Faust`](https://faust.readthedocs.io/en/latest/index.html) application,
 used to consume and send messages from and to various Kafka Topics.
 
 These input/output strategies are called `Streams` in Kemux.
@@ -22,5 +22,3 @@ Each stream is composed of the following elements:
     - `IO`: a class that defines how to filter the incoming messages i.e. when to send a qualified message to a specific Kafka output topic
 
 These objects can be contained in external modules and imported by the `Manager` by pointing it to the directory containing them or constructed programmatically and passed to the `Manager` via appropriate methods.
-
-[`Faust`]: https://faust.readthedocs.io/en/latest/index.html
