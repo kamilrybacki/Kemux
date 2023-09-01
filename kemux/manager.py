@@ -114,6 +114,12 @@ class Manager:
                 output.initialize_handler(self._app)
                 output.declare()
 
+            # pylint: disable=cell-var-from-loop
+            async def _process_input_stream_message(events: faust.StreamT[kemux.data.schema.input.InputSchema]) -> None:
+                event: faust.types.EventT
+                async for event in events.events():
+                    await stream.process(event)  # type: ignore
+
             input_topics_handler: faust.TopicT | None = stream_input.topic_handler
             if not input_topics_handler:
                 raise ValueError(f'{stream_name}: invalid {stream_input.topic} input topic handler')
@@ -125,16 +131,11 @@ class Manager:
         self.logger.info('Starting receiver loop')
         self._app.main()
 
-    # pylint: disable=exec-used
     def create_processing_function(self, stream: kemux.data.stream.StreamBase) -> typing.Callable[[faust.StreamT[kemux.data.schema.input.InputSchema]], typing.Awaitable[None]]:
-        processing_function_name = f'_process_{stream.input.topic}_message'  # type: ignore
-        exec(f'''
-async def {processing_function_name}(events: faust.StreamT[kemux.data.schema.input.InputSchema]) -> None:
-    stream: kemux.data.stream.StreamBase = {stream}
-    event: faust.types.EventT
-    async for event in events.events():
-        await stream.process(event)
-''')
-        if not (processing_function := locals().get(processing_function_name)):
-            raise ValueError(f'Invalid processing function: {processing_function_name}')
-        return processing_function
+        async def _process_input_stream_message(events: faust.StreamT[kemux.data.schema.input.InputSchema]) -> None:
+            event: faust.types.EventT
+            async for event in events.events():
+                await stream.process(event)
+        _process_input_stream_message.__name__ = f'process_{stream.input.topic}_message'  # type: ignore
+        _process_input_stream_message.__qualname__ = f'{self.name}.Manager.{_process_input_stream_message.__name__}'  # type: ignore
+        return _process_input_stream_message
