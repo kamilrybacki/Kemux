@@ -88,26 +88,30 @@ def test_for_message_splitting(tests_logger: logging.Logger, use_consumer: conft
     filtering_function = helpers.get_filtering_function_for_topic(outputs_class_name_for_topic)
 
     manually_filtered_messages_names: list[str] = []
-    new_topic_messages_names: list[str] = []
+    routed_messages_names: list[str] = []
 
     number_of_produced_messages = 0
     while number_of_produced_messages < REQUESTED_NUMBER_OF_MESSAGES:
+        produced_message = next(producer_consumer)
         produced_json_name = ast.literal_eval(
-            next(producer_consumer).value.decode('utf-8')
+            produced_message.value.decode('utf-8')
         ).get('name')
         if filtering_function({
             'name': produced_json_name,
         }):
             manually_filtered_messages_names.append(produced_json_name)
-            time.sleep(0.1)  # Wait for the message to be routed
-
             message_received = False
             timer_start = time.time()
             while not message_received:
                 try:
-                    new_topic_messages_names.append(
+                    routed_message = next(routed_messages_topic_consumer)
+
+                    tests_logger.info(f'Got routed message: {routed_message.value.decode("utf-8")}')
+                    tests_logger.info(f'Expected routed message: {produced_message.value.decode("utf-8")}')
+
+                    routed_messages_names.append(
                         ast.literal_eval(
-                            next(routed_messages_topic_consumer).value.decode('utf-8')
+                            routed_message.value.decode('utf-8')
                         ).get('name')
                     )
                     message_received = True
@@ -117,7 +121,7 @@ def test_for_message_splitting(tests_logger: logging.Logger, use_consumer: conft
                     continue
         number_of_produced_messages += 1
 
-    sorted_messages_names = sorted(new_topic_messages_names)
+    sorted_messages_names = sorted(routed_messages_names)
     expected_sorted_messages_names = sorted(manually_filtered_messages_names)
 
     expected_number_of_messages = len(expected_sorted_messages_names)
