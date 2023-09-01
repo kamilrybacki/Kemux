@@ -16,8 +16,6 @@ import kemux.data.schema.output
 import kemux.data.stream
 
 import kemux.logic.imports
-import kemux.logic.concurrency
-
 
 DEFAULT_MODELS_PATH = 'streams'
 
@@ -114,9 +112,7 @@ class Manager:
                 output.initialize_handler(self._app)
                 if not output.topic_handler:
                     raise ValueError(f'{stream_name}: invalid {output_name} output topic handler')
-                kemux.logic.concurrency.try_in_event_loop(
-                    output.declare
-                )
+                output.declare()
 
             # pylint: disable=cell-var-from-loop
             async def _process_input_stream_message(messages: faust.StreamT[kemux.data.schema.input.InputSchema]) -> None:

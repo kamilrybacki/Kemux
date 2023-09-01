@@ -4,6 +4,8 @@ import kemux.data.io.base
 import kemux.data.schema.input
 import kemux.data.schema.output
 
+import kemux.logic.concurrency
+
 
 @dataclasses.dataclass
 class StreamOutput(kemux.data.io.base.IOBase):
@@ -20,8 +22,13 @@ class StreamOutput(kemux.data.io.base.IOBase):
         else:
             cls.logger.warning(f'Invalid message: {message}')
 
-    async def declare(self) -> None:
-        self.logger.info(f'Declaring topic: {self.topic}')
+    def declare(self) -> None:
+        kemux.logic.concurrency.try_in_event_loop(
+            self.__declare
+        )
+        self.logger.info(f'Output topic declared: {self.topic}')
+
+    async def __declare(self) -> None:
         await self.topic_handler.declare()
         await self.topic_handler.send(
             value='__kemux_init__'
