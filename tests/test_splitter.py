@@ -112,7 +112,7 @@ def test_for_message_splitting(tests_logger: logging.Logger, use_consumer: conft
                         raise TimeoutError(f'Filtering for {topic} timed out (timeout: {FILTERING_TIMEOUT}) seconds') from no_message_received
                     continue
 
-            number_of_produced_messages += 1
+        number_of_produced_messages += 1
 
     sorted_messages_names = sorted(new_topic_messages_names)
     expected_sorted_messages_names = sorted(manually_filtered_messages_names)
