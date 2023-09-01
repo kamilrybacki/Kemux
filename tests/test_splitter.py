@@ -69,7 +69,7 @@ def test_for_message_filtering(tests_logger: logging.Logger, use_consumer: conft
         if '__faust' in produced_json:
             continue
         if time.time() - filtering_start_time > FILTERING_TIMEOUT:
-            raise TimeoutError(f'Filtering function for {topic} timed out (timeout: {FILTERING_TIMEOUT})')
+            raise TimeoutError(f'Filtering function for {topic} timed out (timeout: {FILTERING_TIMEOUT}) seconds')
     tests_logger.info(f'Filtering function for {topic} works as expected')
 
 
@@ -128,7 +128,7 @@ def test_for_message_splitting(tests_logger: logging.Logger, use_consumer: conft
         except StopIteration as no_more_messages:
             tests_logger.info(f'Waiting for more messages in {topic}')
             if time.time() - fetching_start_time > FILTERING_TIMEOUT:
-                raise TimeoutError(f'Filtering function for {topic} timed out (timeout: {FILTERING_TIMEOUT})') from no_more_messages
+                raise TimeoutError(f'Filtering function for {topic} timed out (timeout: {FILTERING_TIMEOUT}) seconds') from no_more_messages
 
     assert sorted(new_topic_messages_names) == sorted(manually_filtered_messages_names)
     tests_logger.info('Splitting works as expected')
