@@ -4,8 +4,6 @@ import kemux.data.io.base
 import kemux.data.schema.input
 import kemux.data.schema.output
 
-import kemux.logic.concurrency
-
 
 @dataclasses.dataclass
 class StreamOutput(kemux.data.io.base.IOBase):

@@ -8,8 +8,6 @@ import kemux.data.io.output
 import kemux.data.schema.input
 import kemux.data.schema.output
 
-import kemux.logic.concurrency
-
 
 @dataclasses.dataclass
 class StreamBase:
