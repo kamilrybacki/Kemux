@@ -9,7 +9,7 @@ import pytest
 import conftest
 import helpers
 
-import lib.producer.start
+import tests.lib.producer.producer
 import kemux.data.stream
 
 FILTERING_TIMEOUT = 50
@@ -47,8 +47,8 @@ def test_for_existence_of_new_topic(tests_logger: logging.Logger, use_consumer: 
 @pytest.mark.order(6)
 @pytest.mark.parametrize('topic', helpers.get_splitter_output_topics())
 def test_for_message_filtering(tests_logger: logging.Logger, use_consumer: conftest.ConsumerFactory, topic: str):
-    producer_consumer: kafka.KafkaConsumer = use_consumer(lib.producer.start.TEST_TOPIC)
-    tests_logger.info(f'Connected to {lib.producer.start.TEST_TOPIC} successfully')
+    producer_consumer: kafka.KafkaConsumer = use_consumer(lib.producer.produces.TEST_TOPIC)
+    tests_logger.info(f'Connected to {lib.producer.produces.TEST_TOPIC} successfully')
 
     outputs_class_name_for_topic = topic.title().replace('-', '')
     filtering_function = helpers.get_filtering_function_for_topic(outputs_class_name_for_topic)
@@ -78,7 +78,7 @@ def test_for_message_filtering(tests_logger: logging.Logger, use_consumer: conft
 @pytest.mark.repeat(3)
 @pytest.mark.parametrize('topic', helpers.get_splitter_output_topics())
 def test_for_message_splitting(tests_logger: logging.Logger, use_consumer: conftest.ConsumerFactory, topic: str):
-    producer_consumer: kafka.KafkaConsumer = use_consumer(lib.producer.start.TEST_TOPIC)
+    producer_consumer: kafka.KafkaConsumer = use_consumer(lib.producer.produces.TEST_TOPIC)
     routed_messages_topic_consumer: kafka.KafkaConsumer = use_consumer(topic)
     assert routed_messages_topic_consumer.bootstrap_connected()
     tests_logger.info(f'Connected to {topic} successfully')
