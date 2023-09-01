@@ -1,3 +1,4 @@
+import datetime
 import dataclasses
 
 import kemux.data.io.base
@@ -27,5 +28,7 @@ class StreamOutput(kemux.data.io.base.IOBase):
         await cls.topic_handler.declare()
         cls.logger.info(f'Sending init message to {cls.topic}')
         await cls.topic_handler.send(
-            value='__kemux_init__'
+            value={
+                '__kemux_init__': datetime.datetime.now().isoformat()
+            }
         )
