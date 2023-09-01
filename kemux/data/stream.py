@@ -81,7 +81,7 @@ class StreamBase:
         return
 
 
-def order_streams(streams: dict[str, kemux.data.stream.StreamBase]) -> dict[str, kemux.data.stream.StreamBase]:
+def order_streams(streams: dict[str, StreamBase]) -> dict[str, StreamBase]:
     ordered_streams = {}
     for stream_info in find_streams_order([
         stream.topics()
