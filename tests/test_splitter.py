@@ -13,7 +13,7 @@ import lib.producer.start
 import kemux.data.stream
 
 FILTERING_TIMEOUT = 10
-NUMBER_OF_PRODUCED_MESSAGES_SAMPLES = 100
+REQUESTED_NUMBER_OF_MESSAGES = 100
 TEST_STREAMS_INFO: list[tuple] = [
     ('2', ['5', '6', '7']),
     ('3', ['5', '6', '7']),
@@ -77,61 +77,42 @@ def test_for_message_filtering(tests_logger: logging.Logger, use_consumer: conft
 @pytest.mark.parametrize('topic', helpers.get_splitter_output_topics())
 def test_for_message_splitting(tests_logger: logging.Logger, use_consumer: conftest.ConsumerFactory, topic: str):
     producer_consumer: kafka.KafkaConsumer = use_consumer(lib.producer.start.TEST_TOPIC)
-
-    produced_messages_names: list[str] = []
-    while True:
-        produced_message = next(producer_consumer)
-        produced_json = ast.literal_eval(
-            produced_message.value.decode('utf-8')
-        )
-        if '__faust' not in produced_json:
-            produced_messages_names.append(
-                produced_json.get('name')
-            )
-        if len(produced_messages_names) == NUMBER_OF_PRODUCED_MESSAGES_SAMPLES and set(produced_messages_names) == {*lib.producer.start.POSSIBLE_KEYS}:
-            break
-
-    outputs_class_name_for_topic = topic.title().replace('-', '')
-    filtering_function = helpers.get_filtering_function_for_topic(outputs_class_name_for_topic)
-
-    manually_filtered_messages_names: list[str] = [
-        produced_message_name
-        for produced_message_name in produced_messages_names
-        if filtering_function(
-            {
-                'name': produced_message_name,
-            }
-        )
-    ]
-
     new_topic_consumer: kafka.KafkaConsumer = use_consumer(topic)
     assert new_topic_consumer.bootstrap_connected()
     tests_logger.info(f'Connected to {topic} successfully')
 
-    expected_number_of_messages = len(manually_filtered_messages_names)
+    outputs_class_name_for_topic = topic.title().replace('-', '')
+    filtering_function = helpers.get_filtering_function_for_topic(outputs_class_name_for_topic)
 
+    manually_filtered_messages_names: list[str] = []
     new_topic_messages_names: list[str] = []
-    while len(new_topic_messages_names) < expected_number_of_messages:
-        fetching_start_time = time.time()
-        try:
+
+    number_of_produced_messages = 0
+    while number_of_produced_messages < REQUESTED_NUMBER_OF_MESSAGES:
+        produced_message = next(producer_consumer)
+        produced_json = ast.literal_eval(
+            produced_message.value.decode('utf-8')
+        )
+        if '__faust' not in produced_json and '__kemux_init__' not in produced_json and filtering_function({
+            'name': produced_json.get('name'),
+        }):
+            manually_filtered_messages_names.append(produced_json.get('name'))
             split_message = next(new_topic_consumer)
-            if message := ast.literal_eval(
+            split_json = ast.literal_eval(
                 split_message.value.decode('utf-8')
-            ):
-                if '__kemux_init__' in message:
-                    tests_logger.info(f'Got init message in {topic}')
-                    continue
-                message_name = message.get('name')
-                new_topic_messages_names.append(message_name)
-        except StopIteration as no_more_messages:
-            if time.time() - fetching_start_time > FILTERING_TIMEOUT:
-                raise TimeoutError(f'Filtering function for {topic} timed out (timeout: {FILTERING_TIMEOUT}) seconds') from no_more_messages
+            )
+            new_topic_messages_names.append(split_json.get('name'))
+            number_of_produced_messages += 1
 
     sorted_messages_names = sorted(new_topic_messages_names)
     expected_sorted_messages_names = sorted(manually_filtered_messages_names)
 
-    tests_logger.info(f'Expected {expected_number_of_messages} messages: {expected_sorted_messages_names}')
-    tests_logger.info(f'Got {len(sorted_messages_names)} messages: {sorted_messages_names}')
+    expected_number_of_messages = len(expected_sorted_messages_names)
+    got_number_of_messages = len(sorted_messages_names)
 
+    tests_logger.info(f'Expected {expected_number_of_messages} messages: {expected_sorted_messages_names}')
+    tests_logger.info(f'Got {got_number_of_messages} messages: {sorted_messages_names}')
+
+    assert got_number_of_messages == expected_number_of_messages
     assert sorted_messages_names == expected_sorted_messages_names
     tests_logger.info('Splitting works as expected')
