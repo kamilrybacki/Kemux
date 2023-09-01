@@ -107,17 +107,14 @@ class Manager:
             self.logger.info(f'{stream_name}: activating input topic handler')
             stream_input.initialize_handler(self._app)
 
+            self.logger.info(f'{stream_name}: activating output topic handlers')
+            output: kemux.data.io.output.StreamOutput
+            for output in stream.outputs.values():
+                output.initialize_handler(self._app)
+                output.declare()
+
             # pylint: disable=cell-var-from-loop
             async def _process_input_stream_message(events: faust.StreamT[kemux.data.schema.input.InputSchema]) -> None:
-                self.logger.info(f'{stream_name}: activating output topic handlers')
-
-                output: kemux.data.io.output.StreamOutput
-                for output_name, output in stream.outputs.items():
-                    output.initialize_handler(self._app)
-                    if not output.topic_handler:
-                        raise ValueError(f'{stream_name}: invalid {output_name} output topic handler')
-                    await output.declare()
-
                 event: faust.types.EventT
                 async for event in events.events():
                     await stream.process(event)  # type: ignore
