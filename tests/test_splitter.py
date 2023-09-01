@@ -80,6 +80,7 @@ def test_for_message_splitting(tests_logger: logging.Logger, use_consumer: conft
     new_topic_consumer: kafka.KafkaConsumer = use_consumer(topic)
     assert new_topic_consumer.bootstrap_connected()
     tests_logger.info(f'Connected to {topic} successfully')
+    next(new_topic_consumer)  # Skip the init message
 
     outputs_class_name_for_topic = topic.title().replace('-', '')
     filtering_function = helpers.get_filtering_function_for_topic(outputs_class_name_for_topic)
@@ -89,20 +90,18 @@ def test_for_message_splitting(tests_logger: logging.Logger, use_consumer: conft
 
     number_of_produced_messages = 0
     while number_of_produced_messages < REQUESTED_NUMBER_OF_MESSAGES:
-        produced_message = next(producer_consumer)
-        produced_json = ast.literal_eval(
-            produced_message.value.decode('utf-8')
-        )
-        if '__faust' not in produced_json and '__kemux_init__' not in produced_json and filtering_function({
-            'name': produced_json.get('name'),
+        produced_json_name = ast.literal_eval(
+            next(producer_consumer).value.decode('utf-8')
+        ).get('name')
+        if filtering_function({
+            'name': produced_json_name,
         }):
-            manually_filtered_messages_names.append(produced_json.get('name'))
-            split_message = next(new_topic_consumer)
-            split_json = ast.literal_eval(
-                split_message.value.decode('utf-8')
+            manually_filtered_messages_names.append(produced_json_name)
+            new_topic_messages_names.append(
+                ast.literal_eval(
+                    next(new_topic_consumer).value.decode('utf-8')
+                ).get('name')
             )
-            tests_logger.info(f'Got {split_json} from {topic}')
-            new_topic_messages_names.append(split_json.get('name'))
             number_of_produced_messages += 1
 
     sorted_messages_names = sorted(new_topic_messages_names)
