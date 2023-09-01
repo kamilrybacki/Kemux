@@ -1,4 +1,3 @@
-import asyncio
 import dataclasses
 
 import kemux.data.io.base
