@@ -117,9 +117,13 @@ def test_for_message_splitting(tests_logger: logging.Logger, use_consumer: conft
         try:
             split_message = next(new_topic_consumer)
             tests_logger.info(f'Got message in {topic}: {split_message.value}')
-            if message_name := ast.literal_eval(
+            if message := ast.literal_eval(
                 split_message.value.decode('utf-8')
-            ).get('name'):
+            ):
+                if '__kemux_init__' in message:
+                    tests_logger.info(f'Got init message in {topic}')
+                    continue
+                message_name = message.get('name')
                 new_topic_messages_names.append(message_name)
         except StopIteration:
             tests_logger.info(f'Waiting for more messages in {topic}')
