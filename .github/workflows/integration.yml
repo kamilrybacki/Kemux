@@ -100,7 +100,7 @@ jobs:
           && \
           docker \
             logs \
-              producer 
+              producer \
           && \
           docker \
             logs \

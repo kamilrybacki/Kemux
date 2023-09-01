@@ -80,7 +80,9 @@ def test_for_message_splitting(tests_logger: logging.Logger, use_consumer: conft
     routed_messages_topic_consumer: kafka.KafkaConsumer = use_consumer(topic)
     assert routed_messages_topic_consumer.bootstrap_connected()
     tests_logger.info(f'Connected to {topic} successfully')
-    next(routed_messages_topic_consumer)  # Skip the init message
+
+    init_message = next(routed_messages_topic_consumer)  # Skip the init message
+    tests_logger.info(f'Skipped init message: {init_message.value.decode("utf-8")}')
 
     outputs_class_name_for_topic = topic.title().replace('-', '')
     filtering_function = helpers.get_filtering_function_for_topic(outputs_class_name_for_topic)
@@ -111,7 +113,6 @@ def test_for_message_splitting(tests_logger: logging.Logger, use_consumer: conft
                     if time.time() - timer_start > FILTERING_TIMEOUT:
                         raise TimeoutError(f'Filtering for {topic} timed out (timeout: {FILTERING_TIMEOUT}) seconds') from no_message_received
                     continue
-
         number_of_produced_messages += 1
 
     sorted_messages_names = sorted(new_topic_messages_names)
