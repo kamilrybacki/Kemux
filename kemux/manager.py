@@ -66,7 +66,10 @@ class Manager:
                 broker=kafka_address,
                 value_serializer='json',
                 datadir=instance.persistent_data_directory,
-                stream_wait_empty=False
+                stream_wait_empty=False,
+                topic_allow_declare=False,
+                topic_disable_leader=True,
+                consumer_auto_offset_reset="latest",
             )
             instance.streams = kemux.logic.imports.load_streams(streams_dir) if streams_dir else {}
             instance._app = app
