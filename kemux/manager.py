@@ -16,6 +16,7 @@ import kemux.data.schema.output
 import kemux.data.stream
 
 import kemux.logic.imports
+import kemux.logic.concurrency
 
 
 DEFAULT_MODELS_PATH = 'streams'
@@ -114,7 +115,7 @@ class Manager:
                 if not output.topic_handler:
                     raise ValueError(f'{stream_name}: invalid {output_name} output topic handler')
                 kemux.logic.concurrency.try_in_event_loop(
-                    output.topic_handler.declare
+                    output.declare
                 )
 
             # pylint: disable=cell-var-from-loop
@@ -132,9 +133,4 @@ class Manager:
             self.agents[stream_name] = self._app.agent(input_topics_handler)(_process_input_stream_message)
 
         self.logger.info('Starting receiver loop')
-        for agent in self.agents.values():
-            kemux.logic.concurrency.try_in_event_loop(
-                agent.start
-            )
-
         self._app.main()

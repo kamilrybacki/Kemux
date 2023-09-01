@@ -19,3 +19,10 @@ class StreamOutput(kemux.data.io.base.IOBase):
             await cls.topic_handler.send(value=transformed_message)  # type: ignore
         else:
             cls.logger.warning(f'Invalid message: {message}')
+
+    async def declare(self) -> None:
+        self.logger.info(f'Declaring topic: {self.topic}')
+        await self.topic_handler.declare()
+        await self.topic_handler.send(
+            value='__kemux_init__'
+        )
