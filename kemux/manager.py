@@ -129,12 +129,12 @@ class Manager:
     def create_processing_function(self, stream: kemux.data.stream.StreamBase) -> typing.Callable[[faust.StreamT[kemux.data.schema.input.InputSchema]], typing.Awaitable[None]]:
         processing_function_name = f'_process_{stream.input.topic}_message'  # type: ignore
         exec(f'''
-            async def {processing_function_name}(events: faust.StreamT[kemux.data.schema.input.InputSchema]) -> None:
-                stream: kemux.data.stream.StreamBase = {stream}
-                event: faust.types.EventT
-                async for event in events.events():
-                    await stream.process(event)
-        ''')
+async def {processing_function_name}(events: faust.StreamT[kemux.data.schema.input.InputSchema]) -> None:
+    stream: kemux.data.stream.StreamBase = {stream}
+    event: faust.types.EventT
+    async for event in events.events():
+        await stream.process(event)
+''')
         if not (processing_function := locals().get(processing_function_name)):
             raise ValueError(f'Invalid processing function: {processing_function_name}')
         return processing_function
