@@ -74,6 +74,8 @@ def test_for_message_filtering(tests_logger: logging.Logger, use_consumer: conft
 
 
 @pytest.mark.order(7)
+# Repeat the test 3 times to make sure that the splitter is working as expected and no race conditions are present
+@pytest.mark.repeat(3)
 @pytest.mark.parametrize('topic', helpers.get_splitter_output_topics())
 def test_for_message_splitting(tests_logger: logging.Logger, use_consumer: conftest.ConsumerFactory, topic: str):
     producer_consumer: kafka.KafkaConsumer = use_consumer(lib.producer.start.TEST_TOPIC)
