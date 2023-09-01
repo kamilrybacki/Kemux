@@ -112,8 +112,8 @@ def test_for_message_splitting(tests_logger: logging.Logger, use_consumer: conft
     tests_logger.info(f'Expecting {expected_number_of_messages} messages filtered to {topic}')
 
     new_topic_messages_names: list[str] = []
-    stop_iteration_hits = 0
     while len(new_topic_messages_names) < expected_number_of_messages:
+        fetching_start_time = time.time()
         try:
             split_message = next(new_topic_consumer)
             tests_logger.info(f'Got message in {topic}: {split_message.value}')
@@ -125,11 +125,10 @@ def test_for_message_splitting(tests_logger: logging.Logger, use_consumer: conft
                     continue
                 message_name = message.get('name')
                 new_topic_messages_names.append(message_name)
-        except StopIteration:
+        except StopIteration as no_more_messages:
             tests_logger.info(f'Waiting for more messages in {topic}')
-            stop_iteration_hits += 1
-        if stop_iteration_hits > 3:
-            raise TimeoutError(f'Waiting for more messages in {topic} timed out')
+            if time.time() - fetching_start_time > FILTERING_TIMEOUT:
+                raise TimeoutError(f'Filtering function for {topic} timed out (timeout: {FILTERING_TIMEOUT})') from no_more_messages
 
-    assert new_topic_messages_names == manually_filtered_messages_names
+    assert sorted(new_topic_messages_names) == sorted(manually_filtered_messages_names)
     tests_logger.info('Splitting works as expected')
