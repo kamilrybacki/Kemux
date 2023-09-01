@@ -115,10 +115,11 @@ class Manager:
                 output.declare()
 
             # pylint: disable=cell-var-from-loop
-            async def _process_input_stream_message(messages: faust.StreamT[kemux.data.schema.input.InputSchema]) -> None:
+            async def _process_input_stream_message(events: faust.StreamT[kemux.data.schema.input.InputSchema]) -> None:
                 self.logger.info(f'{stream_name}: activating output topic handlers')
-                async for message in messages:
-                    await stream.process(message)  # type: ignore
+                event: faust.types.EventT
+                async for event in events.events():
+                    await stream.process(event)  # type: ignore
 
             input_topics_handler: faust.TopicT | None = stream_input.topic_handler
             if not input_topics_handler:
