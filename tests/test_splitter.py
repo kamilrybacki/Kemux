@@ -77,10 +77,10 @@ def test_for_message_filtering(tests_logger: logging.Logger, use_consumer: conft
 @pytest.mark.parametrize('topic', helpers.get_splitter_output_topics())
 def test_for_message_splitting(tests_logger: logging.Logger, use_consumer: conftest.ConsumerFactory, topic: str):
     producer_consumer: kafka.KafkaConsumer = use_consumer(lib.producer.start.TEST_TOPIC)
-    new_topic_consumer: kafka.KafkaConsumer = use_consumer(topic)
-    assert new_topic_consumer.bootstrap_connected()
+    routed_messages_topic_consumer: kafka.KafkaConsumer = use_consumer(topic)
+    assert routed_messages_topic_consumer.bootstrap_connected()
     tests_logger.info(f'Connected to {topic} successfully')
-    next(new_topic_consumer)  # Skip the init message
+    next(routed_messages_topic_consumer)  # Skip the init message
 
     outputs_class_name_for_topic = topic.title().replace('-', '')
     filtering_function = helpers.get_filtering_function_for_topic(outputs_class_name_for_topic)
@@ -97,11 +97,21 @@ def test_for_message_splitting(tests_logger: logging.Logger, use_consumer: conft
             'name': produced_json_name,
         }):
             manually_filtered_messages_names.append(produced_json_name)
-            new_topic_messages_names.append(
-                ast.literal_eval(
-                    next(new_topic_consumer).value.decode('utf-8')
-                ).get('name')
-            )
+            message_received = False
+            timer_start = time.time()
+            while not message_received:
+                try:
+                    new_topic_messages_names.append(
+                        ast.literal_eval(
+                            next(routed_messages_topic_consumer).value.decode('utf-8')
+                        ).get('name')
+                    )
+                    message_received = True
+                except StopIteration as no_message_received:
+                    if time.time() - timer_start > FILTERING_TIMEOUT:
+                        raise TimeoutError(f'Filtering for {topic} timed out (timeout: {FILTERING_TIMEOUT}) seconds') from no_message_received
+                    continue
+
             number_of_produced_messages += 1
 
     sorted_messages_names = sorted(new_topic_messages_names)
