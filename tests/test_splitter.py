@@ -105,10 +105,6 @@ def test_for_message_splitting(tests_logger: logging.Logger, use_consumer: conft
             while not message_received:
                 try:
                     routed_message = next(routed_messages_topic_consumer)
-
-                    tests_logger.info(f'Got routed message: {routed_message.value.decode("utf-8")}')
-                    tests_logger.info(f'Expected routed message: {produced_message.value.decode("utf-8")}')
-
                     routed_messages_names.append(
                         ast.literal_eval(
                             routed_message.value.decode('utf-8')

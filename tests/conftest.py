@@ -48,14 +48,12 @@ def use_consumer(broker_ip: str) -> ConsumerFactory:
             return kafka.KafkaConsumer(
                 bootstrap_servers=broker_ip,
                 auto_offset_reset='earliest',
-                enable_auto_commit=True,
                 consumer_timeout_ms=1000,
             )
         return kafka.KafkaConsumer(
             topic,
             bootstrap_servers=broker_ip,
             auto_offset_reset='earliest',
-            enable_auto_commit=True,
             consumer_timeout_ms=1000,
         )
     return consumer_factory
