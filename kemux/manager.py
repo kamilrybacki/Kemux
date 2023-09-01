@@ -33,9 +33,6 @@ class Manager:
     agents: dict[str, faust.types.AgentT] = dataclasses.field(init=False, default_factory=dict)
 
     _app: faust.App = dataclasses.field(init=False)
-    _executor: ThreadPoolExecutor = dataclasses.field(
-        init=False,
-    )
 
     __instance: Manager | None = dataclasses.field(init=False, default=None)
 
@@ -102,11 +99,6 @@ class Manager:
         if not self.streams.keys():
             raise ValueError('No streams have been loaded!')
 
-        self.logger.info('Initializing thread pool for agents concurrency')
-        self._executor = ThreadPoolExecutor(
-            max_workers=len(self.streams)
-        )
-
         self.logger.info('Starting receiver')
         stream: kemux.data.stream.StreamBase
         for stream_name, stream in self.streams.items():
@@ -128,11 +120,7 @@ class Manager:
             async def _process_input_stream_message(messages: faust.StreamT[kemux.data.schema.input.InputSchema]) -> None:
                 self.logger.info(f'{stream_name}: activating output topic handlers')
                 async for message in messages:
-                    await self._app.loop.run_in_executor(
-                        self._executor,
-                        stream.process,
-                        message,
-                    )
+                    await stream.process(message)  # type: ignore
 
             input_topics_handler: faust.TopicT | None = stream_input.topic_handler
             if not input_topics_handler:
