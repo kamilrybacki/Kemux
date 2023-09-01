@@ -79,3 +79,29 @@ class StreamBase:
         del self.outputs[output_topic_name]
         self.logger.info(f'Removed output: {output_topic_name}')
         return
+
+
+def order_streams(streams: dict[str, kemux.data.stream.StreamBase]) -> dict[str, kemux.data.stream.StreamBase]:
+    ordered_streams = {}
+    for stream_info in find_streams_order([
+        stream.topics()
+        for stream in streams.values()
+    ]):
+        input_topic = stream_info[0]
+        for stream_name, stream in streams.items():
+            if stream.input is None:
+                raise ValueError(f'Invalid stream input: {stream_name}')
+            if stream.input.topic == input_topic:
+                ordered_streams[stream_name] = stream
+                break
+    return ordered_streams
+
+
+def find_streams_order(info: list[tuple]) -> list[tuple]:
+    for stream_index, stream_info in enumerate(info):
+        stream_input_topic = stream_info[0]
+        for other_stream_index, other_stream_info in enumerate(info[stream_index + 1:], start=stream_index + 1):
+            other_stream_output_topics = other_stream_info[1]
+            if stream_input_topic in other_stream_output_topics:
+                info[stream_index], info[other_stream_index] = info[other_stream_index], info[stream_index]
+    return info

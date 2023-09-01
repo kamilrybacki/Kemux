@@ -17,7 +17,6 @@ import kemux.data.schema.input
 import kemux.data.schema.output
 import kemux.data.stream
 
-import kemux.logic.concurrency
 import kemux.logic.imports
 
 
@@ -46,7 +45,7 @@ class Manager:
 
     @streams.setter
     def streams(self, streams: dict[str, kemux.data.stream.StreamBase]) -> None:
-        self.__streams = kemux.logic.concurrency.order_streams(streams)
+        self.__streams = kemux.data.stream.order_streams(streams)
 
     @classmethod
     def init(cls, name: str, kafka_address: str, data_dir: str, streams_dir: str | None = None) -> Manager:
