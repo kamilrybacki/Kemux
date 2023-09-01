@@ -88,15 +88,20 @@ jobs:
               -r requirements-ci.txt \
               .
       - name: Run integration tests
-        continue-on-error: true
         run: |
           python \
             -m \
               pytest \
                 -c \
-                  pytest.ini
-      - name: Print splitter logs
-        run: |
+                  pytest.ini \
+          || \
+          echo \
+            "Container logs:" \
+          && \
+          docker \
+            logs \
+              producer 
+          && \
           docker \
             logs \
               splitter
