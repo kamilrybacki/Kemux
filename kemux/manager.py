@@ -69,7 +69,6 @@ class Manager:
                 stream_wait_empty=False,
                 topic_allow_declare=False,
                 topic_disable_leader=True,
-                consumer_auto_offset_reset="latest",
                 loop=instance._event_loop,
             )
             instance.streams = kemux.logic.imports.load_streams(streams_dir) if streams_dir else {}
