@@ -34,7 +34,7 @@ COPY \
   ${SPLITTER_USER_HOME}/splitter.py
 
 COPY \
-  examples/streams/ \
+  tests/streams/ \
   ${SPLITTER_USER_HOME}/streams/
 
 RUN \
