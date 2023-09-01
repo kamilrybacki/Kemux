@@ -101,6 +101,7 @@ def test_for_message_splitting(tests_logger: logging.Logger, use_consumer: conft
             split_json = ast.literal_eval(
                 split_message.value.decode('utf-8')
             )
+            tests_logger.info(f'Got {split_json} from {topic}')
             new_topic_messages_names.append(split_json.get('name'))
             number_of_produced_messages += 1
 
