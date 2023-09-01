@@ -1,0 +1,8 @@
+site_name: Kemux
+theme:
+  name: readthedocs
+  highlightjs: true
+  hljs_languages:
+    - yaml
+    - python
+  logo: assets/logo.svg
