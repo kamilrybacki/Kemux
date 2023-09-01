@@ -32,6 +32,7 @@ class Manager:
     agents: dict[str, faust.types.AgentT] = dataclasses.field(init=False, default_factory=dict)
 
     _app: faust.App = dataclasses.field(init=False)
+    _event_loop: asyncio.AbstractEventLoop = dataclasses.field(init=False, default_factory=asyncio.get_event_loop)
 
     __instance: Manager | None = dataclasses.field(init=False, default=None)
 
@@ -69,6 +70,7 @@ class Manager:
                 topic_allow_declare=False,
                 topic_disable_leader=True,
                 consumer_auto_offset_reset="latest",
+                loop=instance._event_loop,
             )
             instance.streams = kemux.logic.imports.load_streams(streams_dir) if streams_dir else {}
             instance._app = app
@@ -102,7 +104,7 @@ class Manager:
             raise ValueError('No streams have been loaded!')
 
         self.logger.info('Initializing streams')
-        asyncio.run(
+        self._event_loop.run_until_complete(
             self.initialize_streams()
         )
 
