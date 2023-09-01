@@ -137,5 +137,5 @@ class Manager:
             async for event in events.events():
                 await stream.process(event)
         _process_input_stream_message.__name__ = f'process_{stream.input.topic}_message'  # type: ignore
-        _process_input_stream_message.__qualname__ = f'{self.name}.Manager.{_process_input_stream_message.__name__}'  # type: ignore
+        _process_input_stream_message.__qualname__ = f'{self.__class__.__name__}.{_process_input_stream_message.__name__}'  # type: ignore
         return _process_input_stream_message
