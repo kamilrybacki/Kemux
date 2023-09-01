@@ -4,8 +4,6 @@ from __future__ import annotations
 import dataclasses
 import logging
 
-from concurrent.futures import ThreadPoolExecutor
-
 import faust
 import faust.types
 
