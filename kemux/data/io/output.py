@@ -22,7 +22,7 @@ class StreamOutput(kemux.data.io.base.IOBase):
             cls.logger.warning(f'Invalid message: {message}')
 
     @classmethod
-    async def __declare(cls) -> None:
+    async def declare(cls) -> None:
         if not cls.topic_handler:
             raise ValueError(f'Invalid {cls.topic} output topic handler')
         await cls.topic_handler.declare()
@@ -30,15 +30,3 @@ class StreamOutput(kemux.data.io.base.IOBase):
         await cls.topic_handler.send(
             value='__kemux_init__'
         )
-
-    @classmethod
-    def declare(cls) -> None:
-        loop = asyncio.get_event_loop()
-        if loop.is_running():
-            loop.create_task(
-                cls.__declare()
-            )
-        else:
-            loop.run_until_complete(
-                cls.__declare()
-            )

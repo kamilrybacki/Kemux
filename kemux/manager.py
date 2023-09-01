@@ -1,6 +1,7 @@
 # pylint: disable=consider-using-enumerate
 from __future__ import annotations
 
+import asyncio
 import dataclasses
 import logging
 import typing
@@ -100,36 +101,37 @@ class Manager:
         if not self.streams.keys():
             raise ValueError('No streams have been loaded!')
 
-        self.logger.info('Starting receiver')
-        stream: kemux.data.stream.StreamBase
+        self.logger.info('Initializing streams')
+        asyncio.run(
+            self.initialize_streams()
+        )
+
+        self.logger.info('Starting receiver loop')
+        self._app.main()
+
+    async def initialize_streams(self) -> None:
         for stream_name, stream in self.streams.items():
             if (stream_input := stream.input) is None:
                 raise ValueError(f'Invalid stream input: {stream_name}')
             self.logger.info(f'{stream_name}: activating input topic handler')
+
             stream_input.initialize_handler(self._app)
-
-            self.logger.info(f'{stream_name}: activating output topic handlers')
-            output: kemux.data.io.output.StreamOutput
-            for output in stream.outputs.values():
-                output.initialize_handler(self._app)
-                output.declare()
-
-            # pylint: disable=cell-var-from-loop
-            async def _process_input_stream_message(events: faust.StreamT[kemux.data.schema.input.InputSchema]) -> None:
-                event: faust.types.EventT
-                async for event in events.events():
-                    await stream.process(event)  # type: ignore
-
             input_topics_handler: faust.TopicT | None = stream_input.topic_handler
             if not input_topics_handler:
                 raise ValueError(f'{stream_name}: invalid {stream_input.topic} input topic handler')
-            processing_function = self.create_processing_function(stream)
+
+            output: kemux.data.io.output.StreamOutput
+            for output in stream.outputs.values():
+                output.initialize_handler(self._app)
+                self.logger.info(f'{stream_name}: activating output topic handler: {output.topic}')
+                await output.declare()
 
             self.logger.info(f'{stream_name}: activating stream agent')
-            self.agents[stream_name] = self._app.agent(input_topics_handler)(processing_function)
-
-        self.logger.info('Starting receiver loop')
-        self._app.main()
+            self.agents[stream_name] = self._app.agent(
+                input_topics_handler
+            )(
+                self.create_processing_function(stream)
+            )
 
     def create_processing_function(self, stream: kemux.data.stream.StreamBase) -> typing.Callable[[faust.StreamT[kemux.data.schema.input.InputSchema]], typing.Awaitable[None]]:
         async def _process_input_stream_message(events: faust.StreamT[kemux.data.schema.input.InputSchema]) -> None:
