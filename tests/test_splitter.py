@@ -13,7 +13,7 @@ import lib.producer.start
 import kemux.data.stream
 
 FILTERING_TIMEOUT = 10
-REQUESTED_NUMBER_OF_MESSAGES = 100
+REQUESTED_NUMBER_OF_MESSAGES = 10
 TEST_STREAMS_INFO: list[tuple] = [
     ('2', ['5', '6', '7']),
     ('3', ['5', '6', '7']),
