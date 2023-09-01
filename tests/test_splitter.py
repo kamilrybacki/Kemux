@@ -109,14 +109,12 @@ def test_for_message_splitting(tests_logger: logging.Logger, use_consumer: conft
     tests_logger.info(f'Connected to {topic} successfully')
 
     expected_number_of_messages = len(manually_filtered_messages_names)
-    tests_logger.info(f'Expecting {expected_number_of_messages} messages filtered to {topic}')
 
     new_topic_messages_names: list[str] = []
     while len(new_topic_messages_names) < expected_number_of_messages:
         fetching_start_time = time.time()
         try:
             split_message = next(new_topic_consumer)
-            tests_logger.info(f'Got message in {topic}: {split_message.value}')
             if message := ast.literal_eval(
                 split_message.value.decode('utf-8')
             ):
@@ -126,9 +124,14 @@ def test_for_message_splitting(tests_logger: logging.Logger, use_consumer: conft
                 message_name = message.get('name')
                 new_topic_messages_names.append(message_name)
         except StopIteration as no_more_messages:
-            tests_logger.info(f'Waiting for more messages in {topic}')
             if time.time() - fetching_start_time > FILTERING_TIMEOUT:
                 raise TimeoutError(f'Filtering function for {topic} timed out (timeout: {FILTERING_TIMEOUT}) seconds') from no_more_messages
 
-    assert sorted(new_topic_messages_names) == sorted(manually_filtered_messages_names)
+    sorted_messages_names = sorted(new_topic_messages_names)
+    expected_sorted_messages_names = sorted(manually_filtered_messages_names)
+
+    tests_logger.info(f'Expected {expected_number_of_messages} messages: {expected_sorted_messages_names}')
+    tests_logger.info(f'Got {len(sorted_messages_names)} messages: {sorted_messages_names}')
+
+    assert sorted_messages_names == expected_sorted_messages_names
     tests_logger.info('Splitting works as expected')
