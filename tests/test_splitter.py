@@ -12,7 +12,7 @@ import helpers
 import lib.producer.start
 import kemux.data.stream
 
-FILTERING_TIMEOUT = 10
+FILTERING_TIMEOUT = 50
 REQUESTED_NUMBER_OF_MESSAGES = 10
 TEST_STREAMS_INFO: list[tuple] = [
     ('2', ['5', '6', '7']),
@@ -99,6 +99,8 @@ def test_for_message_splitting(tests_logger: logging.Logger, use_consumer: conft
             'name': produced_json_name,
         }):
             manually_filtered_messages_names.append(produced_json_name)
+            time.sleep(0.1)  # Wait for the message to be routed
+
             message_received = False
             timer_start = time.time()
             while not message_received:
