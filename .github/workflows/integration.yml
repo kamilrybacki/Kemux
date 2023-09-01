@@ -1,0 +1,107 @@
+name: Integration tests using Dockerized services
+run-name: Integration tests
+on: [push]
+concurrency:
+  group: ${{ github.ref }}-it
+  cancel-in-progress: true
+permissions:
+    contents: read
+    packages: write
+
+env:
+  PRODUCER_IMAGE: ghcr.io/${{ github.actor }}/test-kafka-producer
+  SPLITTER_IMAGE: ghcr.io/${{ github.actor }}/test-kafka-splitter
+
+jobs:
+  build-docker-images:
+    runs-on: ubuntu-latest
+    outputs:
+      producer-image: ${{ steps.producer-meta.outputs.tags }}
+      splitter-image: ${{ steps.splitter-meta.outputs.tags }}
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Extract producer image Docker metadata
+        id: producer-meta
+        uses: docker/metadata-action@v4
+        with:
+          images: ${{ env.PRODUCER_IMAGE }}
+      - name: Extract producer image Docker metadata
+        id: splitter-meta
+        uses: docker/metadata-action@v4
+        with:
+          images: ${{ env.SPLITTER_IMAGE }} 
+      - name: Build producer image
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          file: ./tests/environment/docker/Producer.Dockerfile
+          tags: ${{ steps.producer-meta.outputs.tags }}
+          labels: ${{ steps.producer-meta.outputs.labels }}
+          push: true
+      - name: Build splitter image
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: ./tests/environment/docker/Splitter.Dockerfile
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          tags: ${{ steps.splitter-meta.outputs.tags }}
+          labels: ${{ steps.splitter-meta.outputs.labels }}
+          push: true
+  integration-tests:
+    runs-on: ubuntu-latest
+    needs: build-docker-images
+    steps:
+      - uses: actions/checkout@v2
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Setup tests environment 
+        uses: isbang/compose-action@v1.5.0
+        env:
+          PRODUCER_IMAGE: ${{ needs.build-docker-images.outputs.producer-image }}
+          SPLITTER_IMAGE: ${{ needs.build-docker-images.outputs.splitter-image }}
+        with:
+          compose-file: |
+            ./tests/environment/docker-compose.yml
+      - name: Setup Python 3.11
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.11
+      - name: Install dependencies
+        run: |
+          pip \
+            install \
+              -r requirements-ci.txt \
+              .
+      - name: Run integration tests
+        run: |
+          python \
+            -m \
+              pytest \
+                -c \
+                  pytest.ini \
+          && \
+          echo \
+            "Container logs:" \
+          && \
+          docker \
+            logs \
+              producer \
+          && \
+          docker \
+            logs \
+              splitter

@@ -1,5 +1,4 @@
 import dataclasses
-import datetime
 
 import kemux.data.io.input
 import kemux.data.io.output
@@ -10,13 +9,13 @@ import kemux.data.schema.output
 class Input:
     @dataclasses.dataclass
     class Schema(kemux.data.schema.input.InputSchema):
-        _timestamp_ : datetime.datetime
+        _timestamp_ : str
         _name_ : str
         _value_ : int
         _labels_ : dict[str, str]
 
         @staticmethod
-        def _timestamp_validator(timestamp: datetime.datetime) -> None:
+        def _timestamp_validator(timestamp: str) -> None:
             pass
 
         @staticmethod
@@ -48,7 +47,7 @@ class Outputs:
         @dataclasses.dataclass
         class Schema(kemux.data.schema.output.OutputSchema):
             _name_: str
-            _value_: float
+            _value_: int
 
             @staticmethod
             def transform(message: dict) -> dict:
@@ -66,12 +65,12 @@ class Outputs:
         @dataclasses.dataclass
         class Schema(kemux.data.schema.output.OutputSchema):
             _name_: str
-            _value_: float
+            _value_: int
 
             @staticmethod
             def transform(message: dict) -> dict:
                 return message
-        
+
         @dataclasses.dataclass
         class IO(kemux.data.io.output.StreamOutput):
             topic = 'spooky'
@@ -79,17 +78,17 @@ class Outputs:
             @staticmethod
             def filter(message: dict) -> bool:
                 return message.get('name') in ['bat', 'spider']
-    
+
     class Flying:
         @dataclasses.dataclass
         class Schema(kemux.data.schema.output.OutputSchema):
             _name_: str
-            _value_: float
+            _value_: int
 
             @staticmethod
             def transform(message: dict) -> dict:
                 return message
-        
+
         @dataclasses.dataclass
         class IO(kemux.data.io.output.StreamOutput):
             topic = 'flying'

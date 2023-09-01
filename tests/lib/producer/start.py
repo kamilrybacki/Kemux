@@ -29,10 +29,11 @@ def start_producer() -> None:
         level=logging.INFO,
     )
     producer_logger = logging.getLogger('PRODUCER')
-    if not (kafka_host := os.environ.get('TARGET_KAFKA_ADDRESS')):
-        raise ValueError('TARGET_KAFKA_ADDRESS not set')
+    if not (kafka_host := os.environ.get('KAFKA_ADDRESS')):
+        raise ValueError('KAFKA_ADDRESS not set')
     test_producer = kafka.KafkaProducer(
         bootstrap_servers=kafka_host,
+        api_version=(2, 0, 2),
     )
     test_consumer = kafka.KafkaConsumer(
         TEST_TOPIC,

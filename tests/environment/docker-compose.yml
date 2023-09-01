@@ -1,72 +1,68 @@
 version: '2.1'
 
 services:
-  kemux-zoo:
-    image: confluentinc/cp-zookeeper:7.3.2
-    hostname: kemux-zoo
-    networks:
-      - kemux
-    container_name: kemux-zoo
-    ports:
-      - "2181:2181"
+  zookeeper:
+    image: confluentinc/cp-zookeeper:5.5.0
+    container_name: zookeeper
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
-      ZOOKEEPER_SERVER_ID: 1
-      ZOOKEEPER_SERVERS: kemux-zoo:2888:3888
-
-  kemux-kafka:
-    image: confluentinc/cp-kafka:7.3.2
-    hostname: kemux-kafka
     networks:
-      - kemux
-    container_name: kemux-kafka
-    ports:
-      - "9092:9092"
-      - "29092:29092"
-      - "9999:9999"
+      default:
+        ipv4_address: 10.5.0.3
+
+  broker:
+    image: confluentinc/cp-kafka:5.5.0
+    container_name: broker
     environment:
-      KAFKA_LISTENERS: EXTERNAL_SAME_HOST://:29092,INTERNAL://:9092
-      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kemux-kafka:9092,EXTERNAL_SAME_HOST://localhost:29092
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL_SAME_HOST:PLAINTEXT
-      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
-      KAFKA_ZOOKEEPER_CONNECT: "kemux-zoo:2181"
       KAFKA_BROKER_ID: 1
-      KAFKA_LOG4J_LOGGERS: "kafka.controller=INFO,kafka.producer.async.DefaultEventHandler=INFO,state.change.logger=INFO"
+      KAFKA_ZOOKEEPER_CONNECT: 10.5.0.3:2181
+      KAFKA_LISTENERS: PLAINTEXT://:9092,PLAINTEXT_HOST://:29092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://10.5.0.4:9092,PLAINTEXT_HOST://localhost:29092
+      KAFKA_ADVERTISED_HOST_NAME: 10.5.0.4
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
-      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
-      KAFKA_JMX_PORT: 9999
-      KAFKA_JMX_HOSTNAME: ${DOCKER_HOST_IP:-127.0.0.1}
-      KAFKA_AUTHORIZER_CLASS_NAME: kafka.security.authorizer.AclAuthorizer
-      KAFKA_ALLOW_EVERYONE_IF_NO_ACL_FOUND: "true"
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      ALLOW_PLAINTEXT_LISTENER: 1
+    healthcheck:
+      test: ["CMD", "kafka-topics", "--bootstrap-server", "10.5.0.4:9092", "--list"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    ports:
+      - 9092:9092
+      - 29092:29092
+    networks:
+      default:
+        ipv4_address: 10.5.0.4
     depends_on:
-      - kemux-zoo
+      - zookeeper
 
-  kemux-producer:
+  producer:
+    container_name: producer
+    environment:
+      - KAFKA_ADDRESS=10.5.0.4:9092
+    image: ${PRODUCER_IMAGE}
     networks:
-      - kemux
-    build:
-      context: ../../
-      dockerfile: ./tests/environment/producer/Dockerfile
-      args:
-        TARGET_KAFKA_ADDRESS: "kemux-kafka:9092"
-      no_cache: true
+      default:
+        ipv4_address: 10.5.0.5
     depends_on:
-      - kemux-kafka
-      - kemux-zoo
-    
-  kemux-consumer:
+      broker:
+        condition: service_healthy
+
+  splitter:
+    container_name: splitter
+    environment:
+      - KAFKA_ADDRESS=10.5.0.4:9092
+    image: ${SPLITTER_IMAGE}
     networks:
-      - kemux
-    build:
-      context: ../../
-      dockerfile: ./tests/environment/consumer/Dockerfile
-      args:
-        KEMUX_KAFKA_ADDRESS: "kafka://kemux-kafka:9092"
-      no_cache: true
+      default:
+        ipv4_address: 10.5.0.6
     depends_on:
-      - kemux-producer
+      - producer
 
 networks:
-  kemux:
-    name: kemux-test-stack-network
+  default:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.5.0.0/16
+          gateway: 10.5.0.1

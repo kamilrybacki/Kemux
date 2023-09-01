@@ -15,19 +15,15 @@ class IOBase:
         init=False,
         default=logging.getLogger(__name__)
     )
-    _topic_handler: faust.types.TopicT | None = dataclasses.field(init=False, default=None)
+    topic_handler: faust.types.TopicT = dataclasses.field(init=False)
 
     @classmethod
-    def _get_handler(cls, app: faust.App) -> faust.TopicT:
-        if cls._topic_handler is None:
-            cls._initialize_handler(app)
-        return cls._topic_handler  # type: ignore
-    
-    @classmethod
-    def _initialize_handler(cls, app: faust.App) -> None:
+    def initialize_handler(cls, app: faust.App) -> None:
         schema: kemux.data.schema.base.SchemaBase = cls.schema
-        cls._topic_handler = app.topic(
+        cls.logger.info(f'Handler schema for {cls.topic}: {schema.record_class.__annotations__}')
+        cls.topic_handler = app.topic(
             cls.topic,
-            value_type=schema._record_class,
+            value_type=schema.record_class,
+            allow_empty=True,
         )
-        cls._topic_handler.maybe_declare()  # type: ignore
+        cls.logger.info(f'{cls.topic}: topic handler initialized')
