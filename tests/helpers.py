@@ -2,8 +2,8 @@ import typing
 
 import functools
 
-import lib.splitter.streams.primary
-import lib.splitter.streams.secondary
+import streams.primary
+import streams.secondary
 
 
 @functools.lru_cache

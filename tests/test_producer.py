@@ -6,7 +6,7 @@ import pytest
 
 import conftest
 
-import tests.lib.producer.producer
+import lib.producer
 
 NUMBER_OF_SAMPLES = 20
 

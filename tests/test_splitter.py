@@ -9,7 +9,7 @@ import pytest
 import conftest
 import helpers
 
-import tests.lib.producer.producer
+import lib.producer
 import kemux.data.stream
 
 FILTERING_TIMEOUT = 50

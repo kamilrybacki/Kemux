@@ -7,8 +7,8 @@ import docker
 import pytest
 import kafka
 
-import lib.splitter.streams.primary
-import lib.splitter.streams.secondary
+import streams.primary
+import streams.secondary
 
 
 COMPOSE_FILE_PATH = os.path.join(os.path.dirname(__file__), "./environment/docker-compose.yml")
