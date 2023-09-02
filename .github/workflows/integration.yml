@@ -1,5 +1,5 @@
 name: Integration tests
-run-name: Integration tests 🩺 using Dockerized 🐋 producer/splitter combo and Kafka 📨
+run-name: Integration tests 🩺 using Dockerized 🐋 Kemux and Kafka 📨
 on: [push]
 concurrency:
   group: ${{ github.ref }}-it
