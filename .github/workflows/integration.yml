@@ -1,4 +1,5 @@
-name: Integration tests using Dockerized services
+name: Integration tests
+run-name: Integration tests 🩺 using Dockerized 🐋 producer/splitter combo and Kafka 📨
 on: [push]
 concurrency:
   group: ${{ github.ref }}-it

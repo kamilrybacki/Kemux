@@ -1,4 +1,5 @@
-name: Code linting using diff-cache and linters
+name: Code linting
+run-name: Python 🐍 code linting and type checking 🔍
 on: [push]
 concurrency:
   group: ${{ github.ref }}-linting

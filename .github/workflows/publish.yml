@@ -1,4 +1,5 @@
-name: Publish Python 🐍 distributions 📦 to PyPI and TestPyPI
+name: Build and publish Kemux
+run-name: Publish Kemux distributions to PyPI and TestPyPI 🐍
 on: ["push"]
 concurrency:
   group: ${{ github.ref }}-publish
