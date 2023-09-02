@@ -2,7 +2,7 @@ name: Publish Python 🐍 distributions 📦 to PyPI and TestPyPI
 
 on:
   workflow_run:
-    workflows: ["Integration tests using Dockerized services"]
+    workflows: ["Integration tests"]
     types:
       - completed
 
