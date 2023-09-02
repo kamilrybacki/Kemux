@@ -1,8 +1,8 @@
 name: Publish Python 🐍 distributions 📦 to PyPI and TestPyPI
-on:
-  workflow_run:
-    workflows: ["Integration tests using Dockerized services"]
-    types: ["completed"]
+on: ["push"]
+concurrency:
+  group: ${{ github.ref }}-publish
+  cancel-in-progress: true
 
 jobs:
   build-and-publish:
