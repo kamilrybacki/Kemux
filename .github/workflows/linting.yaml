@@ -1,5 +1,4 @@
 name: Code linting using diff-cache and linters
-run-name: Code linting
 on: [push]
 concurrency:
   group: ${{ github.ref }}-linting

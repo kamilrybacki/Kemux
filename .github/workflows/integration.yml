@@ -1,5 +1,4 @@
 name: Integration tests using Dockerized services
-run-name: Integration tests
 on: [push]
 concurrency:
   group: ${{ github.ref }}-it
