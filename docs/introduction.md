@@ -16,7 +16,7 @@ pip install kemux
 
 ## General concepts
 
-The main entrypoint for using Kemux is the `Manager` class that imports the predefined routing strategies and manage the [`Faust`](https://faust.readthedocs.io/en/latest/index.html) application,
+The main entrypoint for using Kemux is the `Manager` class that imports the predefined routing strategies and manage the [Faust](https://faust.readthedocs.io/en/latest/index.html) application,
 used to consume and send messages from and to various Kafka Topics.
 
 These input/output strategies are called `Streams` in Kemux.
