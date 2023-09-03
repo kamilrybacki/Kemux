@@ -5,4 +5,3 @@ pyyaml
 pytest-order == 1.1.0
 pytest-repeat == 0.9.1
 pymongo == 3.13.0
-packaging == 23.0

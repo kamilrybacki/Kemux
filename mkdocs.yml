@@ -6,3 +6,4 @@ theme:
     - yaml
     - python
   logo: assets/logo.svg
+  favicon: assets/favicon.png

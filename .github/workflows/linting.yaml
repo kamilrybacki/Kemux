@@ -30,6 +30,7 @@ jobs:
         run: |
           pip \
             install \
+              packaging \
               -r requirements-ci.txt \
               mypy \
               .
