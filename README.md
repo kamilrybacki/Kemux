@@ -6,9 +6,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.11](https://img.shields.io/badge/python-3.11-green.svg)](https://www.python.org/downloads/release/python-311/)
 
-<div style="margin-bottom: 2rem; margin-top: 2rem; width: 100%; display: flex; justify-content: center;">
-  <img src="docs/assets/images/logo.svg" data-canonical-src="docs/assets/images/logo.svg" width="250"/>
-</div>
+<img src="docs/assets/images/logo.svg" data-canonical-src="docs/assets/images/logo.svg" width="250"/>
 
 **Kemux** is a Kafka demultiplexer that allows to route messages from one topic to another based on a set of rules.
 
