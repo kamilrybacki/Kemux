@@ -16,7 +16,7 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     url="https://kemux.readthedocs.io/en/latest",
     packages=setuptools.find_packages(),
-    requires=[
+    install_requires=[
         "faust-streaming==0.10.14",
-    ],
+    ]
 )
