@@ -23,6 +23,7 @@ RUN \
 COPY \
   pyproject.toml \
   setup.py \
+  README.md \
   ${SPLITTER_USER_HOME}/lib/
 
 COPY \
