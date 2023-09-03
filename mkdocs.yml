@@ -5,5 +5,5 @@ theme:
   hljs_languages:
     - yaml
     - python
-  logo: assets/logo.svg
-  favicon: assets/favicon.png
+  logo: assets/images/logo.svg
+  favicon: assets/images/favicon.ico
