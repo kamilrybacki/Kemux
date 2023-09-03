@@ -13,4 +13,5 @@ nav:
   - User Guide:
     - Defining streams: user-guide/streams.md
     - Managing streams: user-guide/manager.md
+    - Deploying as a service: user-guide/docker.md
   - API Reference: api-reference.md
