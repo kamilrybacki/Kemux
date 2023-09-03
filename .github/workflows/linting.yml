@@ -1,13 +1,13 @@
 name: Code linting
 run-name: Python 🐍 code linting and type checking 🔍
-on: [push]
+on: ["push"]
 concurrency:
   group: ${{ github.ref }}-linting
   cancel-in-progress: true
 
 env:
   PYTHON_SOURCE_DIR: "./kemux ./tests/lib"
-  PYTHON_VERSION: "3.10"
+  PYTHON_VERSION: "3.11"
 
 jobs:
   lint-markdown:
