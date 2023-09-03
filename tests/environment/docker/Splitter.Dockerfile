@@ -22,7 +22,7 @@ RUN \
 
 COPY \
   pyproject.toml \
-  setup.cfg \
+  setup.py \
   ${SPLITTER_USER_HOME}/lib/
 
 COPY \
