@@ -7,3 +7,10 @@ theme:
     - python
   logo: assets/images/logo.svg
   favicon: assets/images/favicon.ico
+nav:
+  - Home: index.md
+  - Introduction: introduction.md
+  - User Guide:
+    - Defining streams: user-guide/streams.md
+    - Managing streams: user-guide/manager.md
+  - API Reference: api-reference.md

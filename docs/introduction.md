@@ -31,4 +31,4 @@ Each stream is composed of the following elements:
 
 These objects can be contained in external modules and imported by the `Manager` by pointing it to the directory containing them or constructed programmatically and passed to the `Manager` via appropriate methods.
 
-At first, it is **important** to understand the [structure of a Kemux stream](user-guide/11-stream.md).
+At first, it is **important** to understand the [structure of a Kemux stream](user-guide/stream.md).
