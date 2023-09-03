@@ -1,12 +1,10 @@
 import os
 import setuptools
-import packaging.version
 
 with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
-version_string = os.environ.get("RELEASE_VERSION", "0.0.0.dev0")
-version = packaging.version.Version(version_string)
+version = os.environ.get("RELEASE_VERSION", "0.0.0.dev0")
 
 setuptools.setup(
     name="kemux",
