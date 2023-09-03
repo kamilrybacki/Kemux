@@ -80,6 +80,8 @@ In other words, if a field is prefixed and suffixed by `_` characters, the `Inpu
 
 Each message read from the input Kafka topic will be validated, ensuring that each of them meets a predefined schema.
 
+**Important note**: the `validate_<field_name>` method **must** return a `bool` value, indicating whether the field is valid or not.
+
 If a field is not prefixed and suffixed by `_` characters, it **will not be treated as a field of the input data**,
 can be used by the `Schema` object for internal state management across the validation methods.
 
@@ -92,6 +94,10 @@ The name of the input Kafka topic **must be** defined by the `topic` attribute o
 
 For the ingestation method, the `Input.IO` object must define a `ingest`. This method accepts the message read from the input Kafka topic, represented as a `dict` object, and returns the input data, represented as a `dict` object.
 
+**Important note**: the actual data is contained under the fields **without** the `_` (underscore) prefix and suffix.
+
+This decoration is only used internally by Kemux to construct appropiate `faust.Record` objects for Kafka topic handlers.
+
 An example of `Input.IO` object is given below:
 
 ```python
@@ -100,9 +106,11 @@ class IO(kemux.data.io.input.StreamInput):
     topic: str = "input-topic"
 
     def ingest(self, message: dict) -> dict:
-        message["_field1_"] = message["_field1_"].upper()
+        message["field1"] = message["field1"].upper()
         return message
 ```
+
+This, of course, can also be treated as a hook, used to communicate with external services, such as databases, before returning the input data.
 
 Combinining the `Input.Schema` and `Input.IO` objects, the `Input` object is defined as follows:
 
@@ -124,7 +132,7 @@ class Input:
         topic: str = "input-topic"
 
         def ingest(self, message: dict) -> dict:
-            message["_field1_"] = message["_field1_"].upper()
+            message["field1"] = message["field1"].upper()
             return message
 ```
 
@@ -136,7 +144,9 @@ First, a structure of an output subclass will be discussed.
 
 #### Output.Schema
 
-The `Output.Schema` object is defined by the `kemux.data.schema.output.OutputSchema` class. This class is a `dataclass` that contains the schema of the output data and a method used to `transform`` the input data into the output data i.e. one schema to another.
+The `Output.Schema` object is defined by the `kemux.data.schema.output.OutputSchema` class.
+
+This class is a `dataclass` that contains the schema of the output data and a method used to `transform`` the input data into the output data i.e. one schema to another.
 
 An example of `Output.Schema` object is given below:
 
@@ -152,6 +162,8 @@ class Schema(kemux.data.schema.output.OutputSchema):
 ```
 
 Field corresponding to keys present in the output data are prefixed and suffixed by `_` (underscore) characters.
+
+Similarly to the `Input.Schema` class, when refering to the actual data withing the messages, the `_` (underscore) prefix and suffix is **not to be used**.
 
 #### Output.IO
 
@@ -200,7 +212,7 @@ class Outputs
     ...
 ```
 
-### Stream
+### Combining I/O into a Stream
 
 Combining the `Input` and `Output` objects, a new stream can be defined in a python file, as follows:
 
@@ -229,7 +241,7 @@ class Input:
         topic: str = "input-topic"
 
         def ingest(self, message: dict) -> dict:
-            message["_field1_"] = message["_field1_"].upper()
+            message["field1"] = message["field1"].upper()
             return message
 
 class Outputs:

@@ -39,7 +39,7 @@ pip install kemux
 
 ## Table of contents
 
-- User guide
-  - [Defining a stream](user-guide/stream.md)
-  - [Managing streams](user-guide/manager.md)
-- [API reference](api-reference.md)
+1. User guide
+    - [Defining a stream](user-guide/stream.md)
+    - [Managing streams](user-guide/manager.md)
+2. [API reference](api-reference.md)
