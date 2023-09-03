@@ -6,7 +6,7 @@ import pytest
 
 import conftest
 
-import lib.producer.start
+import lib.producer
 
 NUMBER_OF_SAMPLES = 20
 
@@ -20,7 +20,7 @@ EXPECTED_ANIMALS_TOPIC_JSON_SCHEMA = {
 
 @pytest.mark.order(3)
 def test_for_consistency(tests_logger: logging.Logger, use_consumer: conftest.ConsumerFactory) -> None:
-    consumer: kafka.KafkaConsumer = use_consumer(lib.producer.start.TEST_TOPIC)
+    consumer: kafka.KafkaConsumer = use_consumer(lib.producer.TEST_TOPIC)
     assert consumer.bootstrap_connected()
     tests_logger.info('Connected to Kafka broker successfully')
 

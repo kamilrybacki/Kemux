@@ -1,5 +1,5 @@
-name: Code linting using diff-cache and linters
-run-name: Code linting
+name: Code linting
+run-name: Python 🐍 code linting and type checking 🔍
 on: [push]
 concurrency:
   group: ${{ github.ref }}-linting
@@ -26,19 +26,19 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: ${{ env.PYTHON_VERSION }}
-      - name: Install Python dependencies
+      - name: Install Python 🐍 dependencies
         run: |
           pip \
             install \
               -r requirements-ci.txt \
               mypy \
               .
-      - name: Lint files with Ruff
+      - name: Lint files with Ruff Action 🐶
         uses: chartboost/ruff-action@v1
         with:
           src: ${{ env.PYTHON_SOURCE_DIR }}
           args: "check --config .github/configs/ruff.toml"
-      - name: Check types with mypy
+      - name: Check types with mypy 🐍
         run: |
           mypy \
             --namespace-packages \

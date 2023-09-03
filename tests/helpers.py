@@ -2,8 +2,8 @@ import typing
 
 import functools
 
-import lib.splitter.streams.primary
-import lib.splitter.streams.secondary
+import streams.primary
+import streams.secondary
 
 
 @functools.lru_cache
@@ -17,8 +17,8 @@ def get_splitter_output_topics() -> list[str]:
                 if hasattr(output, 'IO') and hasattr(output, 'Schema')
             ]
             for stream in [
-                lib.splitter.streams.primary,
-                lib.splitter.streams.secondary,
+                streams.primary,
+                streams.secondary,
             ]
         ]
         for topic in sublist
@@ -30,7 +30,7 @@ def get_filtering_function_for_topic(topic: str) -> typing.Callable[[dict], bool
     try:
         outputs_class = getattr(
             getattr(
-                lib.splitter.streams.primary,
+                streams.primary,
                 'Outputs',
             ),
             topic
@@ -38,7 +38,7 @@ def get_filtering_function_for_topic(topic: str) -> typing.Callable[[dict], bool
     except AttributeError:
         outputs_class = getattr(
             getattr(
-                lib.splitter.streams.secondary,
+                streams.secondary,
                 'Outputs',
             ),
             topic

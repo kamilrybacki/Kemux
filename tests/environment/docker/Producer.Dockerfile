@@ -3,7 +3,7 @@ FROM python:3.11.4-alpine3.18
 USER root
 
 COPY \
-  tests/lib/producer/start.py \
+  tests/lib/producer.py \
   /producer.py
 
 RUN \

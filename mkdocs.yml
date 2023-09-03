@@ -1,0 +1,17 @@
+site_name: Kemux
+theme:
+  name: readthedocs
+  highlightjs: true
+  hljs_languages:
+    - yaml
+    - python
+  logo: assets/images/logo.svg
+  favicon: assets/images/favicon.ico
+nav:
+  - Home: index.md
+  - Introduction: introduction.md
+  - User Guide:
+    - Defining streams: user-guide/streams.md
+    - Managing streams: user-guide/manager.md
+    - Deploying as a service: user-guide/docker.md
+  - API Reference: api-reference.md

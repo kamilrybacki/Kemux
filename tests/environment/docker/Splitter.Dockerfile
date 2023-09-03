@@ -22,7 +22,8 @@ RUN \
 
 COPY \
   pyproject.toml \
-  setup.cfg \
+  setup.py \
+  README.md \
   ${SPLITTER_USER_HOME}/lib/
 
 COPY \
@@ -30,11 +31,11 @@ COPY \
   ${SPLITTER_USER_HOME}/lib/kemux/
 
 COPY \
-  tests/lib/splitter/start.py \
+  tests/lib/splitter.py \
   ${SPLITTER_USER_HOME}/splitter.py
 
 COPY \
-  tests/lib/splitter/streams/ \
+  tests/streams/ \
   ${SPLITTER_USER_HOME}/streams/
 
 RUN \
