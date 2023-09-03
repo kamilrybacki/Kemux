@@ -23,12 +23,23 @@ Each stream is composed of the following elements:
 
 These objects can be contained in external modules and imported by the `Manager` by pointing it to the directory containing them or constructed programmatically and passed to the `Manager` via appropriate methods.
 
-## How to use it?
+## Installation and setup
 
-### Python package
+### Requirements
+
+This package requires Python 3.11 or higher.
+
+### Python interface installation
 
 Kemux is a Python package that can be installed via `pip`:
 
 ```bash
 pip install kemux
 ```
+
+## Table of contents
+
+- User guide
+  - [Defining a stream](user-guide/stream.md)
+  - [Managing streams](user-guide/manager.md)
+- [API reference](api-reference.md)
