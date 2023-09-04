@@ -16,4 +16,9 @@ nav:
     - Defining streams: user-guide/streams.md
     - Managing streams: user-guide/manager.md
     - Deploying as a service: user-guide/docker.md
-  - API Reference: api-reference.md
+  - Code Reference:
+    - Manager: reference/manager.md
+    - Stream: reference/stream.md
+    - Schema: reference/schema.md
+    - Processor: reference/processor.md
+    - Additional logic: reference/logic.md
