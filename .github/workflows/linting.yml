@@ -6,7 +6,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  RELEASE_VERSION: ${{ github.ref }}
+  RELEASE_VERSION: "0.0.0"
   PYTHON_SOURCE_DIR: "./kemux ./tests/lib"
   PYTHON_VERSION: "3.11"
 
