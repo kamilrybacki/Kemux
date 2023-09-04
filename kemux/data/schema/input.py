@@ -55,7 +55,6 @@ class InputSchema(kemux.data.schema.base.Schema):
                 """
 
                 message_data = self.__dict__  # pylint: disable=eval-used
-                cls.logger.info(f'Validating message: {message_data}')
                 for field in cls.fields:
                     validator_name = f'_{field}_validator'
                     validator = getattr(
@@ -64,7 +63,6 @@ class InputSchema(kemux.data.schema.base.Schema):
                     )
                     if not isinstance(validator, types.FunctionType):
                         raise ValueError(f'Validator: {validator_name} is not callable')
-                    cls.logger.info(f'Validating field: {field}')
                     actual_field_value = message_data.get(field)
                     validator(actual_field_value)
 
