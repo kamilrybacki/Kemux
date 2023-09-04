@@ -54,7 +54,7 @@ class InputSchema(kemux.data.schema.base.Schema):
                     ValueError: If a validator is not a valid callable.
                 """
 
-                message_data = eval(self.dumps().decode('utf-8'))  # pylint: disable=eval-used
+                message_data = self.__dict__  # pylint: disable=eval-used
                 cls.logger.info(f'Validating message: {message_data}')
                 for field in cls.fields:
                     validator_name = f'_{field}_validator'
