@@ -36,4 +36,5 @@ class InputProcessor(kemux.data.processor.base.Processor):
         Raises:
             NotImplementedError: If not implemented by user.
         """
+
         raise NotImplementedError(f'{__name__}.ingest() must be implemented!')

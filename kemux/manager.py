@@ -1,4 +1,10 @@
 # pylint: disable=consider-using-enumerate
+"""
+manager.py
+
+Manager class for Kemux - the main class that is used to initialize and start the Kemux receiver.
+"""
+
 from __future__ import annotations
 
 import asyncio
@@ -24,6 +30,23 @@ DEFAULT_MODELS_PATH = 'streams'
 
 @dataclasses.dataclass(kw_only=True)
 class Manager:
+    """
+    Manager Class
+
+    The main class that is used to initialize and start the Kemux receiver
+    and operate on the incoming and outgoing messages accordign to the specifications
+    defined by the user in the Stream subclasses.
+
+    Attributes:
+        name (str): The name of the Kemux application.
+        kafka_address (str): The address of the Kafka broker.
+        streams_dir (str): The path to the directory containing the Stream subclasses.
+        persistent_data_directory (str): The path to the directory where persistent Faust data will be stored.
+        logger (logging.Logger): The logger that will be used to log messages.
+        agents (dict[str, faust.types.AgentT]): The Faust agents that will be used to process incoming messages.
+        streams (dict[str, kemux.data.stream.Stream]): The streams that will be used to process incoming messages.
+    """
+
     name: str
     kafka_address: str
     streams_dir: str | None
@@ -46,6 +69,20 @@ class Manager:
 
     @classmethod
     def init(cls, name: str, kafka_address: str, data_dir: str, streams_dir: str | None = None) -> Manager:
+        """
+        Initialize the Kemux receiver.
+
+        Args:
+            name (str): The name of the Kemux application.
+            kafka_address (str): The address of the Kafka broker.
+            data_dir (str): The path to the directory where persistent Faust data will be stored.
+            streams_dir (str, optional): The path to the directory containing the Stream subclasses. Defaults to None.
+            If None, the Manager will require the user to add streams manually via the add_stream() method.
+
+        Returns:
+            Manager: The initialized Manager instance.
+        """
+
         if cls.__instance is None:
             instance: Manager = cls(
                 name=name,
@@ -78,6 +115,15 @@ class Manager:
         return cls.__instance
 
     def add_stream(self, name: str, stream_input_class: type, stream_outputs_class: type) -> None:
+        """
+        Add a stream to the Kemux manager.
+
+        Args:
+            name (str): The name of the stream.
+            stream_input_class (type): The class of the stream input, containing the Schema and Processor.
+            stream_outputs_class (type): The class of the stream outputs, containing the Schema and Processor.
+        """
+
         stream_input = kemux.logic.imports.load_input(stream_input_class)
         stream_outputs = kemux.logic.imports.load_outputs(stream_outputs_class)
         self.streams = {
@@ -89,6 +135,13 @@ class Manager:
         }
 
     def remove_stream(self, name: str) -> None:
+        """
+        Remove a stream from the Kemux manager.
+
+        Args:
+            name (str): The name of the stream.
+        """
+
         if name not in self.streams:
             self.logger.warning(f'No stream found with name: {name}')
             return
@@ -99,6 +152,13 @@ class Manager:
         }
 
     def start(self) -> None:
+        """
+        Start the Kemux receiver i.e. the underlying Faust application and the stream agents.
+
+        Raises:
+            ValueError: If no streams have been loaded (either manually or from a directory)
+        """
+
         if not self.streams.keys():
             raise ValueError('No streams have been loaded!')
 
@@ -111,6 +171,13 @@ class Manager:
         self._app.main()
 
     async def initialize_streams(self) -> None:
+        """
+        Initialize the streams i.e. initialize the input and output topic handlers and the stream agents.
+
+        Raises:
+            ValueError: If a stream input is not defined or is invalid.
+        """
+
         for stream_name, stream in self.streams.items():
             if (stream_input := stream.input) is None:
                 raise ValueError(f'Invalid stream input: {stream_name}')
@@ -135,6 +202,16 @@ class Manager:
             )
 
     def create_processing_function(self, stream: kemux.data.stream.Stream) -> typing.Callable[[faust.StreamT[kemux.data.schema.input.InputSchema]], typing.Awaitable[None]]:
+        """
+        Create a processing function for a stream, specific to the name of its input topic.
+
+        Args:
+            stream (kemux.data.stream.Stream): The stream to create the processing function for.
+
+        Returns:
+            typing.Callable[[faust.StreamT[kemux.data.schema.input.InputSchema]], typing.Awaitable[None]]: The record processing function.
+        """
+
         async def _process_input_stream_message(events: faust.StreamT[kemux.data.schema.input.InputSchema]) -> None:
             event: faust.types.EventT
             async for event in events.events():

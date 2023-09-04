@@ -38,6 +38,7 @@ class OutputProcessor(kemux.data.processor.base.Processor):
         Raises:
             NotImplementedError: If not implemented by user.
         """
+
         raise NotImplementedError(f'{__name__}.filter() must be implemented!')
 
     @classmethod
@@ -48,6 +49,7 @@ class OutputProcessor(kemux.data.processor.base.Processor):
         Args:
             message (dict): Message to send, with structure defined by schema for output records.
         """
+
         transformed_message = cls.schema.transform(message=message)  # type: ignore
         cls.logger.info(f'Sending message: {transformed_message} to {cls.topic}')
         if cls.schema.validate(message=transformed_message):  # type: ignore
@@ -72,6 +74,7 @@ class OutputProcessor(kemux.data.processor.base.Processor):
         Raises:
             ValueError: If invalid topic handler.
         """
+
         if not cls.topic_handler:
             raise ValueError(f'Invalid {cls.topic} output topic handler')
         await cls.topic_handler.declare()

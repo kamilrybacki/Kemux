@@ -1,3 +1,9 @@
+"""
+base.py
+
+Base class for Schema classes.
+"""
+
 import dataclasses
 import logging
 import re
@@ -8,14 +14,40 @@ DECORATED_FIELDS_REGEX = re.compile(r'^_[a-z]+_$', re.IGNORECASE)
 
 
 class StreamRecordT(faust.Record):
+    """
+    StreamRecordT Class
+
+    A type hint for custom faust.Record classes.
+    These subclasses are created automatically by the input and output schema classes
+    and are passed to faust.TopicT initializers as the value_type argument i.e. record models.
+    """
+
     _decorated_fields: dict[str, type]
     _fields: dict[str, type]
+
     def to_dict(self) -> dict:  # type: ignore
-        ...
+        """
+        Convert the record to a dict.
+
+        Returns:
+            dict: The record as a dict.
+        """
 
 
 @dataclasses.dataclass
 class Schema:
+    """
+    Schema base Class
+
+    Provides a common interface for Schema classes to validate data and create faust.Record classes.
+
+    Attributes:
+        logger (logging.Logger): The logger to use for logging messages.
+        decorated_fields (dict[str, type]): The fields to validate, with the leading and trailing underscores.
+        fields (dict[str, type]): The fields to validate, without the leading and trailing underscores.
+        record_class (faust.Record): The faust.Record class to use for automatic serialization and deserialization of records.
+    """
+
     logger: logging.Logger = dataclasses.field(init=False)
     decorated_fields: dict[str, type] = dataclasses.field(init=False, default_factory=dict)
     fields: dict[str, type] = dataclasses.field(init=False, default_factory=dict)
@@ -23,6 +55,13 @@ class Schema:
 
     @classmethod
     def find_decorated_fields(cls) -> None:
+        """
+        Find decorated fields and compose a faust.Record subclass.
+
+        Raises:
+            ValueError: If no decorated fields are found.
+        """
+
         cls.decorated_fields = {
             field: cls.__annotations__[field]
             for field in [*filter(
@@ -38,15 +77,3 @@ class Schema:
         }
         cls.logger = logging.getLogger(cls.__name__)
         cls.logger.info('Found schema fields: %s', ', '.join(cls.fields))
-
-    @classmethod
-    def make_init_message(cls, topic: str) -> dict:
-        cls.logger.info(f'Sending initial message to topic: {topic}')
-        initial_message_content = {
-            field_name: field_type()
-            for field_name, field_type in cls.fields.items()
-        }
-        return cls.record_class.from_data({
-            '__kemux_init__': True,
-            **initial_message_content
-        })

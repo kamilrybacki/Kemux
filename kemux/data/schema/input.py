@@ -1,4 +1,11 @@
 # pylint: disable=abstract-method
+"""
+input.py
+
+Input schema for Kemux.
+This is the schema that is used to validate incoming messages.
+"""
+
 import dataclasses
 import types
 
@@ -9,22 +16,44 @@ import faust.models.fields
 import kemux.data.schema.base
 
 
-class InputRecordT(kemux.data.schema.base.StreamRecordT):
-    def _validate(self) -> None:
-        ...
-
-
 # pylint: disable=protected-access
 @dataclasses.dataclass
 class InputSchema(kemux.data.schema.base.Schema):
+    """
+    InputSchema Class
+
+    The schema that is used to validate incoming messages.
+    """
+
     @classmethod
     def construct_input_record_class(cls) -> None:
+        """
+        Factory used to construct the faust.Record subclass that is used to accept and validate incoming messages.
+
+        Raises:
+            ValueError: If a validator is not a valid callable.
+        """
+
         class InputRecord(
             faust.Record,
             serializer='json',
             date_parser=dateutil.parser.parse
         ):
+            """
+            InputRecord Class
+
+            The faust.Record that is used to accept and validate incoming messages.
+            """
+
             def validate_message(self) -> None:
+                """
+                Validate the message using validators defined by the user.
+                These validators follow the following naming pattern: "_<field_name>_validator"
+
+                Raises:
+                    ValueError: If a validator is not a valid callable.
+                """
+
                 for field in cls.fields:
                     validator_name = f'_{field}_validator'
                     validator = getattr(
@@ -38,6 +67,13 @@ class InputSchema(kemux.data.schema.base.Schema):
                     validator(actual_field_value)
 
             def to_dict(self) -> dict:
+                """
+                Convert the record to a dict.
+
+                Returns:
+                    dict: The input record as a dict.
+                """
+
                 return {
                     field: self.__dict__.get(field)
                     for field in cls.fields
@@ -70,4 +106,11 @@ class InputSchema(kemux.data.schema.base.Schema):
 
     @classmethod
     def asdict(cls) -> dict[str, type]:
+        """
+        Convert the nested faust.Record subclass to a dict.
+
+        Returns:
+            dict: The nested faust.Record subclass as a dict.
+        """
+
         return cls.record_class.asdict()

@@ -42,10 +42,11 @@ class Processor:
 
         Args:
             app (faust.App): The Faust application to initialize the topic handler for.
-        
+
         Returns:
             None
         """
+
         schema: kemux.data.schema.base.Schema = cls.schema
         cls.logger.info(f'Handler schema for {cls.topic}: {schema.record_class.__annotations__}')
         cls.topic_handler = app.topic(
