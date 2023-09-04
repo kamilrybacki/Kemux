@@ -17,7 +17,7 @@ class Input:
         ...
 
     @dataclasses.dataclass
-    class Processor(kemux.data.io.input.InputProcessor):
+    class Processor(kemux.data.processor.input.InputProcessor):
         ...
 
 class Outputs:
@@ -27,7 +27,7 @@ class Outputs:
             ...
 
         @dataclasses.dataclass
-        class Processor(kemux.data.io.output.OutputProcessor):
+        class Processor(kemux.data.processor.output.OutputProcessor):
             ...
 
     class OutputTopic2:
@@ -36,7 +36,7 @@ class Outputs:
             ...
 
         @dataclasses.dataclass
-        class Processor(kemux.data.io.output.OutputProcessor):
+        class Processor(kemux.data.processor.output.OutputProcessor):
             ...
     ...
 ```
@@ -45,7 +45,7 @@ Note that the `Input` and `Output` objects are defined as classes, used as names
 
 **It is important to note that the `Schema`/`Processor` objects are to be both defined as `dataclasses` and to inherit from correct `kemux` package objects.**
 
-Example: `Input.Schema` inherits from `kemux.data.schema.input.InputSchema` and `Output.Processor` inherits from `kemux.data.io.output.OutputProcessor`.
+Example: `Input.Schema` inherits from `kemux.data.schema.input.InputSchema` and `Output.Processor` inherits from `kemux.data.processor.output.OutputProcessor`.
 
 ### Input
 
@@ -87,7 +87,7 @@ can be used by the `Schema` object for internal state management across the vali
 
 #### Input.Processor
 
-The `Input.Processor` object is defined by the `kemux.data.io.input.InputProcessor` class
+The `Input.Processor` object is defined by the `kemux.data.processor.input.InputProcessor` class
 and is used to defined the name of the input Kafka topic and the method used to read (here: *ingest*) messages from the topic.
 
 The name of the input Kafka topic **must be** defined by the `topic` attribute of the `Input.Processor` object.
@@ -102,7 +102,7 @@ An example of `Input.Processor` object is given below:
 
 ```python
 @dataclasses.dataclass
-class Processor(kemux.data.io.input.InputProcessor):
+class Processor(kemux.data.processor.input.InputProcessor):
     topic: str = "input-topic"
 
     def ingest(self, message: dict) -> dict:
@@ -128,7 +128,7 @@ class Input:
             return True
 
     @dataclasses.dataclass
-    class Processor(kemux.data.io.input.InputProcessor):
+    class Processor(kemux.data.processor.input.InputProcessor):
         topic: str = "input-topic"
 
         def ingest(self, message: dict) -> dict:
@@ -167,11 +167,11 @@ Similarly to the `Input.Schema` class, when refering to the actual data withing 
 
 #### Output.Processor
 
-The `Output.Processor` object is defined by the `kemux.data.io.output.OutputProcessor` class. This class must define the name of the output Kafka topic and the method used to filter and route the incoming messages, as follows:
+The `Output.Processor` object is defined by the `kemux.data.processor.output.OutputProcessor` class. This class must define the name of the output Kafka topic and the method used to filter and route the incoming messages, as follows:
 
 ```python
 @dataclasses.dataclass
-class Processor(kemux.data.io.output.OutputProcessor):
+class Processor(kemux.data.processor.output.OutputProcessor):
     topic: str = "output-topic"
 
     def filter(self, message: dict) -> None:
@@ -194,7 +194,7 @@ class OutputTopic1:
             return message
 
     @dataclasses.dataclass
-    class Processor(kemux.data.io.output.OutputProcessor):
+    class Processor(kemux.data.processor.output.OutputProcessor):
         topic: str = "output-topic-1"
 
         def filter(self, message: dict) -> None:
@@ -219,8 +219,8 @@ Combining the `Input` and `Output` objects, a new stream can be defined in a pyt
 ```python
 import dataclasses
 
-import kemux.data.io.input
-import kemux.data.io.output
+import kemux.data.processor.input
+import kemux.data.processor.output
 import kemux.data.schema.input
 import kemux.data.schema.output
 
@@ -237,7 +237,7 @@ class Input:
             return True
 
     @dataclasses.dataclass
-    class Processor(kemux.data.io.input.InputProcessor):
+    class Processor(kemux.data.processor.input.InputProcessor):
         topic: str = "input-topic"
 
         def ingest(self, message: dict) -> dict:
@@ -256,7 +256,7 @@ class Outputs:
                 return message
 
         @dataclasses.dataclass
-        class Processor(kemux.data.io.output.OutputProcessor):
+        class Processor(kemux.data.processor.output.OutputProcessor):
             topic: str = "output-topic-1"
 
             def filter(self, message: dict) -> None:
@@ -273,7 +273,7 @@ class Outputs:
                 return message
 
         @dataclasses.dataclass
-        class Processor(kemux.data.io.output.OutputProcessor):
+        class Processor(kemux.data.processor.output.OutputProcessor):
             topic: str = "output-topic-2"
 
             def filter(self, message: dict) -> None:
