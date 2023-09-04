@@ -1,4 +1,4 @@
-# Kemux - Kafka Demultiplexer
+I# Kemux - Kafka Demultiplexer
 
 [![Documentation Status](https://readthedocs.org/projects/kemux/badge/?version=latest&style=plastic)](https://kemux.readthedocs.io/en/latest/)
 ![Code linting](https://github.com/kamilrybacki/kemux/actions/workflows/linting.yml/badge.svg)
@@ -49,4 +49,4 @@ For more information about Kemux, please refer to the [documentation].
 
 [Faust]: https://faust.readthedocs.io/en/latest/index.html
 [Docker section]: https://kemux.readthedocs.io/en/latest/user-guide/docker/
-[documentation]: https://kemux.readthedocs.io/en/latest/user-guide/docker/
+[documentation]: https://kemux.readthedocs.io/en/latest
