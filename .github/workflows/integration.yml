@@ -9,6 +9,7 @@ permissions:
     packages: write
 
 env:
+  RELEASE_VERSION: "0.0.0"
   PRODUCER_IMAGE: ghcr.io/${{ github.actor }}/test-kafka-producer
   SPLITTER_IMAGE: ghcr.io/${{ github.actor }}/test-kafka-splitter
 
