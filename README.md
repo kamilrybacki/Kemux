@@ -1,6 +1,6 @@
 # Kemux - Kafka Demultiplexer
 
-![Documentation Status](https://readthedocs.org/projects/kemux/badge/?version=latest&style=plastic)
+[![Documentation Status](https://readthedocs.org/projects/kemux/badge/?version=latest&style=plastic)](https://kemux.readthedocs.io/en/latest/)
 ![Code linting](https://github.com/kamilrybacki/kemux/actions/workflows/linting.yml/badge.svg)
 ![Integration tests](https://github.com/kamilrybacki/kemux/actions/workflows/integration.yml/badge.svg)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
