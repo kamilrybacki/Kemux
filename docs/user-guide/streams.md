@@ -4,7 +4,7 @@
 
 A stream is defined by a `Stream` object that contains the `Input` and `Output` objects.
 
-Both `Input` and `Output` objects are defined by a `Schema` and an `IO` object.
+Both `Input` and `Output` objects are defined by a `Schema` and an `Processor` object.
 These objects  defined in the `kemux` package are `dataclasses`.
 Thus, the `dataclasses` package is to be imported when defining a `Stream`.
 
@@ -17,7 +17,7 @@ class Input:
         ...
 
     @dataclasses.dataclass
-    class IO(kemux.data.io.input.StreamInput):
+    class Processor(kemux.data.io.input.InputProcessor):
         ...
 
 class Outputs:
@@ -27,7 +27,7 @@ class Outputs:
             ...
 
         @dataclasses.dataclass
-        class IO(kemux.data.io.output.StreamOutput):
+        class Processor(kemux.data.io.output.OutputProcessor):
             ...
 
     class OutputTopic2:
@@ -36,20 +36,20 @@ class Outputs:
             ...
 
         @dataclasses.dataclass
-        class IO(kemux.data.io.output.StreamOutput):
+        class Processor(kemux.data.io.output.OutputProcessor):
             ...
     ...
 ```
 
-Note that the `Input` and `Output` objects are defined as classes, used as namespaces for the `Schema` and `IO` objects.
+Note that the `Input` and `Output` objects are defined as classes, used as namespaces for the `Schema` and `Processor` objects.
 
-**It is important to note that the `Schema`/`IO` objects are to be both defined as `dataclasses` and to inherit from correct `kemux` package objects.**
+**It is important to note that the `Schema`/`Processor` objects are to be both defined as `dataclasses` and to inherit from correct `kemux` package objects.**
 
-Example: `Input.Schema` inherits from `kemux.data.schema.input.InputSchema` and `Output.IO` inherits from `kemux.data.io.output.StreamOutput`.
+Example: `Input.Schema` inherits from `kemux.data.schema.input.InputSchema` and `Output.Processor` inherits from `kemux.data.io.output.OutputProcessor`.
 
 ### Input
 
-The `Input` object is defined by the `Input.Schema` and `Input.IO` objects.
+The `Input` object is defined by the `Input.Schema` and `Input.Processor` objects.
 
 #### Input.Schema
 
@@ -85,24 +85,24 @@ Each message read from the input Kafka topic will be validated, ensuring that ea
 If a field is not prefixed and suffixed by `_` characters, it **will not be treated as a field of the input data**,
 can be used by the `Schema` object for internal state management across the validation methods.
 
-#### Input.IO
+#### Input.Processor
 
-The `Input.IO` object is defined by the `kemux.data.io.input.StreamInput` class
+The `Input.Processor` object is defined by the `kemux.data.io.input.InputProcessor` class
 and is used to defined the name of the input Kafka topic and the method used to read (here: *ingest*) messages from the topic.
 
-The name of the input Kafka topic **must be** defined by the `topic` attribute of the `Input.IO` object.
+The name of the input Kafka topic **must be** defined by the `topic` attribute of the `Input.Processor` object.
 
-For the ingestation method, the `Input.IO` object must define a `ingest`. This method accepts the message read from the input Kafka topic, represented as a `dict` object, and returns the input data, represented as a `dict` object.
+For the ingestation method, the `Input.Processor` object must define a `ingest`. This method accepts the message read from the input Kafka topic, represented as a `dict` object, and returns the input data, represented as a `dict` object.
 
 **Important note**: the actual data is contained under the fields **without** the `_` (underscore) prefix and suffix.
 
 This decoration is only used internally by Kemux to construct appropiate `faust.Record` objects for Kafka topic handlers.
 
-An example of `Input.IO` object is given below:
+An example of `Input.Processor` object is given below:
 
 ```python
 @dataclasses.dataclass
-class IO(kemux.data.io.input.StreamInput):
+class Processor(kemux.data.io.input.InputProcessor):
     topic: str = "input-topic"
 
     def ingest(self, message: dict) -> dict:
@@ -112,7 +112,7 @@ class IO(kemux.data.io.input.StreamInput):
 
 This, of course, can also be treated as a hook, used to communicate with external services, such as databases, before returning the input data.
 
-Combinining the `Input.Schema` and `Input.IO` objects, the `Input` object is defined as follows:
+Combinining the `Input.Schema` and `Input.Processor` objects, the `Input` object is defined as follows:
 
 ```python
 class Input:
@@ -128,7 +128,7 @@ class Input:
             return True
 
     @dataclasses.dataclass
-    class IO(kemux.data.io.input.StreamInput):
+    class Processor(kemux.data.io.input.InputProcessor):
         topic: str = "input-topic"
 
         def ingest(self, message: dict) -> dict:
@@ -138,7 +138,7 @@ class Input:
 
 ### Outputs
 
-The `Outputs` object is defined by a group of output subclasses, where each one possses a structure similar to the `Input` class, by the `Output.Schema` and `Output.IO` objects.
+The `Outputs` object is defined by a group of output subclasses, where each one possses a structure similar to the `Input` class, by the `Output.Schema` and `Output.Processor` objects.
 
 First, a structure of an output subclass will be discussed.
 
@@ -165,13 +165,13 @@ Field corresponding to keys present in the output data are prefixed and suffixed
 
 Similarly to the `Input.Schema` class, when refering to the actual data withing the messages, the `_` (underscore) prefix and suffix is **not to be used**.
 
-#### Output.IO
+#### Output.Processor
 
-The `Output.IO` object is defined by the `kemux.data.io.output.StreamOutput` class. This class must define the name of the output Kafka topic and the method used to filter and route the incoming messages, as follows:
+The `Output.Processor` object is defined by the `kemux.data.io.output.OutputProcessor` class. This class must define the name of the output Kafka topic and the method used to filter and route the incoming messages, as follows:
 
 ```python
 @dataclasses.dataclass
-class IO(kemux.data.io.output.StreamOutput):
+class Processor(kemux.data.io.output.OutputProcessor):
     topic: str = "output-topic"
 
     def filter(self, message: dict) -> None:
@@ -180,7 +180,7 @@ class IO(kemux.data.io.output.StreamOutput):
 
 The `filter` method is used to filter the incoming messages, based on the input data schema, and route them to the correct output Kafka topic.
 
-Combining the `Output.Schema` and `Output.IO` objects, the `Output` object is defined as follows:
+Combining the `Output.Schema` and `Output.Processor` objects, the `Output` object is defined as follows:
 
 ```python
 class OutputTopic1:
@@ -194,7 +194,7 @@ class OutputTopic1:
             return message
 
     @dataclasses.dataclass
-    class IO(kemux.data.io.output.StreamOutput):
+    class Processor(kemux.data.io.output.OutputProcessor):
         topic: str = "output-topic-1"
 
         def filter(self, message: dict) -> None:
@@ -237,7 +237,7 @@ class Input:
             return True
 
     @dataclasses.dataclass
-    class IO(kemux.data.io.input.StreamInput):
+    class Processor(kemux.data.io.input.InputProcessor):
         topic: str = "input-topic"
 
         def ingest(self, message: dict) -> dict:
@@ -256,7 +256,7 @@ class Outputs:
                 return message
 
         @dataclasses.dataclass
-        class IO(kemux.data.io.output.StreamOutput):
+        class Processor(kemux.data.io.output.OutputProcessor):
             topic: str = "output-topic-1"
 
             def filter(self, message: dict) -> None:
@@ -273,7 +273,7 @@ class Outputs:
                 return message
 
         @dataclasses.dataclass
-        class IO(kemux.data.io.output.StreamOutput):
+        class Processor(kemux.data.io.output.OutputProcessor):
             topic: str = "output-topic-2"
 
             def filter(self, message: dict) -> None:

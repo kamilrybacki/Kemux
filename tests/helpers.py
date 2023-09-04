@@ -12,9 +12,9 @@ def get_splitter_output_topics() -> list[str]:
         topic
         for sublist in [
             [
-                output.IO.topic
+                output.Processor.topic
                 for output in stream.Outputs.__dict__.values()
-                if hasattr(output, 'IO') and hasattr(output, 'Schema')
+                if hasattr(output, 'Processor') and hasattr(output, 'Schema')
             ]
             for stream in [
                 streams.primary,
@@ -47,5 +47,5 @@ def get_filtering_function_for_topic(topic: str) -> typing.Callable[[dict], bool
 
     return getattr(
         outputs_class,
-        'IO',
+        'Processor',
     ).filter

@@ -67,7 +67,7 @@ def topics() -> set[str]:
     }
     return {*map(
         lambda output_class:
-            output_class.IO.topic,
+            output_class.Processor.topic,
         [
             *filter(
                 lambda output_class_field:
