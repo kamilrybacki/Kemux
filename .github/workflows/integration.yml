@@ -1,6 +1,12 @@
 name: Integration tests
 run-name: Integration tests 🩺 using Dockerized 🐋 Kemux and Kafka 📨
-on: [push]
+on:
+  push:
+    branches-ignore:
+      - main
+      - 'release/*'
+    tags-ignore:
+      - '**'
 concurrency:
   group: ${{ github.ref }}-it
   cancel-in-progress: true

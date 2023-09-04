@@ -1,6 +1,12 @@
 name: Code linting
 run-name: Python 🐍 code linting and type checking 🔍
-on: ["push"]
+on:
+  push:
+    branches-ignore:
+      - main
+      - 'release/*'
+    tags-ignore:
+      - '**'
 concurrency:
   group: ${{ github.ref }}-linting
   cancel-in-progress: true
