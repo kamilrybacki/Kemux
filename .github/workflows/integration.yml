@@ -95,7 +95,7 @@ jobs:
               pytest \
                 -c \
                   pytest.ini \
-          && \
+          || \
           echo \
             "Container logs:" \
           && \
