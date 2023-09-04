@@ -1,7 +1,7 @@
 import dataclasses
 
-import kemux.data.io.input
-import kemux.data.io.output
+import kemux.data.processor.input
+import kemux.data.processor.output
 import kemux.data.schema.input
 import kemux.data.schema.output
 
@@ -23,7 +23,7 @@ class Input:
                 raise ValueError(f'Invalid value: {value}')
 
     @dataclasses.dataclass
-    class IO(kemux.data.io.input.StreamInput):
+    class Processor(kemux.data.processor.input.InputProcessor):
         topic = 'spooky'
 
         @staticmethod
@@ -43,7 +43,7 @@ class Outputs:
                 return message
 
         @dataclasses.dataclass
-        class IO(kemux.data.io.output.StreamOutput):
+        class Processor(kemux.data.processor.output.OutputProcessor):
             topic = 'very-spooky'
 
             @staticmethod

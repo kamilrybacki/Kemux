@@ -8,12 +8,12 @@ import kemux.data.schema.base
 import kemux.data.schema.input
 
 
-class OutputRecordT(kemux.data.schema.base.SchemaBase):
+class OutputRecordT(kemux.data.schema.base.Schema):
     pass
 
 
 @dataclasses.dataclass
-class OutputSchema(kemux.data.schema.base.SchemaBase):
+class OutputSchema(kemux.data.schema.base.Schema):
     @staticmethod
     def transform(message: dict) -> dict:
         raise NotImplementedError(f'{__name__}.transform() must be implemented!')

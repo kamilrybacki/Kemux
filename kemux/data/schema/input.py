@@ -16,7 +16,7 @@ class InputRecordT(kemux.data.schema.base.StreamRecordT):
 
 # pylint: disable=protected-access
 @dataclasses.dataclass
-class InputSchema(kemux.data.schema.base.SchemaBase):
+class InputSchema(kemux.data.schema.base.Schema):
     @classmethod
     def construct_input_record_class(cls) -> None:
         class InputRecord(

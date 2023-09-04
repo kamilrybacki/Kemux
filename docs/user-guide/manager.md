@@ -3,7 +3,7 @@
 Kemux streams can be defined in two ways:
 
 1. Statically, as standalone Python scripts, adhering to the class-based structure [shown previously](streams.md#combining-io-into-a-stream).
-2. Programatically, by defining `IO` and `Schema` subclasses for each of the new streams inputs and outputs.
+2. Programatically, by defining `Processor` and `Schema` subclasses for each of the new streams inputs and outputs.
 
 Both of these methods are a part of the `kemux.manager.Manager` class, which is responsible for loading and running the streams.
 
@@ -30,7 +30,7 @@ To load streams programatically, the `add_stream` method can be used. It takes t
 - (*required*) `stream_input_class`: The input of the stream, defined similarly to the way it is done in standalone [stream scripts](streams.md#input) file.
 - (*required*) `stream_outputs_class`: The output of the stream, defined similarly to the way it is done in standalone [stream scripts](streams.md#output) file.
 
-**Remember**: Each input/output need to have `IO` and `Schema` sublasses defined.
+**Remember**: Each input/output need to have `Processor` and `Schema` sublasses defined.
 
 ### Running streams
 

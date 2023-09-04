@@ -1,7 +1,7 @@
 """
 base.py
 
-Base class for IO classes.
+Base class for Processor classes.
 """
 
 import dataclasses
@@ -14,11 +14,11 @@ import kemux.data.schema.base
 
 
 @dataclasses.dataclass
-class IOBase:
+class Processor:
     """
-    IOBase Class
+    Processor base Class
 
-    Provides a common interface for IO classes to read and write data to or from Kafka topics.
+    Provides a common interface for Processor classes to read and write data to or from Kafka topics.
 
     Attributes:
         topic (str): The Kafka topic to read and write data to or from.
@@ -28,7 +28,7 @@ class IOBase:
     """
 
     topic: str = dataclasses.field(init=False)
-    schema: kemux.data.schema.base.SchemaBase = dataclasses.field(init=False)
+    schema: kemux.data.schema.base.Schema = dataclasses.field(init=False)
     logger: logging.Logger = dataclasses.field(
         init=False,
         default=logging.getLogger(__name__)
@@ -46,7 +46,7 @@ class IOBase:
         Returns:
             None
         """
-        schema: kemux.data.schema.base.SchemaBase = cls.schema
+        schema: kemux.data.schema.base.Schema = cls.schema
         cls.logger.info(f'Handler schema for {cls.topic}: {schema.record_class.__annotations__}')
         cls.topic_handler = app.topic(
             cls.topic,

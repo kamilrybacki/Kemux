@@ -6,14 +6,14 @@ Base class for stream input classes.
 
 import dataclasses
 
-import kemux.data.io.base
+import kemux.data.processor.base
 import kemux.data.schema.input
 
 
 @dataclasses.dataclass
-class StreamInput(kemux.data.io.base.IOBase):
+class InputProcessor(kemux.data.processor.base.Processor):
     """
-    StreamInput Class
+    InputProcessor Class
 
     Provides a common interface for stream input classes to read data from Kafka topic.
     """

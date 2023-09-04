@@ -3,16 +3,16 @@ import logging
 
 import faust.types
 
-import kemux.data.io.input
-import kemux.data.io.output
+import kemux.data.processor.input
+import kemux.data.processor.output
 import kemux.data.schema.input
 import kemux.data.schema.output
 
 
 @dataclasses.dataclass
-class StreamBase:
-    input: kemux.data.io.input.StreamInput | None = dataclasses.field(default=None)
-    outputs: dict[str, kemux.data.io.output.StreamOutput] = dataclasses.field(default_factory=dict)
+class Stream:
+    input: kemux.data.processor.input.InputProcessor | None = dataclasses.field(default=None)
+    outputs: dict[str, kemux.data.processor.output.OutputProcessor] = dataclasses.field(default_factory=dict)
     logger: logging.Logger = dataclasses.field(
         init=False,
         default=logging.getLogger(__name__)
@@ -42,7 +42,7 @@ class StreamBase:
 
     def set_input(
         self,
-        stream_input: kemux.data.io.input.StreamInput,
+        stream_input: kemux.data.processor.input.InputProcessor,
         input_schema: kemux.data.schema.input.InputSchema | None = None,
     ) -> None:
         if self.input:
@@ -59,7 +59,7 @@ class StreamBase:
 
     def add_output(
         self,
-        stream_output: kemux.data.io.output.StreamOutput,
+        stream_output: kemux.data.processor.output.OutputProcessor,
         output_schema: kemux.data.schema.output.OutputSchema | None = None,
     ) -> None:
         if output_schema:
@@ -79,7 +79,7 @@ class StreamBase:
         return
 
 
-def order_streams(streams: dict[str, StreamBase]) -> dict[str, StreamBase]:
+def order_streams(streams: dict[str, Stream]) -> dict[str, Stream]:
     ordered_streams = {}
     for stream_info in find_streams_order([
         stream.topics()

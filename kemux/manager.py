@@ -9,9 +9,9 @@ import typing
 import faust
 import faust.types
 
-import kemux.data.io.base
-import kemux.data.io.input
-import kemux.data.io.output
+import kemux.data.processor.base
+import kemux.data.processor.input
+import kemux.data.processor.output
 import kemux.data.schema.base
 import kemux.data.schema.input
 import kemux.data.schema.output
@@ -37,11 +37,11 @@ class Manager:
     __instance: Manager | None = dataclasses.field(init=False, default=None)
 
     @property
-    def streams(self) -> dict[str, kemux.data.stream.StreamBase]:
+    def streams(self) -> dict[str, kemux.data.stream.Stream]:
         return self.__streams
 
     @streams.setter
-    def streams(self, streams: dict[str, kemux.data.stream.StreamBase]) -> None:
+    def streams(self, streams: dict[str, kemux.data.stream.Stream]) -> None:
         self.__streams = kemux.data.stream.order_streams(streams)
 
     @classmethod
@@ -82,7 +82,7 @@ class Manager:
         stream_outputs = kemux.logic.imports.load_outputs(stream_outputs_class)
         self.streams = {
             **self.streams,
-            name: kemux.data.stream.StreamBase(
+            name: kemux.data.stream.Stream(
                 input=stream_input,
                 outputs=stream_outputs,
             )
@@ -121,7 +121,7 @@ class Manager:
             if not input_topics_handler:
                 raise ValueError(f'{stream_name}: invalid {stream_input.topic} input topic handler')
 
-            output: kemux.data.io.output.StreamOutput
+            output: kemux.data.processor.output.OutputProcessor
             for output in stream.outputs.values():
                 output.initialize_handler(self._app)
                 self.logger.info(f'{stream_name}: activating output topic handler: {output.topic}')
@@ -134,7 +134,7 @@ class Manager:
                 self.create_processing_function(stream)
             )
 
-    def create_processing_function(self, stream: kemux.data.stream.StreamBase) -> typing.Callable[[faust.StreamT[kemux.data.schema.input.InputSchema]], typing.Awaitable[None]]:
+    def create_processing_function(self, stream: kemux.data.stream.Stream) -> typing.Callable[[faust.StreamT[kemux.data.schema.input.InputSchema]], typing.Awaitable[None]]:
         async def _process_input_stream_message(events: faust.StreamT[kemux.data.schema.input.InputSchema]) -> None:
             event: faust.types.EventT
             async for event in events.events():

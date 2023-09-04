@@ -7,18 +7,17 @@ Base class for stream output classes.
 import datetime
 import dataclasses
 
-import kemux.data.io.base
+import kemux.data.processor.base
 import kemux.data.schema.input
 import kemux.data.schema.output
 
 
 @dataclasses.dataclass
-class StreamOutput(kemux.data.io.base.IOBase):
+class OutputProcessor(kemux.data.processor.base.Processor):
     """
-    StreamOutput Class
+    OutputProcessor Class
 
     Provides a common interface for stream output classes to write data to Kafka topic.
-
     """
 
     @staticmethod
