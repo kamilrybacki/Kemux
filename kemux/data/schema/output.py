@@ -1,6 +1,4 @@
 """
-output.py
-
 Base class for output schema classes.
 """
 

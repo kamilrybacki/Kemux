@@ -1,6 +1,4 @@
 """
-imports.py
-
 Functions for loading streams (statically or dynamically).
 """
 

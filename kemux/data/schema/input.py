@@ -1,8 +1,7 @@
 # pylint: disable=abstract-method
 """
-input.py
-
 Input schema for Kemux.
+
 This is the schema that is used to validate incoming messages.
 """
 

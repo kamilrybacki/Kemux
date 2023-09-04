@@ -1,5 +1,5 @@
 """
-stream.py
+Stream class definition.
 
 A stream is a collection of input and output processors that are connected
 and ensure that messages are ingested, transformed, and sent to the correct

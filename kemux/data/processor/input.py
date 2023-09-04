@@ -1,6 +1,4 @@
 """
-input.py
-
 Base class for stream input classes.
 """
 

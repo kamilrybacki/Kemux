@@ -1,8 +1,8 @@
 # pylint: disable=consider-using-enumerate
 """
-manager.py
+Manager class for Kemux.
 
-Manager class for Kemux - the main class that is used to initialize and start the Kemux receiver.
+The main class that is used to initialize and start the Kemux receiver.
 """
 
 from __future__ import annotations

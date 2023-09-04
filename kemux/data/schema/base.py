@@ -1,6 +1,4 @@
 """
-base.py
-
 Base class for Schema classes.
 """
 
