@@ -1,4 +1,4 @@
-I# Kemux - Kafka Demultiplexer
+# Kemux - Kafka Demultiplexer
 
 [![Documentation Status](https://readthedocs.org/projects/kemux/badge/?version=latest&style=plastic)](https://kemux.readthedocs.io/en/latest/)
 ![Code linting](https://github.com/kamilrybacki/kemux/actions/workflows/linting.yml/badge.svg)
