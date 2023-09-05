@@ -8,7 +8,7 @@
 
 <img src="docs/assets/images/logo.svg" data-canonical-src="docs/assets/images/logo.svg" width="250"/>
 
-**Kemux** is a Kafka demultiplexer that allows to route messages from one topic to another based on a set of rules.
+**Kemux** is a Kafka [demultiplexer] that allows to route messages from one topic to another based on a set of rules.
 
 ## How it works
 
@@ -47,6 +47,7 @@ Kemux can be deployed as a standalone Docker container. The process is described
 
 For more information about Kemux, please refer to the [documentation].
 
+[demultiplexer]: https://www.electronics-tutorials.ws/combination/comb_3.html
 [Faust]: https://faust.readthedocs.io/en/latest/index.html
 [Docker section]: https://kemux.readthedocs.io/en/latest/user-guide/docker/
 [documentation]: https://kemux.readthedocs.io/en/latest
